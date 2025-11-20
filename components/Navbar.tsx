@@ -33,22 +33,22 @@ export default async function Navbar() {
       </div>
 
       {/* Main Navbar - Modern Design with Yellow Accents */}
-      <nav className="bg-primary-blue shadow-2xl sticky top-0 z-50 border-b-4 border-accent-yellow">
-        <div className="container mx-auto px-3 sm:px-4">
+      <nav className="bg-primary-blue shadow-2xl sticky top-0 z-50 border-b-4 border-accent-yellow w-full">
+        <div className="container mx-auto px-3 sm:px-4 w-full">
           {/* Mobile Layout */}
-          <div className="lg:hidden flex items-center justify-between h-16">
+          <div className="lg:hidden flex items-center justify-between h-16 min-h-[64px]">
             {/* Mobile Menu Button & Logo */}
-            <div className="flex items-center space-x-3 flex-shrink-0">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 min-w-0">
               <NavbarMobile categories={categories} />
-              <Link href="/" className="text-xl font-extrabold text-white drop-shadow-lg hover:text-accent-yellow transition">
+              <Link href="/" className="text-lg sm:text-xl font-extrabold text-white drop-shadow-lg hover:text-accent-yellow transition truncate">
                 New Holland
               </Link>
             </div>
 
-            {/* Mobile Search Icon */}
+            {/* Mobile Search Icon - Hidden on very small screens */}
             <Link
               href="/products"
-              className="p-2.5 text-white hover:text-accent-yellow hover:bg-primary-blue-dark rounded-lg transition-all"
+              className="hidden sm:flex p-2.5 text-white hover:text-accent-yellow hover:bg-primary-blue-dark rounded-lg transition-all flex-shrink-0"
               aria-label="Ara"
             >
               <svg
@@ -67,7 +67,7 @@ export default async function Navbar() {
             </Link>
 
             {/* Mobile Actions */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
               {user ? (
                 <NavbarClient user={user} />
               ) : (

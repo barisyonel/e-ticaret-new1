@@ -36,17 +36,17 @@ export default function NavbarClient({ user }: NavbarClientProps) {
   }, []);
 
   return (
-    <div className="flex items-center gap-2 lg:gap-3">
-      {/* Bildirimler */}
+    <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
+      {/* Bildirimler - Mobile & Desktop */}
       <NotificationBell />
 
-      {/* Karşılaştırma */}
+      {/* Karşılaştırma - Desktop Only */}
       <Link
         href="/compare"
-        className="relative flex items-center justify-center p-2 lg:px-3 lg:py-2 text-white hover:text-accent-yellow transition-all group rounded-lg hover:bg-primary-blue-dark"
+        className="hidden sm:flex relative items-center justify-center p-2 lg:px-3 lg:py-2 text-white hover:text-accent-yellow transition-all group rounded-lg hover:bg-primary-blue-dark"
         title="Ürün Karşılaştırma"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
         </svg>
         <span className="hidden lg:inline lg:ml-2 text-sm font-semibold">Karşılaştır</span>
@@ -57,14 +57,14 @@ export default function NavbarClient({ user }: NavbarClientProps) {
         )}
       </Link>
 
-      {/* Siparişlerim */}
+      {/* Siparişlerim - Desktop Only */}
       <Link
         href="/profile/orders"
-        className="relative flex items-center justify-center p-2 lg:px-3 lg:py-2 text-white hover:text-accent-yellow transition-all group rounded-lg hover:bg-primary-blue-dark"
+        className="hidden sm:flex relative items-center justify-center p-2 lg:px-3 lg:py-2 text-white hover:text-accent-yellow transition-all group rounded-lg hover:bg-primary-blue-dark"
         title="Siparişlerim"
       >
         <svg
-          className="w-5 h-5 lg:w-5 lg:h-5"
+          className="w-5 h-5 sm:w-6 sm:h-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -79,14 +79,14 @@ export default function NavbarClient({ user }: NavbarClientProps) {
         <span className="hidden lg:inline lg:ml-2 text-sm font-semibold">Siparişlerim</span>
       </Link>
 
-      {/* Favorilerim */}
+      {/* Favorilerim - Mobile & Desktop */}
       <Link
         href="/favorites"
         className="relative flex items-center justify-center p-2 lg:px-3 lg:py-2 text-white hover:text-accent-yellow transition-all group rounded-lg hover:bg-primary-blue-dark"
         title="Favorilerim"
       >
         <svg
-          className="w-5 h-5 lg:w-5 lg:h-5"
+          className="w-5 h-5 sm:w-6 sm:h-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -106,14 +106,14 @@ export default function NavbarClient({ user }: NavbarClientProps) {
         )}
       </Link>
 
-      {/* Sepetim */}
+      {/* Sepetim - Mobile & Desktop */}
       <Link
         href="/cart"
         className="relative flex items-center justify-center p-2 lg:px-3 lg:py-2 text-white hover:text-accent-yellow transition-all group rounded-lg hover:bg-primary-blue-dark"
         title="Sepetim"
       >
         <svg
-          className="w-5 h-5 lg:w-5 lg:h-5"
+          className="w-5 h-5 sm:w-6 sm:h-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -128,8 +128,8 @@ export default function NavbarClient({ user }: NavbarClientProps) {
         <span className="hidden lg:inline lg:ml-2 text-sm font-semibold">Sepetim</span>
       </Link>
 
-      {/* User Menu */}
-      <div className="hidden lg:block ml-2">
+      {/* User Menu - Mobile & Desktop */}
+      <div className="ml-1 sm:ml-2">
         <UserMenu userName={user.name} userRole={user.role} />
       </div>
     </div>
