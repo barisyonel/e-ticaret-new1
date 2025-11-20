@@ -69,7 +69,12 @@ export default function MobileMenu({ categories, isOpen, onClose }: MobileMenuPr
           {/* Categories */}
           <div className="flex-1 overflow-y-auto">
             <div className="p-2">
-              {mainCategories.map((category) => {
+              {mainCategories.length === 0 ? (
+                <div className="p-4 text-center text-gray-500">
+                  <p className="text-sm">Henüz kategori bulunmamaktadır.</p>
+                </div>
+              ) : (
+                mainCategories.map((category) => {
                 const hasChildren = category.children && category.children.length > 0;
                 const isActive = activeCategory === category.id;
 
@@ -140,7 +145,7 @@ export default function MobileMenu({ categories, isOpen, onClose }: MobileMenuPr
                     )}
                   </div>
                 );
-              })}
+              }))}
             </div>
           </div>
 

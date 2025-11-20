@@ -36,7 +36,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
   }, []);
 
   return (
-    <div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
+    <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2 lg:gap-3 min-w-0">
       {/* Bildirimler - Mobile & Desktop */}
       <NotificationBell />
 

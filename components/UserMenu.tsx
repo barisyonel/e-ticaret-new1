@@ -44,7 +44,7 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 text-white hover:text-accent-yellow transition focus:outline-none rounded-lg hover:bg-primary-blue-dark"
       >
-        <span className="font-semibold text-[11px] sm:text-xs md:text-sm truncate max-w-[50px] sm:max-w-[80px] md:max-w-none">{userName}</span>
+        <span className="font-semibold text-[10px] sm:text-xs md:text-sm truncate max-w-[35px] sm:max-w-[60px] md:max-w-none">{userName}</span>
         <svg
           className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"

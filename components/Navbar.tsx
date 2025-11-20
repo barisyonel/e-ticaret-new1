@@ -67,7 +67,7 @@ export default async function Navbar() {
             </Link>
 
             {/* Mobile Actions */}
-            <div className="flex items-center space-x-0.5 sm:space-x-1 flex-shrink-0">
+            <div className="flex items-center space-x-0.5 sm:space-x-1 flex-shrink-0 min-w-0">
               {user ? (
                 <NavbarClient user={user} />
               ) : (
