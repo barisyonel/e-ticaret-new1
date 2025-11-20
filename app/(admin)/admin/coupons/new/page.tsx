@@ -2,6 +2,8 @@ import { requireUser } from '@/lib/requireUser';
 import Link from 'next/link';
 import CouponForm from '../CouponForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewCouponPage() {
   await requireUser('ADMIN');
 

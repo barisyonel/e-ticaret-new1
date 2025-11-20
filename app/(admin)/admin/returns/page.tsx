@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { formatDateToTurkey } from '@/lib/utils/dateFormatter';
 import ReturnList from './ReturnList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminReturnsPage() {
   await requireUser('ADMIN');
 

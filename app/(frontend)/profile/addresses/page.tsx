@@ -3,6 +3,8 @@ import { getUserAddresses } from '@/app/server-actions/addressActions';
 import Link from 'next/link';
 import AddressList from './AddressList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AddressesPage() {
   const user = await requireUser();
 

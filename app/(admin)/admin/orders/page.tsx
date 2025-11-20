@@ -2,6 +2,8 @@ import { getAllOrders } from '@/app/server-actions/orderActions';
 import Link from 'next/link';
 import { formatDateToTurkeyShort } from '@/lib/utils/dateFormatter';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminOrdersPage() {
   const result = await getAllOrders();
 

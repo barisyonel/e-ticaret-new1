@@ -2,6 +2,8 @@ import { requireUser } from '@/lib/requireUser';
 import { getUserNotifications } from '@/app/server-actions/notificationActions';
 import NotificationList from './NotificationList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function NotificationsPage() {
   const user = await requireUser();
   

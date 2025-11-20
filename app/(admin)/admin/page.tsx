@@ -4,6 +4,8 @@ import { ProductRepository } from '@/lib/repositories/ProductRepository';
 import { CategoryRepository } from '@/lib/repositories/CategoryRepository';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboard() {
   const statsResult = await getDashboardStats();
   const stats = statsResult.success && statsResult.data ? statsResult.data : null;

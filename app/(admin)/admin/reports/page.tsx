@@ -3,6 +3,8 @@ import { getSalesReport, getProductSalesReport } from '@/app/server-actions/repo
 import { formatDateToTurkeyShort } from '@/lib/utils/dateFormatter';
 import ReportsForm from './ReportsForm';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   searchParams: Promise<{
     startDate?: string;

@@ -2,6 +2,8 @@ import { requireUser } from '@/lib/requireUser';
 import Link from 'next/link';
 import AddressForm from '../AddressForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewAddressPage() {
   await requireUser();
 

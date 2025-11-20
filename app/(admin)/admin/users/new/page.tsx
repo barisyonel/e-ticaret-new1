@@ -2,6 +2,8 @@ import { requireUser } from '@/lib/requireUser';
 import Link from 'next/link';
 import CreateUserForm from './CreateUserForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CreateUserPage() {
   await requireUser('ADMIN');
 

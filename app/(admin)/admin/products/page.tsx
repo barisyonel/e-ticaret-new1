@@ -5,6 +5,8 @@ import Image from 'next/image';
 import DeleteProductButton from './DeleteProductButton';
 import ToggleProductActiveButton from './ToggleProductActiveButton';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminProductsPage() {
   try {
     // Admin can see all products (including inactive)

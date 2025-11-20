@@ -3,6 +3,8 @@ import { getAllReviews } from '@/app/server-actions/reviewActions';
 import { formatDateToTurkey } from '@/lib/utils/dateFormatter';
 import ReviewList from './ReviewList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminReviewsPage() {
   await requireUser('ADMIN');
 

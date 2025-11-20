@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { formatDateToTurkey } from '@/lib/utils/dateFormatter';
 import { getOrdersForUser } from '@/lib/services/userOrders';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
   const user = await requireUser();
 

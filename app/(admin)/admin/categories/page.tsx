@@ -2,6 +2,8 @@ import { getCategoryTree } from '@/app/server-actions/categoryActions';
 import Link from 'next/link';
 import CategoryRow from './CategoryRow';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCategoriesPage() {
   try {
     // Get category tree (hierarchical structure)

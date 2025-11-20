@@ -5,6 +5,8 @@ import ProductImageGallery from './ProductImageGallery';
 import ProductDetailInfo from './ProductDetailInfo';
 import ProductReviews from './ProductReviews';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProductDetailPage({
   params,
 }: {

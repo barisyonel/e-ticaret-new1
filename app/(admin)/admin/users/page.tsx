@@ -5,6 +5,8 @@ import Link from 'next/link';
 import UpdateUserRoleButton from './UpdateUserRoleButton';
 import DeleteUserButton from './DeleteUserButton';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminUsersPage() {
   const usersResult = await getAllUsers();
   const users = usersResult.success && usersResult.data ? usersResult.data : [];

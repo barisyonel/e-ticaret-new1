@@ -3,6 +3,8 @@ import Link from 'next/link';
 import DeleteAttributeButton from './DeleteAttributeButton';
 import ToggleAttributeActiveButton from './ToggleAttributeActiveButton';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminAttributesPage() {
   try {
     const result = await getAllAttributes(true);

@@ -2,6 +2,8 @@ import { getCategoryTree } from '@/app/server-actions/categoryActions';
 import Link from 'next/link';
 import CategoryForm from './CategoryForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewCategoryPage() {
   // Load categories for parent selection (server-side)
   const result = await getCategoryTree(true); // Include inactive for admin

@@ -4,6 +4,8 @@ import { getAllCoupons } from '@/app/server-actions/couponActions';
 import Link from 'next/link';
 import CouponForm from '../../CouponForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditCouponPage({
   params,
 }: {

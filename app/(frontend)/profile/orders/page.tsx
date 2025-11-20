@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { formatDateToTurkey } from '@/lib/utils/dateFormatter';
 import { getOrdersForUser } from '@/lib/services/userOrders';
 
+export const dynamic = 'force-dynamic';
+
 export default async function OrdersPage() {
   const user = await requireUser();
 
