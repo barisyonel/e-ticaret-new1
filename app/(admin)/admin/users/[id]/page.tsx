@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { formatDateToTurkey } from '@/lib/utils/dateFormatter';
 import { UserRole } from '@/lib/types/UserRole';
 
+export const dynamic = 'force-dynamic';
+
 export default async function UserDetailPage({
   params,
 }: {

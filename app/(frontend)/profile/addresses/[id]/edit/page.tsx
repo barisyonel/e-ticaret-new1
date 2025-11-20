@@ -4,6 +4,8 @@ import { getUserAddresses } from '@/app/server-actions/addressActions';
 import Link from 'next/link';
 import AddressForm from './AddressForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditAddressPage({
   params,
 }: {

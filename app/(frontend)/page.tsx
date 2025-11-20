@@ -4,6 +4,8 @@ import ProductCard from '@/components/ProductCard';
 import { ProductGridSkeleton } from '@/components/SkeletonLoader';
 import { Suspense } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   // Get first 8 products for homepage
   const productsResult = await getAllProducts();

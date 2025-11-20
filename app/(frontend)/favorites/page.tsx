@@ -3,6 +3,8 @@ import { requireUser } from '@/lib/requireUser';
 import { redirect } from 'next/navigation';
 import FavoritesClient from './FavoritesClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function FavoritesPage() {
   try {
     await requireUser('USER');

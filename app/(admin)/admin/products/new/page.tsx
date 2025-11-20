@@ -3,6 +3,8 @@ import { getAllAttributesWithValues } from '@/app/server-actions/attributeAction
 import Link from 'next/link';
 import ProductForm from './ProductForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewProductPage() {
   // Load categories and attributes for selection (server-side)
   const [categoriesResult, attributesResult] = await Promise.all([

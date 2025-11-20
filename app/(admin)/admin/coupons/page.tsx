@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { formatDateToTurkey } from '@/lib/utils/dateFormatter';
 import CouponList from './CouponList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCouponsPage() {
   await requireUser('ADMIN');
 

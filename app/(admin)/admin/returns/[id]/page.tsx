@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { formatDateToTurkey } from '@/lib/utils/dateFormatter';
 import ReturnStatusUpdateForm from './ReturnStatusUpdateForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ReturnDetailPage({
   params,
 }: {

@@ -6,6 +6,8 @@ import UserOrderStatusTimeline from './UserOrderStatusTimeline';
 import CancelOrderButton from './CancelOrderButton';
 import { formatDateToTurkey, formatDateToTurkeyShort } from '@/lib/utils/dateFormatter';
 
+export const dynamic = 'force-dynamic';
+
 export default async function OrderDetailPage({
   params,
 }: {

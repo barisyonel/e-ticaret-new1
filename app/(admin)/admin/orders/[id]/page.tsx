@@ -9,6 +9,8 @@ import OrderStatusTimeline from './OrderStatusTimeline';
 import CancelOrderButton from './CancelOrderButton';
 import { formatDateToTurkey, formatDateToTurkeyShort } from '@/lib/utils/dateFormatter';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: {
     id: string;
