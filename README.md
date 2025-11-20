@@ -1,4 +1,4 @@
-# 💅 Aura Güzellik Merkezi
+#  NewHolland Merkezi
 
 Modern ve kullanıcı dostu güzellik salonu web sitesi ve yönetim sistemi.
 
@@ -198,3 +198,4 @@ Bu proje [MIT](LICENSE) lisansı altında lisanslanmıştır.
 ---
 
 ⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
+
