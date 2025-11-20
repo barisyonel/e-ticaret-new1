@@ -264,6 +264,10 @@ export class CouponRepository {
       }
     );
 
+    if (!result || !result.id) {
+      throw new Error('Coupon oluşturulamadı');
+    }
+
     const coupon = await this.findById(result.id);
     if (!coupon) {
       throw new Error('Coupon oluşturulamadı');
