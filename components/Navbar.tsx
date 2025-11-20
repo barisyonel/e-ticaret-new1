@@ -33,14 +33,14 @@ export default async function Navbar() {
       </div>
 
       {/* Main Navbar - Modern Design with Yellow Accents */}
-      <nav className="bg-primary-blue shadow-2xl sticky top-0 z-50 border-b-4 border-accent-yellow w-full">
+      <nav className="bg-primary-blue shadow-2xl sticky top-0 z-[60] border-b-4 border-accent-yellow w-full">
         <div className="container mx-auto px-3 sm:px-4 w-full">
           {/* Mobile Layout */}
-          <div className="lg:hidden flex items-center justify-between h-16 min-h-[64px]">
+          <div className="lg:hidden flex items-center justify-between h-16 min-h-[64px] w-full overflow-hidden">
             {/* Mobile Menu Button & Logo */}
-            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 min-w-0">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 min-w-0 flex-1">
               <NavbarMobile categories={categories} />
-              <Link href="/" className="text-lg sm:text-xl font-extrabold text-white drop-shadow-lg hover:text-accent-yellow transition truncate">
+              <Link href="/" className="text-base sm:text-lg md:text-xl font-extrabold text-white drop-shadow-lg hover:text-accent-yellow transition truncate">
                 New Holland
               </Link>
             </div>
@@ -48,11 +48,11 @@ export default async function Navbar() {
             {/* Mobile Search Icon - Hidden on very small screens */}
             <Link
               href="/products"
-              className="hidden sm:flex p-2.5 text-white hover:text-accent-yellow hover:bg-primary-blue-dark rounded-lg transition-all flex-shrink-0"
+              className="hidden sm:flex p-2 text-white hover:text-accent-yellow hover:bg-primary-blue-dark rounded-lg transition-all flex-shrink-0"
               aria-label="Ara"
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5 sm:w-6 sm:h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -67,7 +67,7 @@ export default async function Navbar() {
             </Link>
 
             {/* Mobile Actions */}
-            <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+            <div className="flex items-center space-x-0.5 sm:space-x-1 flex-shrink-0">
               {user ? (
                 <NavbarClient user={user} />
               ) : (
