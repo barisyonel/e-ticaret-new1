@@ -436,11 +436,22 @@ export async function getUserOrders(isForAdmin: boolean = false, userIdOverride?
       };
     }
 
-    const ordersWithItems = await getOrdersForUser(targetUserId);
+    const orders = await OrderRepository.findByUserId(targetUserId);
     
+    // Fetch items for each order
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const orderWithItems = await OrderRepository.findById(order.id);
+        return orderWithItems ? {
+          ...orderWithItems,
+          shippingAddress: OrderRepository.parseShippingAddress(orderWithItems.shippingAddressJson),
+        } : null;
+      })
+    );
+
     return {
       success: true,
-      data: ordersWithItems,
+      data: ordersWithItems.filter(order => order !== null),
     };
   } catch (error) {
     console.error('Get user orders error:', error);
