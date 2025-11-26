@@ -24,7 +24,7 @@ export interface Order {
   updatedAt: Date;
   confirmedAt: Date | null;
   paymentStatus?: string | null;
-  iyzicoPaymentId?: string | null;
+  paymentId?: string | null;
   paymentErrorMessage?: string | null;
 }
 
@@ -73,7 +73,7 @@ export class OrderRepository {
         `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                 tracking_number as trackingNumber,
                 payment_status as paymentStatus,
-                iyzico_payment_id as iyzicoPaymentId,
+                payment_id as paymentId,
                 payment_error_message as paymentErrorMessage,
                 CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                 CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
@@ -88,7 +88,7 @@ export class OrderRepository {
           `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                   tracking_number as trackingNumber,
                   payment_status as paymentStatus,
-                  iyzico_payment_id as iyzicoPaymentId,
+                  payment_id as paymentId,
                   payment_error_message as paymentErrorMessage,
                   CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                   CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
@@ -144,7 +144,7 @@ export class OrderRepository {
         `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                 tracking_number as trackingNumber,
                 payment_status as paymentStatus,
-                iyzico_payment_id as iyzicoPaymentId,
+                payment_id as paymentId,
                 payment_error_message as paymentErrorMessage,
                 CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                 CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
@@ -160,7 +160,7 @@ export class OrderRepository {
           `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                   tracking_number as trackingNumber,
                   payment_status as paymentStatus,
-                  iyzico_payment_id as iyzicoPaymentId,
+                  payment_id as paymentId,
                   payment_error_message as paymentErrorMessage,
                   CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                   CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
@@ -197,7 +197,7 @@ export class OrderRepository {
         `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                 tracking_number as trackingNumber,
                 payment_status as paymentStatus,
-                iyzico_payment_id as iyzicoPaymentId,
+                payment_id as paymentId,
                 payment_error_message as paymentErrorMessage,
                 CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                 CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
@@ -212,7 +212,7 @@ export class OrderRepository {
           `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                   tracking_number as trackingNumber,
                   payment_status as paymentStatus,
-                  iyzico_payment_id as iyzicoPaymentId,
+                  payment_id as paymentId,
                   payment_error_message as paymentErrorMessage,
                   CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                   CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,

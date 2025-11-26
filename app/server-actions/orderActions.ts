@@ -15,7 +15,6 @@ import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '@/lib/em
 import { createNotification } from './notificationActions';
 import { CouponRepository } from '@/lib/repositories/CouponRepository';
 import { getOrdersForUser } from '@/lib/services/userOrders';
-import { createPayment, CreatePaymentRequest } from '@/lib/services/iyzico';
 
 // Validation schema
 const shippingAddressSchema = z.object({
@@ -370,82 +369,20 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       };
     });
 
-    // Process payment with iyzico
-    let paymentResult;
-    let paymentStatus = 'PENDING';
-    let iyzicoPaymentId: string | null = null;
+    // Simulate payment processing (İyzico API will be integrated later)
+    let paymentStatus = 'SUCCESS'; // Simulate successful payment for now
+    let paymentId: string | null = `PAY-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     let paymentErrorMessage: string | null = null;
 
     try {
-      // Prepare card info
-      const cardNumberDigits = validatedPayment.cardNumber.replace(/\D/g, '');
-      const expiryParts = validatedPayment.expiryDate.split('/');
-      const expiryMonth = expiryParts[0];
-      const expiryYear = '20' + expiryParts[1];
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Prepare buyer name
-      const nameParts = validatedAddress.fullName.trim().split(' ');
-      const buyerName = nameParts[0] || validatedAddress.fullName;
-      const buyerSurname = nameParts.slice(1).join(' ') || buyerName;
+      // For demo purposes, assume payment is always successful
+      // TODO: Integrate with İyzico API when ready
+      console.log('Payment simulation completed for order:', order.id);
 
-      // Get user email
-      const userData = await UserRepository.findById(order.userId);
-      const userEmail = userData?.email || `${user.id}@temp.com`;
-
-      // Prepare iyzico payment request
-      const paymentRequest: CreatePaymentRequest = {
-        price: total.toFixed(2),
-        paidPrice: total.toFixed(2),
-        currency: 'TRY',
-        basketId: `BASKET-${order.id}`,
-        paymentCard: {
-          cardHolderName: validatedPayment.cardHolder.toUpperCase(),
-          cardNumber: cardNumberDigits,
-          expireMonth: expiryMonth,
-          expireYear: expiryYear,
-          cvc: validatedPayment.cvc,
-        },
-        buyer: {
-          id: user.id.toString(),
-          name: buyerName,
-          surname: buyerSurname,
-          gsmNumber: validatedAddress.phone.replace(/\D/g, ''),
-          email: userEmail,
-          registrationAddress: validatedAddress.address,
-          city: validatedAddress.city,
-          country: validatedAddress.country,
-          zipCode: validatedAddress.postalCode,
-        },
-        shippingAddress: {
-          contactName: validatedAddress.fullName,
-          city: validatedAddress.city,
-          country: validatedAddress.country,
-          address: validatedAddress.address,
-          zipCode: validatedAddress.postalCode,
-        },
-        billingAddress: {
-          contactName: validatedAddress.fullName,
-          city: validatedAddress.city,
-          country: validatedAddress.country,
-          address: validatedAddress.address,
-          zipCode: validatedAddress.postalCode,
-        },
-        basketItems: orderItems.map((item, index) => ({
-          id: `ITEM-${order.id}-${index}`,
-          name: item.nameSnapshot,
-          category1: 'Product',
-          itemType: 'PHYSICAL',
-          price: (item.priceSnapshot * item.quantity).toFixed(2),
-        })),
-      };
-
-      // Process payment
-      paymentResult = await createPayment(paymentRequest);
-
-      if (paymentResult.status === 'success') {
-        paymentStatus = 'SUCCESS';
-        iyzicoPaymentId = paymentResult.paymentId || null;
-
+      if (paymentStatus === 'SUCCESS') {
         // Update order status to CONFIRMED
         await OrderRepository.updateStatus(order.id, OrderStatus.CONFIRMED);
 
@@ -453,18 +390,18 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
         await executeNonQuery(
           `UPDATE orders 
            SET payment_status = @paymentStatus, 
-               iyzico_payment_id = @iyzicoPaymentId,
+               payment_id = @paymentId,
                updated_at = GETDATE()
            WHERE id = @orderId`,
           {
             orderId: order.id,
             paymentStatus,
-            iyzicoPaymentId,
+            paymentId,
           }
         );
       } else {
         paymentStatus = 'FAILED';
-        paymentErrorMessage = paymentResult.errorMessage || 'Ödeme işlemi başarısız';
+        paymentErrorMessage = 'Ödeme işlemi başarısız';
 
         // Update payment info in order
         await executeNonQuery(
