@@ -39,13 +39,15 @@ export async function getCartItems() {
   try {
     const user = await getOptionalUser();
     
-    let items;
-    if (user) {
-      items = await CartRepository.findByUserId(user.id);
-    } else {
-      const sessionId = await getSessionId();
-      items = await CartRepository.findBySessionId(sessionId);
+    // If user is not logged in, return empty cart
+    if (!user) {
+      return {
+        success: true,
+        data: [],
+      };
     }
+
+    const items = await CartRepository.findByUserId(user.id);
 
     // Format items with product data
     const formattedItems = items.map(item => ({
@@ -78,6 +80,15 @@ export async function getCartItems() {
  */
 export async function addToCart(productId: number, quantity: number = 1): Promise<ActionResponse> {
   try {
+    // Check if user is logged in - REQUIRED for adding to cart
+    const user = await getOptionalUser();
+    if (!user) {
+      return {
+        success: false,
+        error: 'LOGIN_REQUIRED',
+      };
+    }
+
     // Validate quantity
     if (quantity < 1) {
       return {
@@ -102,16 +113,9 @@ export async function addToCart(productId: number, quantity: number = 1): Promis
       };
     }
 
-    const user = await getOptionalUser();
-    let sessionId: string | null = null;
-
-    if (!user) {
-      sessionId = await getSessionId();
-    }
-
     const existingItem = await CartRepository.findByUserAndProduct(
-      user ? user.id : null,
-      sessionId,
+      user.id,
+      null,
       productId
     );
 
@@ -124,19 +128,11 @@ export async function addToCart(productId: number, quantity: number = 1): Promis
       };
     }
 
-    if (user) {
-      await CartRepository.addItem({
-        userId: user.id,
-        productId,
-        quantity,
-      });
-    } else {
-      await CartRepository.addItem({
-        sessionId,
-        productId,
-        quantity,
-      });
-    }
+    await CartRepository.addItem({
+      userId: user.id,
+      productId,
+      quantity,
+    });
 
     return {
       success: true,

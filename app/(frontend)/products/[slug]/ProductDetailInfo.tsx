@@ -52,9 +52,13 @@ export default function ProductDetailInfo({ product, rating }: ProductDetailInfo
       await addItem(product.id, quantity);
       showToast(`${product.name} sepete eklendi!`, 'success');
       setQuantity(1);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding to cart:', error);
-      showToast('Sepete eklenirken bir hata oluştu', 'error');
+      // Don't show error toast here - CartContext handles login redirect
+      // Only show toast for other errors
+      if (error.message && !error.message.includes('LOGIN_REQUIRED')) {
+        showToast(error.message || 'Sepete eklenirken bir hata oluştu', 'error');
+      }
     } finally {
       setIsAdding(false);
     }
