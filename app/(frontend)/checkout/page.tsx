@@ -387,7 +387,7 @@ export default function CheckoutPage() {
                     <p className="text-sm text-blue-800">
                       🔒 Ödeme bilgileriniz güvenli ödeme altyapısı ile işlenmektedir. Kart bilgileriniz saklanmaz.
                     </p>
-                    <img src="/iyzico-logo-pack/checkout_iyzico_ile_ode/TR/Tr_Colored/iyzico_ile_ode_colored.svg" alt="iyzico ile Öde" className="h-8" />
+                    <img src="/iyzico-ile-ode.svg" alt="iyzico ile Öde" className="h-8" />
                   </div>
                 </div>
               </div>

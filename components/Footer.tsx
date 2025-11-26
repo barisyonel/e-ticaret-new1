@@ -50,7 +50,7 @@ export default function Footer() {
               <div className="flex items-center space-x-3">
                 <img src="/visa-logo.svg" alt="Visa" className="h-6" />
                 <img src="/mastercard-logo.svg" alt="MasterCard" className="h-6" />
-                <img src="/iyzico-logo-pack/checkout_iyzico_ile_ode/TR/Tr_Colored/iyzico_ile_ode_colored.svg" alt="iyzico ile Öde" className="h-8" />
+                <img src="/iyzico-ile-ode.svg" alt="iyzico ile Öde" className="h-8" />
               </div>
             </div>
           </div>
