@@ -16,6 +16,7 @@ import { createNotification } from './notificationActions';
 import { CouponRepository } from '@/lib/repositories/CouponRepository';
 import { getOrdersForUser } from '@/lib/services/userOrders';
 import { createPayment, CreatePaymentRequest } from '@/lib/services/iyzico';
+import { NotificationRepository } from '@/lib/repositories/NotificationRepository';
 
 // Validation schema
 const shippingAddressSchema = z.object({
@@ -444,9 +445,15 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
 
         // Update order status to CONFIRMED
         await OrderRepository.updateStatus(order.id, OrderStatus.CONFIRMED);
+        
+        // Create payment success notification
+        await NotificationRepository.createPaymentNotification(user.id, order.id, true);
       } else {
         paymentStatus = 'FAILED';
         paymentErrorMessage = paymentResult.errorMessage || 'Ödeme işlemi başarısız';
+        
+        // Create payment failure notification
+        await NotificationRepository.createPaymentNotification(user.id, order.id, false);
       }
 
       // Update payment info in order
@@ -475,6 +482,9 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       console.error('Payment processing error:', paymentError);
       paymentStatus = 'FAILED';
       paymentErrorMessage = paymentError.message || 'Ödeme işlemi sırasında bir hata oluştu';
+      
+      // Create payment failure notification
+      await NotificationRepository.createPaymentNotification(user.id, order.id, false);
 
       // Update payment info in order
       await executeNonQuery(
@@ -519,15 +529,9 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       console.error('Failed to send order confirmation email:', emailError);
     }
 
-    // Create notification for user
+    // Create order notification for user
     try {
-      await createNotification({
-        userId: order.userId,
-        type: 'ORDER',
-        title: 'Siparişiniz Alındı',
-        message: `Siparişiniz (#${order.id}) başarıyla oluşturuldu. Toplam tutar: ${order.total.toFixed(2)} ₺`,
-        dataJson: { orderId: order.id },
-      });
+      await NotificationRepository.createOrderNotification(user.id, order.id, 'CREATED');
     } catch (notificationError) {
       // Don't fail the order if notification fails
       console.error('Failed to create notification:', notificationError);

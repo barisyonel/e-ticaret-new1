@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/app/server-actions/notificationActions';
+import { getUserNotifications, getUnreadNotificationCount, markNotificationAsRead, markAllNotificationsAsRead } from '@/app/server-actions/notificationActions';
 import { showToast } from './ToastContainer';
 
 export default function NotificationBell() {
@@ -20,10 +20,17 @@ export default function NotificationBell() {
 
   const loadNotifications = async () => {
     try {
-      const result = await getUserNotifications({ limit: 10 });
-      if (result.success && result.data) {
-        setNotifications(result.data.notifications);
-        setUnreadCount(result.data.unreadCount);
+      const [notificationsResult, countResult] = await Promise.all([
+        getUserNotifications(1, 10),
+        getUnreadNotificationCount()
+      ]);
+      
+      if (notificationsResult.success && notificationsResult.data) {
+        setNotifications(notificationsResult.data);
+      }
+      
+      if (countResult.success && countResult.data) {
+        setUnreadCount(countResult.data.count);
       }
     } catch (error) {
       console.error('Error loading notifications:', error);
@@ -36,7 +43,7 @@ export default function NotificationBell() {
       if (result.success) {
         setNotifications(prev =>
           prev.map(n =>
-            n.id === notificationId ? { ...n, isRead: true, readAt: new Date() } : n
+            n.id === notificationId ? { ...n, status: 'read', readAt: new Date() } : n
           )
         );
         setUnreadCount(prev => Math.max(0, prev - 1));
