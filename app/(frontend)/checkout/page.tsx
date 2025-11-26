@@ -299,7 +299,13 @@ export default function CheckoutPage() {
 
               {/* Payment Information */}
               <div className="border-t pt-6 mt-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Ödeme Bilgileri</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">Ödeme Bilgileri</h2>
+                  <div className="flex items-center space-x-2">
+                    <img src="/visa-logo.svg" alt="Visa" className="h-6" />
+                    <img src="/mastercard-logo.svg" alt="MasterCard" className="h-6" />
+                  </div>
+                </div>
 
                 <div className="mb-4">
                   <label htmlFor="cardHolder" className="block text-gray-700 font-medium mb-2">
@@ -377,9 +383,12 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-800">
-                    🔒 Ödeme bilgileriniz güvenli bir şekilde işlenmektedir. Test modunda herhangi bir gerçek ödeme alınmayacaktır.
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-blue-800">
+                      🔒 Ödeme bilgileriniz güvenli ödeme altyapısı ile işlenmektedir. Kart bilgileriniz saklanmaz.
+                    </p>
+                    <img src="/iyzico-logo.svg" alt="iyzico ile Öde" className="h-8" />
+                  </div>
                 </div>
               </div>
 
