@@ -15,7 +15,7 @@ import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '@/lib/em
 import { createNotification } from './notificationActions';
 import { CouponRepository } from '@/lib/repositories/CouponRepository';
 import { getOrdersForUser } from '@/lib/services/userOrders';
-// import { createPayment, CreatePaymentRequest } from '@/lib/services/iyzico'; // Temporarily disabled
+import { createPayment, CreatePaymentRequest } from '@/lib/services/iyzico';
 
 // Validation schema
 const shippingAddressSchema = z.object({
@@ -253,9 +253,9 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       orderRequest.input('shippingAddressJson', sql.NVarChar(sql.MAX), JSON.stringify(validatedAddress));
 
       const orderResult = await orderRequest.query(`
-        INSERT INTO orders (user_id, total, status, shipping_address_json, created_at, updated_at)
+        INSERT INTO orders (user_id, total, status, shipping_address_json, payment_status, created_at, updated_at)
         OUTPUT INSERTED.id
-        VALUES (@userId, @total, @status, @shippingAddressJson, GETDATE(), GETDATE())
+        VALUES (@userId, @total, @status, @shippingAddressJson, 'PENDING', GETDATE(), GETDATE())
       `);
 
       const orderId = orderResult.recordset[0].id;
@@ -367,22 +367,132 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       };
     });
 
-    // For now, simulate successful payment (iyzico integration will be added later)
-    console.log('Processing payment for order:', order.id, 'Total:', total);
+    // Process payment with iyzico
+    let paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED' = 'PENDING';
+    let iyzicoPaymentId: string | null = null;
+    let paymentErrorMessage: string | null = null;
 
-    // Simulate successful payment processing (iyzico integration temporarily disabled)
     try {
-      console.log('Processing payment for order:', order.id, 'Total:', total);
-      
-      // Update order status to CONFIRMED
-      await OrderRepository.updateStatus(order.id, OrderStatus.CONFIRMED);
-      
-      console.log('Order confirmed successfully:', order.id);
-    } catch (error: any) {
-      console.error('Error confirming order:', error);
+      // Prepare card info
+      const cardNumberDigits = validatedPayment.cardNumber.replace(/\D/g, '');
+      const expiryParts = validatedPayment.expiryDate.split('/');
+      const expiryMonth = expiryParts[0];
+      const expiryYear = '20' + expiryParts[1];
+
+      // Prepare buyer name
+      const nameParts = validatedAddress.fullName.trim().split(' ');
+      const buyerName = nameParts[0] || validatedAddress.fullName;
+      const buyerSurname = nameParts.slice(1).join(' ') || buyerName;
+
+      // Get user email
+      const userData = await UserRepository.findById(order.userId);
+      const userEmail = userData?.email || `${user.id}@temp.com`;
+
+      // Prepare iyzico payment request
+      const paymentRequest: CreatePaymentRequest = {
+        price: total.toFixed(2),
+        paidPrice: total.toFixed(2),
+        currency: 'TRY',
+        basketId: `BASKET-${order.id}`,
+        paymentCard: {
+          cardHolderName: validatedPayment.cardHolder.toUpperCase(),
+          cardNumber: cardNumberDigits,
+          expireMonth: expiryMonth,
+          expireYear: expiryYear,
+          cvc: validatedPayment.cvc,
+        },
+        buyer: {
+          id: user.id.toString(),
+          name: buyerName,
+          surname: buyerSurname,
+          gsmNumber: validatedAddress.phone.replace(/\D/g, ''),
+          email: userEmail,
+          registrationAddress: validatedAddress.address,
+          city: validatedAddress.city,
+          country: validatedAddress.country,
+          zipCode: validatedAddress.postalCode,
+        },
+        shippingAddress: {
+          contactName: validatedAddress.fullName,
+          city: validatedAddress.city,
+          country: validatedAddress.country,
+          address: validatedAddress.address,
+          zipCode: validatedAddress.postalCode,
+        },
+        billingAddress: {
+          contactName: validatedAddress.fullName,
+          city: validatedAddress.city,
+          country: validatedAddress.country,
+          address: validatedAddress.address,
+          zipCode: validatedAddress.postalCode,
+        },
+        basketItems: orderItems.map((item, index) => ({
+          id: `ITEM-${order.id}-${index}`,
+          name: item.nameSnapshot,
+          category1: 'Product',
+          itemType: 'PHYSICAL',
+          price: (item.priceSnapshot * item.quantity).toFixed(2),
+        })),
+      };
+
+      // Process payment
+      const paymentResult = await createPayment(paymentRequest);
+
+      if (paymentResult.status === 'success') {
+        paymentStatus = 'SUCCESS';
+        iyzicoPaymentId = paymentResult.paymentId || null;
+
+        // Update order status to CONFIRMED
+        await OrderRepository.updateStatus(order.id, OrderStatus.CONFIRMED);
+      } else {
+        paymentStatus = 'FAILED';
+        paymentErrorMessage = paymentResult.errorMessage || 'Ödeme işlemi başarısız';
+      }
+
+      // Update payment info in order
+      await executeNonQuery(
+        `UPDATE orders 
+         SET payment_status = @paymentStatus, 
+             iyzico_payment_id = @iyzicoPaymentId,
+             payment_error_message = @paymentErrorMessage,
+             updated_at = GETDATE()
+         WHERE id = @orderId`,
+        {
+          orderId: order.id,
+          paymentStatus,
+          iyzicoPaymentId,
+          paymentErrorMessage,
+        }
+      );
+
+      if (paymentStatus === 'FAILED') {
+        return {
+          success: false,
+          error: paymentErrorMessage,
+        };
+      }
+    } catch (paymentError: any) {
+      console.error('Payment processing error:', paymentError);
+      paymentStatus = 'FAILED';
+      paymentErrorMessage = paymentError.message || 'Ödeme işlemi sırasında bir hata oluştu';
+
+      // Update payment info in order
+      await executeNonQuery(
+        `UPDATE orders 
+         SET payment_status = @paymentStatus, 
+             payment_error_message = @paymentErrorMessage,
+             updated_at = GETDATE()
+         WHERE id = @orderId`,
+        {
+          orderId: order.id,
+          paymentStatus,
+          paymentErrorMessage,
+        }
+      );
+
       return {
         success: false,
-        error: 'Sipariş onaylanırken bir hata oluştu',
+        error: paymentErrorMessage,
       };
     }
 

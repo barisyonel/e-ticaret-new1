@@ -20,6 +20,9 @@ export interface Order {
   status: OrderStatus;
   shippingAddressJson: string;
   trackingNumber: string | null;
+  paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED' | null;
+  iyzicoPaymentId: string | null;
+  paymentErrorMessage: string | null;
   createdAt: Date;
   updatedAt: Date;
   confirmedAt: Date | null;
@@ -69,6 +72,9 @@ export class OrderRepository {
       order = await executeQueryOne<any>(
         `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                 tracking_number as trackingNumber,
+                payment_status as paymentStatus,
+                iyzico_payment_id as iyzicoPaymentId,
+                payment_error_message as paymentErrorMessage,
                 CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                 CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
                 CASE WHEN confirmed_at IS NULL THEN NULL ELSE CONVERT(VARCHAR(23), confirmed_at, 126) END as confirmedAt
@@ -137,6 +143,9 @@ export class OrderRepository {
       orders = await executeQuery<any>(
         `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                 tracking_number as trackingNumber,
+                payment_status as paymentStatus,
+                iyzico_payment_id as iyzicoPaymentId,
+                payment_error_message as paymentErrorMessage,
                 CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                 CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
                 CASE WHEN confirmed_at IS NULL THEN NULL ELSE CONVERT(VARCHAR(23), confirmed_at, 126) END as confirmedAt
@@ -187,6 +196,9 @@ export class OrderRepository {
       orders = await executeQuery<any>(
         `SELECT id, user_id as userId, total, status, shipping_address_json as shippingAddressJson,
                 tracking_number as trackingNumber,
+                payment_status as paymentStatus,
+                iyzico_payment_id as iyzicoPaymentId,
+                payment_error_message as paymentErrorMessage,
                 CONVERT(VARCHAR(23), created_at, 126) as createdAt,
                 CONVERT(VARCHAR(23), updated_at, 126) as updatedAt,
                 CASE WHEN confirmed_at IS NULL THEN NULL ELSE CONVERT(VARCHAR(23), confirmed_at, 126) END as confirmedAt
