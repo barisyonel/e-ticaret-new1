@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" width="300" height="80">
+  <defs>
+    <style>
+      .cls-1 { fill: #003366; }
+      .cls-2 { fill: #FFD700; }
+      .cls-3 { fill: #FFFFFF; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="80" fill="#003366" rx="8"/>
+  
+  <!-- Tractor Icon -->
+  <g transform="translate(15, 15)">
+    <!-- Tractor Body -->
+    <rect class="cls-2" x="10" y="25" width="35" height="20" rx="3"/>
+    
+    <!-- Cabin -->
+    <rect class="cls-2" x="25" y="15" width="15" height="15" rx="2"/>
+    
+    <!-- Front Wheel -->
+    <circle class="cls-3" cx="15" cy="45" r="8"/>
+    <circle class="cls-1" cx="15" cy="45" r="5"/>
+    
+    <!-- Rear Wheel -->
+    <circle class="cls-3" cx="40" cy="45" r="12"/>
+    <circle class="cls-1" cx="40" cy="45" r="8"/>
+    
+    <!-- Exhaust -->
+    <rect class="cls-1" x="12" y="10" width="3" height="8" rx="1"/>
+  </g>
+  
+  <!-- Company Name -->
+  <text x="80" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#FFD700">
+    NEW HOLLAND
+  </text>
+  <text x="80" y="50" font-family="Arial, sans-serif" font-size="14" fill="#FFFFFF">
+    YEDEK PARÇA BAYİ
+  </text>
+  <text x="80" y="65" font-family="Arial, sans-serif" font-size="10" fill="#FFD700">
+    Kaliteli Parça, Güvenilir Hizmet
+  </text>
+</svg>

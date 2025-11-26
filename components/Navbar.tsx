@@ -40,8 +40,12 @@ export default async function Navbar() {
             {/* Mobile Menu Button & Logo */}
             <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 min-w-0 flex-1">
               <NavbarMobile categories={categories} />
-              <Link href="/" className="text-base sm:text-lg md:text-xl font-extrabold text-white drop-shadow-lg hover:text-accent-yellow transition truncate">
-                New Holland
+              <Link href="/" className="flex items-center">
+                <img 
+                  src="/site-logo.svg" 
+                  alt="New Holland Yedek Parça Bayi" 
+                  className="h-10 w-auto"
+                />
               </Link>
             </div>
 
@@ -78,21 +82,13 @@ export default async function Navbar() {
 
           {/* Desktop Layout */}
           <div className="hidden lg:flex items-center justify-between h-20">
-            {/* Logo - White Text */}
-            <Link href="/" className="flex items-center space-x-3 flex-shrink-0 group">
-              <div className="bg-accent-yellow/20 rounded-lg p-2 group-hover:bg-accent-yellow/30 transition">
-                <span className="text-3xl font-extrabold text-white drop-shadow-lg group-hover:text-accent-yellow transition">
-                  NH
-                </span>
-              </div>
-              <div>
-                <div className="text-2xl font-extrabold text-white drop-shadow-lg leading-tight group-hover:text-accent-yellow transition">
-                  New Holland
-                </div>
-                <div className="text-xs text-white/90 font-semibold">
-                  Yedek Parça Bayi
-                </div>
-              </div>
+            {/* Logo */}
+            <Link href="/" className="flex items-center flex-shrink-0 group">
+              <img 
+                src="/site-logo.svg" 
+                alt="New Holland Yedek Parça Bayi" 
+                className="h-16 w-auto group-hover:scale-105 transition-transform duration-200"
+              />
             </Link>
 
             {/* Search Bar - Enhanced */}
