@@ -1,8 +1,7 @@
 import Iyzipay from 'iyzipay';
-import { IyzipayConfig } from 'iyzipay/dist/types/iyzipay';
 
 // iyzico Configuration
-const getIyzicoConfig = (): IyzipayConfig => {
+const getIyzicoConfig = (): any => {
   const apiKey = process.env.IYZICO_API_KEY;
   const secretKey = process.env.IYZICO_SECRET_KEY;
   const baseUrl = process.env.IYZICO_BASE_URL || 'https://sandbox-api.iyzipay.com';
@@ -22,8 +21,8 @@ const getIyzicoConfig = (): IyzipayConfig => {
 const iyzipay = new Iyzipay(getIyzicoConfig());
 
 export interface CreatePaymentRequest {
-  price: number;
-  paidPrice: number;
+  price: string;
+  paidPrice: string;
   currency: string;
   basketId: string;
   paymentCard: {
@@ -66,7 +65,7 @@ export interface CreatePaymentRequest {
     category1: string;
     category2?: string;
     itemType: string;
-    price: number;
+    price: string;
   }>;
   callbackUrl?: string;
 }

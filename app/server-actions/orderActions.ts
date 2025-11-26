@@ -63,6 +63,9 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
   try {
     // Require user to be logged in
     const user = await requireUser();
+    
+    let total = 0; // Will be calculated later
+    let orderItems: any[] = []; // Will be populated later
 
     // Parse shipping address
     const rawAddress = {
@@ -243,7 +246,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       }
 
       // Calculate total
-      const total = Math.max(0, subtotal - discountAmount);
+      total = Math.max(0, subtotal - discountAmount);
 
       // Create order directly in transaction (no nested transaction)
       const orderRequest = new sql.Request(transaction);
@@ -504,7 +507,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
 
       return {
         success: false,
-        error: paymentErrorMessage,
+        error: paymentErrorMessage || 'Ödeme işlemi başarısız',
       };
     }
 

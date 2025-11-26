@@ -226,6 +226,22 @@ export class CartRepository {
       `);
     });
   }
+
+  // Clear all cart items for a user
+  static async clearByUserId(userId: number): Promise<void> {
+    await executeNonQuery(
+      `DELETE FROM cart_items WHERE user_id = @userId`,
+      { userId }
+    );
+  }
+
+  // Get product by ID (for order processing)
+  static async getProductById(productId: number): Promise<any> {
+    return await executeQueryOne(
+      `SELECT id, name, price, stock, active FROM products WHERE id = @productId`,
+      { productId }
+    );
+  }
 }
 
 

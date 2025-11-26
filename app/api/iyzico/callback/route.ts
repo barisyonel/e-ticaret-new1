@@ -1,5 +1,3 @@
-'use server';
-
 import { OrderRepository, OrderStatus } from '@/lib/repositories/OrderRepository';
 import { executeNonQuery } from '@/lib/db';
 import { CartRepository } from '@/lib/repositories/CartRepository';
@@ -10,7 +8,7 @@ import Iyzipay from 'iyzipay';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<Response> {
   try {
     const formData = await request.formData();
     const token = formData.get('token') as string;
@@ -35,8 +33,8 @@ export async function POST(request: Request) {
     });
 
     // Retrieve checkout form result
-    return new Promise((resolve, reject) => {
-      iyzipay.checkoutForm.retrieve(
+    return new Promise<Response>((resolve, reject) => {
+      (iyzipay.checkoutForm as any).retrieve(
         { token },
         async (err: any, result: any) => {
           if (err) {

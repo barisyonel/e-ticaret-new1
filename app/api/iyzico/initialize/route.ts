@@ -1,5 +1,3 @@
-'use server';
-
 import { requireUser } from '@/lib/requireUser';
 import { CartRepository } from '@/lib/repositories/CartRepository';
 import { CouponRepository } from '@/lib/repositories/CouponRepository';
@@ -21,7 +19,7 @@ interface InitializePaymentRequest {
   couponId?: number;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<Response> {
   try {
     const user = await requireUser();
     const body: InitializePaymentRequest = await request.json();
@@ -37,7 +35,7 @@ export async function POST(request: Request) {
 
     // Calculate total
     const subtotal = cartItems.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
+      (sum, item) => sum + (item.productPrice || 0) * item.quantity,
       0
     );
 
@@ -208,7 +206,7 @@ export async function POST(request: Request) {
     };
 
     return new Promise((resolve, reject) => {
-      iyzipay.checkoutFormInitialize.create(
+      (iyzipay.checkoutFormInitialize as any).create(
         checkoutFormInitializeRequest,
         (err: any, result: any) => {
           if (err) {
