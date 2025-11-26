@@ -178,9 +178,9 @@ export default function CheckoutPage() {
             <p className="text-gray-600 text-lg mb-4">Sepetiniz boş</p>
             <button
               onClick={() => router.push('/products')}
-              className="inline-block px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
+              className="inline-block px-8 py-4 bg-primary-blue text-white rounded-xl hover:bg-primary-blue-light transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold"
             >
-              Alışverişe Başla
+              🛒 Alışverişe Başla
             </button>
           </div>
         </div>
@@ -189,14 +189,17 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Ödeme</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-yellow-50 py-12">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-primary-blue mb-4">💳 Güvenli Ödeme</h1>
+          <p className="text-primary-blue-light text-lg">SSL sertifikalı güvenli ödeme altyapısı</p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-8 border-t-4 border-accent-yellow">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Teslimat Bilgileri</h2>
 
               {error && (
@@ -298,12 +301,16 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Information */}
-              <div className="border-t pt-6 mt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-gray-900">Ödeme Bilgileri</h2>
-                  <div className="flex items-center space-x-2">
-                    <img src="/visa-logo.svg" alt="Visa" className="h-6" />
-                    <img src="/mastercard-logo.svg" alt="MasterCard" className="h-6" />
+              <div className="border-t-2 border-accent-yellow pt-8 mt-8">
+                <div className="bg-gradient-to-r from-primary-blue to-primary-blue-light rounded-2xl p-6 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-2xl font-bold text-white flex items-center">
+                      💳 Ödeme Bilgileri
+                    </h2>
+                    <div className="flex items-center space-x-3 bg-white rounded-lg px-4 py-2">
+                      <img src="/visa-logo.svg" alt="Visa" className="h-6 hover:scale-110 transition-transform" />
+                      <img src="/mastercard-logo.svg" alt="MasterCard" className="h-6 hover:scale-110 transition-transform" />
+                    </div>
                   </div>
                 </div>
 
@@ -382,12 +389,27 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-blue-800">
-                      🔒 Ödeme bilgileriniz güvenli ödeme altyapısı ile işlenmektedir. Kart bilgileriniz saklanmaz.
-                    </p>
-                    <img src="/iyzico-ile-ode.svg" alt="iyzico ile Öde" className="h-8" />
+                <div className="mt-6 bg-white rounded-xl p-6 shadow-lg border-l-4 border-accent-yellow">
+                  <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <span className="text-green-600 text-2xl">🔒</span>
+                      </div>
+                      <div>
+                        <p className="text-primary-blue font-semibold text-lg">
+                          256-bit SSL Güvenlik
+                        </p>
+                        <p className="text-primary-blue-light text-sm">
+                          Ödeme bilgileriniz güvenli altyapı ile işlenmektedir. Kart bilgileriniz saklanmaz.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-center">
+                        <img src="/iyzico-ile-ode.svg" alt="iyzico ile Öde" className="h-12 mx-auto hover:scale-110 transition-transform" />
+                        <p className="text-primary-blue text-xs mt-1 font-medium">Güvenli Ödeme</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -395,21 +417,26 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors ${
+                className={`w-full px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg ${
                   isSubmitting
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-pink-600 hover:bg-pink-700 text-white'
+                    : 'bg-gradient-to-r from-primary-blue to-primary-blue-light hover:from-primary-blue-light hover:to-primary-blue text-white hover:shadow-xl'
                 }`}
               >
-                {isSubmitting ? 'Sipariş Oluşturuluyor...' : 'Siparişi Tamamla'}
+{isSubmitting ? '⏳ Sipariş Oluşturuluyor...' : '🛒 Güvenli Ödeme ile Sipariş Ver'}
               </button>
             </form>
           </div>
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Sipariş Özeti</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-8 sticky top-4 border-t-4 border-accent-yellow">
+              <div className="bg-gradient-to-r from-primary-blue to-primary-blue-light rounded-xl p-4 mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2 flex items-center">
+                  📋 Sipariş Özeti
+                </h2>
+                <p className="text-blue-100 text-sm">Sepetinizdeki ürünler</p>
+              </div>
               
               <div className="space-y-2 mb-4">
                 {items.map((item) => (
