@@ -1,265 +1,166 @@
-import { executeQuery, executeQueryOne, executeNonQuery } from '../db';
+import 'server-only';
 
-export type NotificationType = 'ORDER' | 'PAYMENT' | 'SHIPPING' | 'PROMOTION' | 'SYSTEM';
-export type NotificationStatus = 'UNREAD' | 'READ' | 'ARCHIVED';
+import { executeQuery, executeQueryOne, executeNonQuery } from '../db';
 
 export interface Notification {
   id: number;
   userId: number;
-  type: NotificationType;
+  type: 'ORDER' | 'STOCK' | 'CAMPAIGN' | 'PRICE' | 'REVIEW' | 'RETURN' | 'SYSTEM';
   title: string;
   message: string;
-  status: NotificationStatus;
-  relatedId: number | null; // Order ID, Product ID, etc.
-  createdAt: Date;
+  dataJson: string | null; // JSON string
+  isRead: boolean;
   readAt: Date | null;
+  createdAt: Date;
 }
 
 export interface CreateNotificationDto {
   userId: number;
-  type: NotificationType;
+  type: Notification['type'];
   title: string;
   message: string;
-  relatedId?: number | null;
+  dataJson?: Record<string, any>;
 }
 
 export class NotificationRepository {
-  // Parse SQL Server date string to Date object
-  private static parseSqlDate(dateStr: string | null): Date | null {
-    if (!dateStr) return null;
-    try {
-      return new Date(dateStr);
-    } catch {
-      return null;
-    }
-  }
-
-  // Get notifications for user
-  static async findByUserId(userId: number, limit: number = 20, offset: number = 0): Promise<Notification[]> {
-    try {
-      const notifications = await executeQuery<any>(
-        `SELECT id, user_id as userId, type, title, message, status, related_id as relatedId,
-                CONVERT(VARCHAR(23), created_at, 126) as createdAt,
-                CASE WHEN read_at IS NULL THEN NULL ELSE CONVERT(VARCHAR(23), read_at, 126) END as readAt
-         FROM notifications 
-         WHERE user_id = @userId 
-         ORDER BY created_at DESC
-         OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`,
-        { userId, limit, offset }
-      );
-
-      return notifications.map(notification => ({
-        ...notification,
-        createdAt: this.parseSqlDate(notification.createdAt)!,
-        readAt: this.parseSqlDate(notification.readAt),
-      }));
-    } catch (error) {
-      console.error('Error finding notifications by user ID:', error);
-      return [];
-    }
-  }
-
-  // Get unread count for user
-  static async getUnreadCount(userId: number): Promise<number> {
-    try {
-      const result = await executeQueryOne<{ count: number }>(
-        `SELECT COUNT(*) as count FROM notifications WHERE user_id = @userId AND status = 'UNREAD'`,
-        { userId }
-      );
-
-      return result?.count || 0;
-    } catch (error) {
-      console.error('Error getting unread count:', error);
-      return 0;
-    }
-  }
-
-  // Create notification
+  /**
+   * Create a new notification
+   */
   static async create(data: CreateNotificationDto): Promise<Notification> {
-    try {
-      const result = await executeQueryOne<{ id: number }>(
-        `INSERT INTO notifications (user_id, type, title, message, status, related_id, created_at)
-         OUTPUT INSERTED.id
-         VALUES (@userId, @type, @title, @message, 'UNREAD', @relatedId, GETDATE())`,
-        {
-          userId: data.userId,
-          type: data.type,
-          title: data.title,
-          message: data.message,
-          relatedId: data.relatedId || null,
-        }
-      );
-
-      if (!result) {
-        throw new Error('Failed to create notification');
+    const dataJson = data.dataJson ? JSON.stringify(data.dataJson) : null;
+    
+    const result = await executeQueryOne<any>(
+      `INSERT INTO notifications (user_id, type, title, message, data_json, is_read, created_at)
+       OUTPUT INSERTED.id, INSERTED.user_id, INSERTED.type, INSERTED.title, INSERTED.message, 
+              INSERTED.data_json, INSERTED.is_read, INSERTED.read_at, INSERTED.created_at
+       VALUES (@userId, @type, @title, @message, @dataJson, 0, GETDATE())`,
+      {
+        userId: data.userId,
+        type: data.type,
+        title: data.title,
+        message: data.message,
+        dataJson,
       }
+    );
 
-      const notification = await this.findById(result.id);
-      if (!notification) {
-        throw new Error('Failed to retrieve created notification');
-      }
-
-      return notification;
-    } catch (error) {
-      console.error('Error creating notification:', error);
-      throw error;
-    }
+    return this.mapToNotification(result);
   }
 
-  // Find notification by ID
-  static async findById(id: number): Promise<Notification | null> {
-    try {
-      const notification = await executeQueryOne<any>(
-        `SELECT id, user_id as userId, type, title, message, status, related_id as relatedId,
-                CONVERT(VARCHAR(23), created_at, 126) as createdAt,
-                CASE WHEN read_at IS NULL THEN NULL ELSE CONVERT(VARCHAR(23), read_at, 126) END as readAt
-         FROM notifications 
-         WHERE id = @id`,
-        { id }
-      );
-
-      if (!notification) return null;
-
-      return {
-        ...notification,
-        createdAt: this.parseSqlDate(notification.createdAt)!,
-        readAt: this.parseSqlDate(notification.readAt),
-      };
-    } catch (error) {
-      console.error('Error finding notification by ID:', error);
-      return null;
+  /**
+   * Get notifications for a user
+   */
+  static async findByUserId(
+    userId: number,
+    options?: {
+      unreadOnly?: boolean;
+      limit?: number;
+      offset?: number;
     }
+  ): Promise<Notification[]> {
+    let query = `
+      SELECT id, user_id, type, title, message, data_json, is_read, read_at, created_at
+      FROM notifications
+      WHERE user_id = @userId
+    `;
+
+    if (options?.unreadOnly) {
+      query += ' AND is_read = 0';
+    }
+
+    query += ' ORDER BY created_at DESC';
+
+    if (options?.limit) {
+      query += ` OFFSET ${options.offset || 0} ROWS FETCH NEXT ${options.limit} ROWS ONLY`;
+    }
+
+    const results = await executeQuery<any>(query, { userId });
+
+    return results.map(this.mapToNotification);
   }
 
-  // Mark notification as read
-  static async markAsRead(id: number, userId: number): Promise<boolean> {
-    try {
-      const rowsAffected = await executeNonQuery(
-        `UPDATE notifications 
-         SET status = 'READ', read_at = GETDATE() 
-         WHERE id = @id AND user_id = @userId AND status = 'UNREAD'`,
-        { id, userId }
-      );
+  /**
+   * Get unread notification count for a user
+   */
+  static async getUnreadCount(userId: number): Promise<number> {
+    const result = await executeQueryOne<{ count: number }>(
+      `SELECT COUNT(*) as count
+       FROM notifications
+       WHERE user_id = @userId AND is_read = 0`,
+      { userId }
+    );
 
-      return rowsAffected > 0;
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      return false;
-    }
+    return result?.count || 0;
   }
 
-  // Mark all notifications as read for user
-  static async markAllAsRead(userId: number): Promise<boolean> {
-    try {
-      const rowsAffected = await executeNonQuery(
-        `UPDATE notifications 
-         SET status = 'read', read_at = GETDATE() 
-         WHERE user_id = @userId AND status = 'UNREAD'`,
-        { userId }
-      );
+  /**
+   * Mark notification as read
+   */
+  static async markAsRead(notificationId: number, userId: number): Promise<boolean> {
+    const result = await executeNonQuery(
+      `UPDATE notifications
+       SET is_read = 1, read_at = GETDATE()
+       WHERE id = @notificationId AND user_id = @userId`,
+      { notificationId, userId }
+    );
 
-      return rowsAffected >= 0; // Even 0 is success (no unread notifications)
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      return false;
-    }
+    return result > 0;
   }
 
-  // Delete notification
-  static async delete(id: number, userId: number): Promise<boolean> {
-    try {
-      const rowsAffected = await executeNonQuery(
-        'DELETE FROM notifications WHERE id = @id AND user_id = @userId',
-        { id, userId }
-      );
+  /**
+   * Mark all notifications as read for a user
+   */
+  static async markAllAsRead(userId: number): Promise<number> {
+    const result = await executeNonQuery(
+      `UPDATE notifications
+       SET is_read = 1, read_at = GETDATE()
+       WHERE user_id = @userId AND is_read = 0`,
+      { userId }
+    );
 
-      return rowsAffected > 0;
-    } catch (error) {
-      console.error('Error deleting notification:', error);
-      return false;
-    }
+    return result;
   }
 
-  // Create order notification
-  static async createOrderNotification(userId: number, orderId: number, type: 'CREATED' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'): Promise<void> {
-    const notifications = {
-      CREATED: {
-        title: '🛒 Sipariş Oluşturuldu',
-        message: `#${orderId} numaralı siparişiniz başarıyla oluşturuldu. Ödeme onayı bekleniyor.`,
-      },
-      CONFIRMED: {
-        title: '✅ Sipariş Onaylandı',
-        message: `#${orderId} numaralı siparişiniz onaylandı ve hazırlanmaya başlandı.`,
-      },
-      SHIPPED: {
-        title: '🚚 Sipariş Kargoya Verildi',
-        message: `#${orderId} numaralı siparişiniz kargoya verildi. Takip numaranızı kontrol edebilirsiniz.`,
-      },
-      DELIVERED: {
-        title: '📦 Sipariş Teslim Edildi',
-        message: `#${orderId} numaralı siparişiniz başarıyla teslim edildi. Teşekkür ederiz!`,
-      },
-      CANCELLED: {
-        title: '❌ Sipariş İptal Edildi',
-        message: `#${orderId} numaralı siparişiniz iptal edildi. İade işlemi başlatıldı.`,
-      },
+  /**
+   * Delete notification
+   */
+  static async delete(notificationId: number, userId: number): Promise<boolean> {
+    const result = await executeNonQuery(
+      `DELETE FROM notifications
+       WHERE id = @notificationId AND user_id = @userId`,
+      { notificationId, userId }
+    );
+
+    return result > 0;
+  }
+
+  /**
+   * Delete all read notifications for a user
+   */
+  static async deleteAllRead(userId: number): Promise<number> {
+    const result = await executeNonQuery(
+      `DELETE FROM notifications
+       WHERE user_id = @userId AND is_read = 1`,
+      { userId }
+    );
+
+    return result;
+  }
+
+  /**
+   * Map database result to Notification object
+   */
+  private static mapToNotification(result: any): Notification {
+    return {
+      id: result.id,
+      userId: result.user_id,
+      type: result.type,
+      title: result.title,
+      message: result.message,
+      dataJson: result.data_json,
+      isRead: result.is_read === 1 || result.is_read === true,
+      readAt: result.read_at ? new Date(result.read_at) : null,
+      createdAt: new Date(result.created_at),
     };
-
-    const notificationData = notifications[type];
-    if (notificationData) {
-      await this.create({
-        userId,
-        type: 'ORDER',
-        title: notificationData.title,
-        message: notificationData.message,
-        relatedId: orderId,
-      });
-    }
-  }
-
-  // Create payment notification
-  static async createPaymentNotification(userId: number, orderId: number, success: boolean): Promise<void> {
-    const title = success ? '💳 Ödeme Başarılı' : '❌ Ödeme Başarısız';
-    const message = success 
-      ? `#${orderId} numaralı siparişinizin ödemesi başarıyla alındı.`
-      : `#${orderId} numaralı siparişinizin ödemesi başarısız oldu. Lütfen tekrar deneyin.`;
-
-    await this.create({
-      userId,
-      type: 'PAYMENT',
-      title,
-      message,
-      relatedId: orderId,
-    });
-  }
-
-  // Create promotion notification
-  static async createPromotionNotification(userId: number, title: string, message: string): Promise<void> {
-    await this.create({
-      userId,
-      type: 'PROMOTION',
-      title: `🎉 ${title}`,
-      message,
-    });
-  }
-
-  // Create system notification for all users
-  static async createSystemNotificationForAll(title: string, message: string): Promise<void> {
-    try {
-      // Get all user IDs
-      const users = await executeQuery<{ id: number }>('SELECT id FROM users');
-      
-      // Create notification for each user
-      for (const user of users) {
-        await this.create({
-          userId: user.id,
-          type: 'SYSTEM',
-          title: `📢 ${title}`,
-          message,
-        });
-      }
-    } catch (error) {
-      console.error('Error creating system notification for all users:', error);
-    }
   }
 }
+

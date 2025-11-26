@@ -2,259 +2,316 @@ export const dynamic = 'force-dynamic';
 
 export default function MesafeliSatisSozlesmesiPage() {
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold text-center mb-8">Mesafeli Satış Sözleşmesi</h1>
-      
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          
-          {/* Giriş */}
-          <section className="mb-8">
-            <p className="text-gray-600 mb-4">
-              Bu sözleşme, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve 
-              Mesafeli Sözleşmeler Yönetmeliği hükümleri gereğince düzenlenmiştir.
-            </p>
-          </section>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 py-12">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-accent-yellow to-accent-yellow-light rounded-2xl mb-6 shadow-lg">
+            <svg className="w-8 h-8 text-primary-blue-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-black text-gray-900 mb-4">Mesafeli Satış Sözleşmesi</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Online alışverişinizde güvenliğiniz için hazırlanmış mesafeli satış sözleşmesi ve 
+            tüketici haklarınız hakkında detaylı bilgiler.
+          </p>
+          <div className="mt-6 text-sm text-gray-500 bg-gray-100 rounded-lg p-3 inline-block">
+            <strong>Son Güncelleme:</strong> 26 Kasım 2024
+          </div>
+        </div>
 
-          {/* Taraflar */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">1. TARAFLAR</h2>
-            
-            <div className="mb-6">
-              <h3 className="text-xl font-medium mb-3">SATICI BİLGİLERİ</h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-600 mb-2"><strong>Unvan:</strong> barış can yönel</p>
-                <p className="text-gray-600 mb-2"><strong>Adres:</strong> Tokat merkez karşıyaka mahallesi 60100 Tokat / Türkiye</p>
-                <p className="text-gray-600 mb-2"><strong>Telefon:</strong> +90 530 112 94 40</p>
-                <p className="text-gray-600 mb-2"><strong>E-posta:</strong> takasan97@gmail.com</p>
-                <p className="text-gray-600"><strong>Faaliyet Konusu:</strong> New Holland Yedek Parça Satışı</p>
-              </div>
+        {/* Content */}
+        <div className="w-full max-w-none mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <div className="p-8 lg:p-12 space-y-8">
+              
+              {/* Section 1 - Taraflar */}
+              <section>
+                <h2 className="text-2xl font-bold text-primary-blue mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-primary-blue/10 rounded-lg flex items-center justify-center mr-3">
+                    <span className="text-primary-blue font-bold text-sm">1</span>
+                  </div>
+                  Sözleşme Tarafları
+                </h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                    <h3 className="font-bold text-blue-900 mb-3 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H7m2 0v-4a2 2 0 012-2h2a2 2 0 012 2v4" />
+                      </svg>
+                      SATICI BİLGİLERİ
+                    </h3>
+                    <div className="space-y-2 text-sm text-blue-800">
+                      <p><strong>Ünvan:</strong> New Holland Yedek Parça Bayi</p>
+                      <p><strong>Adres:</strong> Tokat merkez karşıyaka mahallesi 60100 Tokat / Türkiye</p>
+                      <p><strong>Telefon:</strong> +90 530 112 94 40</p>
+                      <p><strong>E-posta:</strong> takasan97@gmail.com</p>
+                      <p><strong>Web Sitesi:</strong> www.newhollandyedekparca.com</p>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                    <h3 className="font-bold text-green-900 mb-3 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      ALICI BİLGİLERİ
+                    </h3>
+                    <div className="space-y-2 text-sm text-green-800">
+                      <p>Alıcı bilgileri sipariş sırasında alınacak ve sözleşmenin ayrılmaz parçası olacaktır.</p>
+                      <p><strong>Bilgiler:</strong></p>
+                      <ul className="list-disc list-inside space-y-1 ml-2">
+                        <li>Ad, Soyad / Ünvan</li>
+                        <li>Adres Bilgileri</li>
+                        <li>Telefon ve E-posta</li>
+                        <li>T.C. Kimlik No / Vergi No</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 2 - Ürün Bilgileri */}
+              <section>
+                <h2 className="text-2xl font-bold text-primary-blue mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-primary-blue/10 rounded-lg flex items-center justify-center mr-3">
+                    <span className="text-primary-blue font-bold text-sm">2</span>
+                  </div>
+                  Ürün/Hizmet Bilgileri
+                </h2>
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Satışa konu olan ürün/hizmetlerin temel özellikleri, fiyatları, ödeme ve teslimat koşulları 
+                    web sitesinde yer almaktadır. Ürün bilgileri sipariş onayı ile birlikte alıcıya iletilir.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-4 mt-4">
+                    <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                      <div className="text-2xl mb-2">🚜</div>
+                      <h4 className="font-semibold text-gray-900">Yedek Parçalar</h4>
+                      <p className="text-sm text-gray-600">Orijinal New Holland parçaları</p>
+                    </div>
+                    <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                      <div className="text-2xl mb-2">🔧</div>
+                      <h4 className="font-semibold text-gray-900">Aksesuarlar</h4>
+                      <p className="text-sm text-gray-600">Uyumlu aksesuar ürünleri</p>
+                    </div>
+                    <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                      <div className="text-2xl mb-2">⚙️</div>
+                      <h4 className="font-semibold text-gray-900">Servis</h4>
+                      <p className="text-sm text-gray-600">Teknik destek hizmetleri</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 3 - Cayma Hakkı */}
+              <section>
+                <h2 className="text-2xl font-bold text-primary-blue mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-primary-blue/10 rounded-lg flex items-center justify-center mr-3">
+                    <span className="text-primary-blue font-bold text-sm">3</span>
+                  </div>
+                  Cayma Hakkı
+                </h2>
+                <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 border border-red-200">
+                  <div className="flex items-start space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-red-900 mb-2">14 Gün Cayma Hakkı</h3>
+                      <p className="text-red-800 text-sm leading-relaxed">
+                        Alıcı, ürünü teslim aldığı tarihten itibaren 14 gün içerisinde herhangi bir gerekçe göstermeksizin 
+                        ve cezai şart ödemeksizin sözleşmeden cayma hakkına sahiptir.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                      <h4 className="font-semibold text-red-900 mb-3">Cayma Hakkı Koşulları:</h4>
+                      <ul className="space-y-2 text-sm text-red-800">
+                        <li className="flex items-start">
+                          <span className="text-green-600 mr-2 mt-0.5">✓</span>
+                          Ürün orijinal ambalajında olmalı
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-green-600 mr-2 mt-0.5">✓</span>
+                          Kullanılmamış durumda olmalı
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-green-600 mr-2 mt-0.5">✓</span>
+                          Etiketleri zarar görmemiş olmalı
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-green-600 mr-2 mt-0.5">✓</span>
+                          İade formu doldurulmalı
+                        </li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-red-900 mb-3">Cayma Hakkı Olmayan Durumlar:</h4>
+                      <ul className="space-y-2 text-sm text-red-800">
+                        <li className="flex items-start">
+                          <span className="text-red-600 mr-2 mt-0.5">✗</span>
+                          Özel üretim ürünler
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-red-600 mr-2 mt-0.5">✗</span>
+                          Hijyen açısından uygun olmayan ürünler
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-red-600 mr-2 mt-0.5">✗</span>
+                          Hızla bozulabilen ürünler
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-red-600 mr-2 mt-0.5">✗</span>
+                          Dijital içerikler
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 4 - Teslimat */}
+              <section>
+                <h2 className="text-2xl font-bold text-primary-blue mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-primary-blue/10 rounded-lg flex items-center justify-center mr-3">
+                    <span className="text-primary-blue font-bold text-sm">4</span>
+                  </div>
+                  Teslimat Koşulları
+                </h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-blue-50 rounded-xl p-6">
+                    <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Teslimat Süreleri
+                    </h3>
+                    <ul className="space-y-2 text-sm text-blue-800">
+                      <li>• Stokta bulunan ürünler: 1-3 iş günü</li>
+                      <li>• Tedarik edilecek ürünler: 5-10 iş günü</li>
+                      <li>• Özel sipariş ürünler: 15-30 iş günü</li>
+                      <li>• Acil durumlar için aynı gün teslimat (şehir içi)</li>
+                    </ul>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-6">
+                    <h3 className="font-semibold text-green-900 mb-3 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      </svg>
+                      Teslimat Bölgeleri
+                    </h3>
+                    <ul className="space-y-2 text-sm text-green-800">
+                      <li>• Türkiye geneli kargo teslimatı</li>
+                      <li>• Tokat ili içi ücretsiz teslimat</li>
+                      <li>• Komşu iller için özel indirim</li>
+                      <li>• Yurt dışı teslimat (talep üzerine)</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 5 - Ödeme */}
+              <section>
+                <h2 className="text-2xl font-bold text-primary-blue mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-primary-blue/10 rounded-lg flex items-center justify-center mr-3">
+                    <span className="text-primary-blue font-bold text-sm">5</span>
+                  </div>
+                  Ödeme Koşulları
+                </h2>
+                <div className="bg-gradient-to-r from-accent-yellow/10 to-accent-yellow/5 rounded-xl p-6 border border-accent-yellow/30">
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-accent-yellow/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-8 h-8 text-accent-yellow-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Kredi Kartı</h3>
+                      <p className="text-sm text-gray-600">Visa, MasterCard ile güvenli ödeme</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-accent-yellow/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-8 h-8 text-accent-yellow-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Havale/EFT</h3>
+                      <p className="text-sm text-gray-600">Banka havalesi ile ödeme</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-accent-yellow/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-8 h-8 text-accent-yellow-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Kapıda Ödeme</h3>
+                      <p className="text-sm text-gray-600">Teslimat sırasında nakit ödeme</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 6 - Sorumluluklar */}
+              <section>
+                <h2 className="text-2xl font-bold text-primary-blue mb-4 flex items-center">
+                  <div className="w-8 h-8 bg-primary-blue/10 rounded-lg flex items-center justify-center mr-3">
+                    <span className="text-primary-blue font-bold text-sm">6</span>
+                  </div>
+                  Tarafların Sorumlulukları
+                </h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-blue-50 rounded-xl p-6">
+                    <h3 className="font-semibold text-blue-900 mb-3">Satıcının Sorumlulukları:</h3>
+                    <ul className="space-y-2 text-sm text-blue-800">
+                      <li>• Ürünü zamanında ve eksiksiz teslim etmek</li>
+                      <li>• Ürün kalitesini garanti etmek</li>
+                      <li>• Müşteri hizmetleri sunmak</li>
+                      <li>• Yasal gereklilikleri yerine getirmek</li>
+                      <li>• Kişisel verileri korumak</li>
+                    </ul>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-6">
+                    <h3 className="font-semibold text-green-900 mb-3">Alıcının Sorumlulukları:</h3>
+                    <ul className="space-y-2 text-sm text-green-800">
+                      <li>• Doğru bilgi vermek</li>
+                      <li>• Ödemeyi zamanında yapmak</li>
+                      <li>• Ürünü teslim almak</li>
+                      <li>• Sözleşme koşullarına uymak</li>
+                      <li>• İade koşullarına riayet etmek</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              {/* Contact Section */}
+              <section className="bg-gradient-to-r from-primary-blue to-primary-blue-light rounded-xl p-8 text-white">
+                <h2 className="text-2xl font-bold mb-4 flex items-center">
+                  <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  Sözleşme Hakkında İletişim
+                </h2>
+                <p className="mb-4 text-white/90">
+                  Bu sözleşme hakkında sorularınız için bizimle iletişime geçebilirsiniz:
+                </p>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p><strong>E-posta:</strong> takasan97@gmail.com</p>
+                    <p><strong>Telefon:</strong> +90 530 112 94 40</p>
+                  </div>
+                  <div>
+                    <p><strong>Adres:</strong> Tokat merkez karşıyaka mahallesi 60100 Tokat / Türkiye</p>
+                    <p><strong>Çalışma Saatleri:</strong> Pazartesi-Cuma 08:00-18:00</p>
+                  </div>
+                </div>
+              </section>
             </div>
-
-            <div className="mb-6">
-              <h3 className="text-xl font-medium mb-3">ALICI BİLGİLERİ</h3>
-              <p className="text-gray-600">
-                Sipariş sırasında kayıt olunan kişi bilgileri geçerlidir.
-              </p>
-            </div>
-          </section>
-
-          {/* Konu */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">2. SÖZLEŞME KONUSU</h2>
-            <p className="text-gray-600 mb-4">
-              İşbu sözleşmenin konusu, ALICI'nın SATICI'ya ait internet sitesi üzerinden 
-              elektronik ortamda siparişini yaptığı aşağıda nitelikleri ve satış fiyatı 
-              belirtilen ürün/ürünlerin satışı ve teslimi ile ilgili olarak 6502 sayılı 
-              Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği 
-              hükümleri gereğince tarafların hak ve yükümlülüklerinin saptanmasıdır.
-            </p>
-          </section>
-
-          {/* Ürün Bilgileri */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">3. ÜRÜN BİLGİLERİ</h2>
-            <p className="text-gray-600 mb-4">
-              Satışa konu ürün/ürünlerin temel nitelikleri (türü, miktarı, marka/modeli, 
-              rengi, adedi) SATICI'ya ait internet sitesinde yer almaktadır. 
-              Kampanya döneminde ürün fiyatları SATICI tarafından belirtilen süre sonunda 
-              değişebilir.
-            </p>
-            
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-              <p className="text-yellow-800">
-                <strong>Önemli:</strong> Ürün bilgileri sipariş onayı ile birlikte 
-                e-posta adresinize gönderilecektir.
-              </p>
-            </div>
-          </section>
-
-          {/* Fiyat ve Ödeme */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">4. FİYAT VE ÖDEME KOŞULLARI</h2>
-            
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Fiyat Bilgileri</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Ürün fiyatları KDV dahildir</li>
-                <li>Kargo ücreti ayrıca belirtilir</li>
-                <li>500 TL ve üzeri siparişlerde kargo ücretsizdir</li>
-                <li>Fiyatlar sipariş anındaki geçerli fiyatlardır</li>
-              </ul>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Ödeme Yöntemleri</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Kredi kartı (Visa, MasterCard, American Express)</li>
-                <li>Banka kartı</li>
-                <li>Havale/EFT</li>
-                <li>iyzico ile güvenli ödeme</li>
-                <li>Kapıda ödeme (seçili bölgelerde)</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Teslimat */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">5. TESLİMAT KOŞULLARI</h2>
-            
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Teslimat Süreleri</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Stokta bulunan ürünler: 1-3 iş günü</li>
-                <li>Stokta bulunmayan ürünler: 5-10 iş günü</li>
-                <li>Özel sipariş ürünleri: 15-30 iş günü</li>
-                <li>Teslimat süresi, ödemenin onaylanmasından sonra başlar</li>
-              </ul>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Teslimat Şartları</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Ürünler belirtilen adrese kargo ile gönderilir</li>
-                <li>Teslim sırasında kimlik kontrolü yapılabilir</li>
-                <li>Ürün hasarlı ise teslim alınmamalıdır</li>
-                <li>Teslim alınamayan ürünler kargo firmasında 15 gün bekletilir</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Cayma Hakkı */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-red-600">6. CAYMA HAKKI</h2>
-            
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Cayma Süresi</h3>
-              <p className="text-gray-600 mb-4">
-                ALICI, ürünü teslim aldığı tarihten itibaren 14 (on dört) gün içinde 
-                herhangi bir gerekçe göstermeksizin ve cezai şart ödemeksizin sözleşmeden 
-                cayma hakkına sahiptir.
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Cayma Hakkının Kullanımı</h3>
-              <ol className="list-decimal list-inside space-y-2 text-gray-600">
-                <li>Cayma hakkının kullanılması için yazılı bildirim yapılmalıdır</li>
-                <li>Ürün orijinal ambalajında ve hasarsız olarak iade edilmelidir</li>
-                <li>Fatura ve varsa garanti belgesi eksiksiz olmalıdır</li>
-                <li>İade kargo ücreti ALICI'ya aittir (kusurlu ürün hariç)</li>
-              </ol>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Cayma Hakkının Kullanılamadığı Durumlar</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Özel sipariş üzerine üretilen ürünler</li>
-                <li>Hijyen açısından iade edilmesi uygun olmayan ürünler</li>
-                <li>Ambalajı açıldıktan sonra sağlık ve hijyen açısından iade edilemeyecek ürünler</li>
-                <li>Teslimden sonra başka ürünlerle karışan ürünler</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Garanti */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">7. GARANTİ KOŞULLARI</h2>
-            <ul className="list-disc list-inside space-y-2 text-gray-600">
-              <li>Ürünler üretici firma garantisi altındadır</li>
-              <li>Garanti süresi ürün özelliklerine göre değişir</li>
-              <li>Garanti kapsamındaki arızalar ücretsiz onarılır</li>
-              <li>Garanti belgesi fatura ile birlikte gönderilir</li>
-              <li>Garanti şartları üretici firma koşullarına tabidir</li>
-            </ul>
-          </section>
-
-          {/* Yükümlülükler */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">8. TARAFLARIN YÜKÜMLÜLÜKLERİ</h2>
-            
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">SATICI'nın Yükümlülükleri</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Ürünü sözleşme şartlarına uygun olarak teslim etmek</li>
-                <li>Yasal garanti yükümlülüklerini yerine getirmek</li>
-                <li>Cayma hakkı bilgilendirmesini yapmak</li>
-                <li>İade ve değişim işlemlerini gerçekleştirmek</li>
-              </ul>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">ALICI'nın Yükümlülükleri</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Sipariş bedelini zamanında ödemek</li>
-                <li>Doğru teslimat bilgilerini vermek</li>
-                <li>Ürünü teslim almak</li>
-                <li>Sözleşme şartlarına uymak</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Mücbir Sebepler */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">9. MÜCBİR SEBEPLER</h2>
-            <p className="text-gray-600">
-              Doğal afet, savaş, terör, grev, lokavt, pandemi gibi mücbir sebep hallerde 
-              taraflar yükümlülüklerinden geçici olarak muaf tutulur. Bu durumda sözleşme 
-              askıya alınır ve taraflar karşılıklı olarak zarar ziyan talebinde bulunamaz.
-            </p>
-          </section>
-
-          {/* Uyuşmazlık Çözümü */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">10. UYUŞMAZLIK ÇÖZÜMÜ</h2>
-            <div className="mb-4">
-              <h3 className="text-xl font-medium mb-3">Şikayetler</h3>
-              <p className="text-gray-600 mb-4">
-                Şikayetlerinizi aşağıdaki kanallardan iletebilirsiniz:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-600">
-                <li>Telefon: +90 530 112 94 40</li>
-                <li>E-posta: takasan97@gmail.com</li>
-                <li>Tüketici Hakem Heyetleri</li>
-                <li>Tüketici Mahkemeleri</li>
-              </ul>
-            </div>
-
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
-              <p className="text-blue-800">
-                <strong>Tüketici Hakem Heyeti:</strong> Satın alınan ürün veya hizmetin 
-                değerinin 2023 yılı için 11.500 TL'nin altında olması durumunda il/ilçe 
-                tüketici hakem heyetlerine, 11.500 TL'nin üzerinde olması durumunda 
-                tüketici mahkemelerine başvurulabilir.
-              </p>
-            </div>
-          </section>
-
-          {/* Yürürlük */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-600">11. YÜRÜRLÜK</h2>
-            <p className="text-gray-600">
-              İşbu sözleşme, ALICI tarafından elektronik ortamda onaylanması ile 
-              yürürlüğe girer. SATICI, sipariş öncesinde işbu sözleşme hükümlerini 
-              ALICI'ya okutup, onay aldıktan sonra siparişi gerçekleştirir.
-            </p>
-          </section>
-
-          {/* Onay */}
-          <section className="bg-gray-50 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">SÖZLEŞME ONAYI</h2>
-            <p className="text-gray-600 mb-4">
-              Bu sözleşmeyi okudum, anladım ve kabul ediyorum. Sipariş vermekle 
-              bu sözleşme hükümlerini kabul etmiş sayılırım.
-            </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-              <div>
-                <p><strong>Sözleşme Tarihi:</strong> Sipariş tarihi</p>
-                <p><strong>SATICI:</strong> barış can yönel</p>
-              </div>
-              <div>
-                <p><strong>ALICI:</strong> Sipariş veren kişi</p>
-                <p><strong>İmza:</strong> Elektronik onay</p>
-              </div>
-            </div>
-          </section>
+          </div>
         </div>
       </div>
     </div>

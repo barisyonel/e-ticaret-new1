@@ -1,9 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { addToCart, removeFromCart, updateCartItemQuantity, getCartItems, clearCart } from '../server-actions/cartActions';
-import { showToast } from '@/components/ToastContainer';
 
 interface CartItem {
   id: number;
@@ -36,7 +34,6 @@ const CART_STORAGE_KEY = 'cart_v1';
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   // Load cart from server
   const refresh = useCallback(async () => {
@@ -77,15 +74,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (result.success) {
       await refresh();
     } else {
-      // Check if user needs to login
-      if (result.error === 'LOGIN_REQUIRED') {
-        showToast('Sepete ürün eklemek için giriş yapmanız gerekiyor', 'error');
-        router.push('/auth/login');
-        return;
-      }
       throw new Error(result.error || 'Failed to add item to cart');
     }
-  }, [refresh, router]);
+  }, [refresh]);
 
   // Remove item from cart
   const removeItem = useCallback(async (cartItemId: number) => {

@@ -16,7 +16,6 @@ import { createNotification } from './notificationActions';
 import { CouponRepository } from '@/lib/repositories/CouponRepository';
 import { getOrdersForUser } from '@/lib/services/userOrders';
 import { createPayment, CreatePaymentRequest } from '@/lib/services/iyzico';
-import { NotificationRepository } from '@/lib/repositories/NotificationRepository';
 
 // Validation schema
 const shippingAddressSchema = z.object({
@@ -369,7 +368,8 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
     });
 
     // Process payment with iyzico
-    let paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED' = 'PENDING';
+    let paymentResult;
+    let paymentStatus = 'PENDING';
     let iyzicoPaymentId: string | null = null;
     let paymentErrorMessage: string | null = null;
 
@@ -437,7 +437,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       };
 
       // Process payment
-      const paymentResult = await createPayment(paymentRequest);
+      paymentResult = await createPayment(paymentRequest);
 
       if (paymentResult.status === 'success') {
         paymentStatus = 'SUCCESS';
@@ -445,46 +445,48 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
 
         // Update order status to CONFIRMED
         await OrderRepository.updateStatus(order.id, OrderStatus.CONFIRMED);
-        
-        // Create payment success notification
-        await NotificationRepository.createPaymentNotification(user.id, order.id, true);
+
+        // Update payment info in order
+        await executeNonQuery(
+          `UPDATE orders 
+           SET payment_status = @paymentStatus, 
+               iyzico_payment_id = @iyzicoPaymentId,
+               updated_at = GETDATE()
+           WHERE id = @orderId`,
+          {
+            orderId: order.id,
+            paymentStatus,
+            iyzicoPaymentId,
+          }
+        );
       } else {
         paymentStatus = 'FAILED';
         paymentErrorMessage = paymentResult.errorMessage || 'Ödeme işlemi başarısız';
-        
-        // Create payment failure notification
-        await NotificationRepository.createPaymentNotification(user.id, order.id, false);
-      }
 
-      // Update payment info in order
-      await executeNonQuery(
-        `UPDATE orders 
-         SET payment_status = @paymentStatus, 
-             iyzico_payment_id = @iyzicoPaymentId,
-             payment_error_message = @paymentErrorMessage,
-             updated_at = GETDATE()
-         WHERE id = @orderId`,
-        {
-          orderId: order.id,
-          paymentStatus,
-          iyzicoPaymentId,
-          paymentErrorMessage,
-        }
-      );
+        // Update payment info in order
+        await executeNonQuery(
+          `UPDATE orders 
+           SET payment_status = @paymentStatus, 
+               payment_error_message = @paymentErrorMessage,
+               updated_at = GETDATE()
+           WHERE id = @orderId`,
+          {
+            orderId: order.id,
+            paymentStatus,
+            paymentErrorMessage,
+          }
+        );
 
-      if (paymentStatus === 'FAILED') {
+        // Return error
         return {
           success: false,
           error: paymentErrorMessage,
         };
       }
     } catch (paymentError: any) {
-      console.error('Payment processing error:', paymentError);
+      // Payment processing failed
       paymentStatus = 'FAILED';
       paymentErrorMessage = paymentError.message || 'Ödeme işlemi sırasında bir hata oluştu';
-      
-      // Create payment failure notification
-      await NotificationRepository.createPaymentNotification(user.id, order.id, false);
 
       // Update payment info in order
       await executeNonQuery(
@@ -529,9 +531,15 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       console.error('Failed to send order confirmation email:', emailError);
     }
 
-    // Create order notification for user
+    // Create notification for user
     try {
-      await NotificationRepository.createOrderNotification(user.id, order.id, 'CREATED');
+      await createNotification({
+        userId: order.userId,
+        type: 'ORDER',
+        title: 'Siparişiniz Alındı',
+        message: `Siparişiniz (#${order.id}) başarıyla oluşturuldu. Toplam tutar: ${order.total.toFixed(2)} ₺`,
+        dataJson: { orderId: order.id },
+      });
     } catch (notificationError) {
       // Don't fail the order if notification fails
       console.error('Failed to create notification:', notificationError);

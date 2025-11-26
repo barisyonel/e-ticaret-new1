@@ -20,12 +20,12 @@ export interface Order {
   status: OrderStatus;
   shippingAddressJson: string;
   trackingNumber: string | null;
-  paymentStatus: 'PENDING' | 'SUCCESS' | 'FAILED' | null;
-  iyzicoPaymentId: string | null;
-  paymentErrorMessage: string | null;
   createdAt: Date;
   updatedAt: Date;
   confirmedAt: Date | null;
+  paymentStatus?: string | null;
+  iyzicoPaymentId?: string | null;
+  paymentErrorMessage?: string | null;
 }
 
 export interface OrderItem {

@@ -13,24 +13,21 @@ export default function NavbarMobile({ categories }: NavbarMobileProps) {
 
   return (
     <>
+      {/* Enhanced Mobile Menu Button */}
       <button
         onClick={() => setIsMenuOpen(true)}
-        className="p-2 text-white hover:text-accent-yellow hover:bg-primary-blue-dark rounded-lg transition-colors"
+        className="relative p-3 text-white hover:text-accent-yellow hover:bg-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/10 hover:border-accent-yellow/30 hover:shadow-lg hover:shadow-accent-yellow/20 transform hover:scale-110 group"
         aria-label="Menüyü Aç"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
+        {/* Animated Hamburger Icon */}
+        <div className="relative w-6 h-6 flex flex-col justify-center items-center">
+          <div className="w-6 h-0.5 bg-current rounded-full transition-all duration-300 group-hover:w-7 transform origin-center"></div>
+          <div className="w-5 h-0.5 bg-current rounded-full mt-1.5 transition-all duration-300 group-hover:w-6 transform origin-center"></div>
+          <div className="w-4 h-0.5 bg-current rounded-full mt-1.5 transition-all duration-300 group-hover:w-5 transform origin-center"></div>
+        </div>
+        
+        {/* Pulse Effect */}
+        <div className="absolute inset-0 rounded-xl bg-accent-yellow/20 opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-300"></div>
       </button>
 
       <MobileMenu
@@ -41,4 +38,3 @@ export default function NavbarMobile({ categories }: NavbarMobileProps) {
     </>
   );
 }
-

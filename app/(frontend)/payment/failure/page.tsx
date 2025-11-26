@@ -92,6 +92,16 @@ export default function PaymentFailurePage() {
             {countdown} saniye sonra ödeme sayfasına yönlendirileceksiniz...
           </p>
         )}
+
+        {/* iyzico Güvenli Ödeme */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <p className="text-xs text-gray-500 mb-2">Güvenli ödeme altyapısı</p>
+          <img 
+            src="/iyzico-logo-pack/checkout_iyzico_ile_ode/TR/Tr_Colored_Horizontal/iyzico_ile_ode_colored_horizontal.png" 
+            alt="iyzico ile Öde" 
+            className="h-6 mx-auto opacity-70" 
+          />
+        </div>
       </div>
     </div>
   );

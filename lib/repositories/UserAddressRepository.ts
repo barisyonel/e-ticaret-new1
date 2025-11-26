@@ -1,14 +1,15 @@
+import 'server-only';
+
 import { executeQuery, executeQueryOne, executeNonQuery } from '../db';
 
 export interface UserAddress {
   id: number;
   userId: number;
-  title: string; // "Ev", "İş", "Diğer" gibi
+  title: string;
   fullName: string;
   phone: string;
   address: string;
   city: string;
-  district: string;
   postalCode: string;
   country: string;
   isDefault: boolean;
@@ -16,242 +17,235 @@ export interface UserAddress {
   updatedAt: Date;
 }
 
-export interface CreateUserAddressDto {
-  userId: number;
-  title: string;
-  fullName: string;
-  phone: string;
-  address: string;
-  city: string;
-  district: string;
-  postalCode: string;
-  country: string;
-  isDefault?: boolean;
-}
-
 export class UserAddressRepository {
-  // Get all addresses for a user
-  static async findByUserId(userId: number): Promise<UserAddress[]> {
+  // Parse SQL Server date string to Date object
+  private static parseSqlDate(dateStr: string | null): Date | null {
+    if (!dateStr) return null;
     try {
-      const addresses = await executeQuery<any>(
-        `SELECT id, user_id as userId, title, full_name as fullName, phone, address, 
-                city, district, postal_code as postalCode, country, is_default as isDefault,
-                created_at as createdAt, updated_at as updatedAt
-         FROM user_addresses 
-         WHERE user_id = @userId 
-         ORDER BY is_default DESC, created_at DESC`,
-        { userId }
-      );
-
-      return addresses.map(addr => ({
-        ...addr,
-        createdAt: new Date(addr.createdAt),
-        updatedAt: new Date(addr.updatedAt),
-      }));
-    } catch (error) {
-      console.error('Error finding addresses by user ID:', error);
-      return [];
+      return new Date(dateStr);
+    } catch {
+      return null;
     }
   }
 
-  // Get address by ID
+  // Find address by ID
   static async findById(id: number): Promise<UserAddress | null> {
-    try {
-      const address = await executeQueryOne<any>(
-        `SELECT id, user_id as userId, title, full_name as fullName, phone, address, 
-                city, district, postal_code as postalCode, country, is_default as isDefault,
-                created_at as createdAt, updated_at as updatedAt
-         FROM user_addresses 
-         WHERE id = @id`,
-        { id }
-      );
+    const result = await executeQueryOne<any>(
+      `SELECT id, user_id as userId, title, full_name as fullName, phone, address, city,
+              postal_code as postalCode, country, is_default as isDefault,
+              CONVERT(VARCHAR(23), created_at, 126) as createdAt,
+              CONVERT(VARCHAR(23), updated_at, 126) as updatedAt
+       FROM user_addresses 
+       WHERE id = @id`,
+      { id }
+    );
 
-      if (!address) return null;
+    if (!result) return null;
 
-      return {
-        ...address,
-        createdAt: new Date(address.createdAt),
-        updatedAt: new Date(address.updatedAt),
-      };
-    } catch (error) {
-      console.error('Error finding address by ID:', error);
-      return null;
-    }
+    return {
+      ...result,
+      createdAt: this.parseSqlDate(result.createdAt)!,
+      updatedAt: this.parseSqlDate(result.updatedAt)!,
+    };
   }
 
-  // Get default address for user
+  // Find all addresses for a user
+  static async findByUserId(userId: number): Promise<UserAddress[]> {
+    const results = await executeQuery<any>(
+      `SELECT id, user_id as userId, title, full_name as fullName, phone, address, city,
+              postal_code as postalCode, country, is_default as isDefault,
+              CONVERT(VARCHAR(23), created_at, 126) as createdAt,
+              CONVERT(VARCHAR(23), updated_at, 126) as updatedAt
+       FROM user_addresses 
+       WHERE user_id = @userId
+       ORDER BY is_default DESC, created_at DESC`,
+      { userId }
+    );
+
+    return results.map(item => ({
+      ...item,
+      createdAt: this.parseSqlDate(item.createdAt)!,
+      updatedAt: this.parseSqlDate(item.updatedAt)!,
+    }));
+  }
+
+  // Get default address for a user
   static async findDefaultByUserId(userId: number): Promise<UserAddress | null> {
-    try {
-      const address = await executeQueryOne<any>(
-        `SELECT id, user_id as userId, title, full_name as fullName, phone, address, 
-                city, district, postal_code as postalCode, country, is_default as isDefault,
-                created_at as createdAt, updated_at as updatedAt
-         FROM user_addresses 
-         WHERE user_id = @userId AND is_default = 1`,
-        { userId }
-      );
+    const result = await executeQueryOne<any>(
+      `SELECT id, user_id as userId, title, full_name as fullName, phone, address, city,
+              postal_code as postalCode, country, is_default as isDefault,
+              CONVERT(VARCHAR(23), created_at, 126) as createdAt,
+              CONVERT(VARCHAR(23), updated_at, 126) as updatedAt
+       FROM user_addresses 
+       WHERE user_id = @userId AND is_default = 1`,
+      { userId }
+    );
 
-      if (!address) return null;
+    if (!result) return null;
 
-      return {
-        ...address,
-        createdAt: new Date(address.createdAt),
-        updatedAt: new Date(address.updatedAt),
-      };
-    } catch (error) {
-      console.error('Error finding default address:', error);
-      return null;
-    }
+    return {
+      ...result,
+      createdAt: this.parseSqlDate(result.createdAt)!,
+      updatedAt: this.parseSqlDate(result.updatedAt)!,
+    };
   }
 
-  // Create new address
-  static async create(data: CreateUserAddressDto): Promise<UserAddress> {
-    try {
-      // If this is set as default, unset other defaults first
-      if (data.isDefault) {
-        await executeNonQuery(
-          'UPDATE user_addresses SET is_default = 0 WHERE user_id = @userId',
-          { userId: data.userId }
-        );
-      }
-
-      const result = await executeQueryOne<{ id: number }>(
-        `INSERT INTO user_addresses (user_id, title, full_name, phone, address, city, district, postal_code, country, is_default, created_at, updated_at)
-         OUTPUT INSERTED.id
-         VALUES (@userId, @title, @fullName, @phone, @address, @city, @district, @postalCode, @country, @isDefault, GETDATE(), GETDATE())`,
-        {
-          userId: data.userId,
-          title: data.title,
-          fullName: data.fullName,
-          phone: data.phone,
-          address: data.address,
-          city: data.city,
-          district: data.district,
-          postalCode: data.postalCode,
-          country: data.country,
-          isDefault: data.isDefault ? 1 : 0,
-        }
+  // Create address
+  static async create(addressData: {
+    userId: number;
+    title: string;
+    fullName: string;
+    phone: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    country?: string;
+    isDefault?: boolean;
+  }): Promise<UserAddress> {
+    // If this is set as default, unset other default addresses
+    if (addressData.isDefault) {
+      await executeNonQuery(
+        `UPDATE user_addresses 
+         SET is_default = 0, updated_at = GETDATE()
+         WHERE user_id = @userId`,
+        { userId: addressData.userId }
       );
-
-      if (!result) {
-        throw new Error('Failed to create address');
-      }
-
-      const createdAddress = await this.findById(result.id);
-      if (!createdAddress) {
-        throw new Error('Failed to retrieve created address');
-      }
-
-      return createdAddress;
-    } catch (error) {
-      console.error('Error creating address:', error);
-      throw error;
     }
+
+    const result = await executeQueryOne<{ id: number }>(
+      `INSERT INTO user_addresses (user_id, title, full_name, phone, address, city, postal_code, country, is_default, created_at, updated_at)
+       OUTPUT INSERTED.id
+       VALUES (@userId, @title, @fullName, @phone, @address, @city, @postalCode, @country, @isDefault, GETDATE(), GETDATE())`,
+      {
+        userId: addressData.userId,
+        title: addressData.title,
+        fullName: addressData.fullName,
+        phone: addressData.phone,
+        address: addressData.address,
+        city: addressData.city,
+        postalCode: addressData.postalCode,
+        country: addressData.country || 'Türkiye',
+        isDefault: addressData.isDefault ? 1 : 0,
+      }
+    );
+
+    if (!result || !result.id) {
+      throw new Error('Address oluşturulamadı');
+    }
+
+    const address = await this.findById(result.id);
+    if (!address) {
+      throw new Error('Address oluşturulamadı');
+    }
+
+    return address;
   }
 
   // Update address
-  static async update(id: number, data: Partial<CreateUserAddressDto>): Promise<boolean> {
-    try {
-      // If this is set as default, unset other defaults first
-      if (data.isDefault && data.userId) {
-        await executeNonQuery(
-          'UPDATE user_addresses SET is_default = 0 WHERE user_id = @userId AND id != @id',
-          { userId: data.userId, id }
-        );
-      }
+  static async update(id: number, updates: Partial<{
+    title: string;
+    fullName: string;
+    phone: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    isDefault: boolean;
+  }>): Promise<UserAddress | null> {
+    const address = await this.findById(id);
+    if (!address) return null;
 
-      const fields: string[] = [];
-      const params: any = { id };
-
-      if (data.title !== undefined) {
-        fields.push('title = @title');
-        params.title = data.title;
-      }
-      if (data.fullName !== undefined) {
-        fields.push('full_name = @fullName');
-        params.fullName = data.fullName;
-      }
-      if (data.phone !== undefined) {
-        fields.push('phone = @phone');
-        params.phone = data.phone;
-      }
-      if (data.address !== undefined) {
-        fields.push('address = @address');
-        params.address = data.address;
-      }
-      if (data.city !== undefined) {
-        fields.push('city = @city');
-        params.city = data.city;
-      }
-      if (data.district !== undefined) {
-        fields.push('district = @district');
-        params.district = data.district;
-      }
-      if (data.postalCode !== undefined) {
-        fields.push('postal_code = @postalCode');
-        params.postalCode = data.postalCode;
-      }
-      if (data.country !== undefined) {
-        fields.push('country = @country');
-        params.country = data.country;
-      }
-      if (data.isDefault !== undefined) {
-        fields.push('is_default = @isDefault');
-        params.isDefault = data.isDefault ? 1 : 0;
-      }
-
-      if (fields.length === 0) {
-        return true; // Nothing to update
-      }
-
-      fields.push('updated_at = GETDATE()');
-
-      const rowsAffected = await executeNonQuery(
-        `UPDATE user_addresses SET ${fields.join(', ')} WHERE id = @id`,
-        params
+    // If setting as default, unset other default addresses
+    if (updates.isDefault === true) {
+      await executeNonQuery(
+        `UPDATE user_addresses 
+         SET is_default = 0, updated_at = GETDATE()
+         WHERE user_id = @userId AND id != @id`,
+        { userId: address.userId, id }
       );
-
-      return rowsAffected > 0;
-    } catch (error) {
-      console.error('Error updating address:', error);
-      return false;
     }
+
+    const fields: string[] = [];
+    const params: Record<string, any> = { id };
+
+    if (updates.title !== undefined) {
+      fields.push('title = @title');
+      params.title = updates.title;
+    }
+    if (updates.fullName !== undefined) {
+      fields.push('full_name = @fullName');
+      params.fullName = updates.fullName;
+    }
+    if (updates.phone !== undefined) {
+      fields.push('phone = @phone');
+      params.phone = updates.phone;
+    }
+    if (updates.address !== undefined) {
+      fields.push('address = @address');
+      params.address = updates.address;
+    }
+    if (updates.city !== undefined) {
+      fields.push('city = @city');
+      params.city = updates.city;
+    }
+    if (updates.postalCode !== undefined) {
+      fields.push('postal_code = @postalCode');
+      params.postalCode = updates.postalCode;
+    }
+    if (updates.country !== undefined) {
+      fields.push('country = @country');
+      params.country = updates.country;
+    }
+    if (updates.isDefault !== undefined) {
+      fields.push('is_default = @isDefault');
+      params.isDefault = updates.isDefault ? 1 : 0;
+    }
+
+    if (fields.length === 0) {
+      return await this.findById(id);
+    }
+
+    fields.push('updated_at = GETDATE()');
+
+    await executeNonQuery(
+      `UPDATE user_addresses 
+       SET ${fields.join(', ')}
+       WHERE id = @id`,
+      params
+    );
+
+    return await this.findById(id);
   }
 
   // Delete address
   static async delete(id: number): Promise<boolean> {
-    try {
-      const rowsAffected = await executeNonQuery(
-        'DELETE FROM user_addresses WHERE id = @id',
-        { id }
-      );
+    const result = await executeNonQuery(
+      `DELETE FROM user_addresses WHERE id = @id`,
+      { id }
+    );
 
-      return rowsAffected > 0;
-    } catch (error) {
-      console.error('Error deleting address:', error);
-      return false;
-    }
+    return result > 0;
   }
 
   // Set address as default
   static async setAsDefault(id: number, userId: number): Promise<boolean> {
-    try {
-      // First, unset all defaults for this user
-      await executeNonQuery(
-        'UPDATE user_addresses SET is_default = 0 WHERE user_id = @userId',
-        { userId }
-      );
+    // Unset all other default addresses
+    await executeNonQuery(
+      `UPDATE user_addresses 
+       SET is_default = 0, updated_at = GETDATE()
+       WHERE user_id = @userId`,
+      { userId }
+    );
 
-      // Then set this address as default
-      const rowsAffected = await executeNonQuery(
-        'UPDATE user_addresses SET is_default = 1, updated_at = GETDATE() WHERE id = @id AND user_id = @userId',
-        { id, userId }
-      );
+    // Set this address as default
+    const result = await executeNonQuery(
+      `UPDATE user_addresses 
+       SET is_default = 1, updated_at = GETDATE()
+       WHERE id = @id AND user_id = @userId`,
+      { id, userId }
+    );
 
-      return rowsAffected > 0;
-    } catch (error) {
-      console.error('Error setting default address:', error);
-      return false;
-    }
+    return result > 0;
   }
 }
+
