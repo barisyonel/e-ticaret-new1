@@ -6,15 +6,6 @@ import { verifyToken } from '@/lib/auth/jwt';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // www subdomain kontrolü - next.config.js redirect'i çalışmazsa fallback
-  const host = request.headers.get('host');
-  if (host?.startsWith('www.')) {
-    const newHost = host.replace('www.', '');
-    const newUrl = new URL(request.url);
-    newUrl.host = newHost;
-    return NextResponse.redirect(newUrl, 301);
-  }
 
   // /admin/* yollarını koru
   if (pathname.startsWith('/admin')) {
