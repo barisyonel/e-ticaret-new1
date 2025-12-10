@@ -1,33 +1,37 @@
 'use client';
 
 import { useState } from 'react';
-// Yeni action'ı import ediyoruz
-import { createCategoryAction } from '@/app/server-actions/categoryActions'; 
+import { useRouter } from 'next/navigation';
+import { createCategoryAction } from '@/app/server-actions/categoryActions';
 import Link from 'next/link';
 import { generateSlug } from '@/lib/utils/slug';
 import ImageUpload from '@/components/ImageUpload';
-// Repository'den gelen Category tipini kullanmaya devam ediyoruz
-import { Category } from '@/lib/repositories/CategoryRepository';
+// Eğer CategoryRepository importu hata verirse, aşağıdaki satırı silip
+// dosyanın en altına manuel interface ekleyebilirsin.
+import { Category } from '@/lib/repositories/CategoryRepository'; 
 
 interface CategoryFormProps {
-  categories: Category[];
+  availableCategories: Category[];
 }
 
-export default function CategoryForm({ categories }: CategoryFormProps) {
+export default function CategoryForm({ availableCategories }: CategoryFormProps) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // State yönetimleri aynen kalıyor
+  // Form State'leri
   const [image, setImage] = useState<string | null>(null);
   const [slug, setSlug] = useState('');
   const [isSlugManual, setIsSlugManual] = useState(false);
   const [parentId, setParentId] = useState<number | null>(null);
+  const [displayOrder, setDisplayOrder] = useState(0);
+  const [isActive, setIsActive] = useState(true);
 
-  // Kategorileri düzleştirme (Dropdown için)
+  // Kategorileri hiyerarşik yapı için düzleştirme fonksiyonu
   const flattenCategories = (cats: Category[], level: number = 0): Array<Category & { level: number; displayName: string }> => {
     let result: Array<Category & { level: number; displayName: string }> = [];
     cats.forEach((cat) => {
-      result.push({ ...cat, level, displayName: '  '.repeat(level) + cat.name });
+      result.push({ ...cat, level, displayName: '— '.repeat(level) + cat.name });
       if (cat.children && cat.children.length > 0) {
         result = result.concat(flattenCategories(cat.children, level + 1));
       }
@@ -43,43 +47,42 @@ export default function CategoryForm({ categories }: CategoryFormProps) {
     try {
       const formData = new FormData(e.currentTarget);
       
-      // Resim varsa FormData'ya ekliyoruz (Server Action bunu yakalayacak)
+      // Image alanını ekle
       if (image) {
         formData.set('image', image);
       }
 
-      // ParentId varsa ekliyoruz
+      // Parent ID (null kontrolü)
       if (parentId) {
         formData.set('parentId', parentId.toString());
+      } else {
+        formData.delete('parentId'); 
       }
 
-      // Checkbox işaretli değilse FormData'ya 'off' olarak bile gitmeyebilir,
-      // ama HTML form davranışı gereği server action'da kontrol ediyoruz.
-      // Sadece emin olmak için isActive'i manuel set etmeye gerek yok, input name="isActive" yeterli.
+      // Diğer alanları manuel set ediyoruz
+      formData.set('slug', slug);
+      formData.set('displayOrder', displayOrder.toString());
+      formData.set('isActive', isActive ? 'true' : 'false');
 
-      // 🔥 Server Action'ı çağırıyoruz
-      // İlk parametre null (prevState), ikincisi formData
-      const result = await createCategoryAction(null, formData);
+      // 🔥 DÜZELTME BURADA YAPILDI:
+      // Eskiden: createCategoryAction(null, formData) idi.
+      // Şimdi: Sadece formData gönderiyoruz.
+      const result = await createCategoryAction(formData);
 
-      // Başarısız olursa hatayı göster
-      if (result && !result.success) {
-        setError(result.message || 'Kategori oluşturulurken bir hata oluştu');
-      } 
-      
-      // Not: Başarılı olursa Server Action içinde "redirect" olduğu için
-      // sayfa otomatik olarak yönlendirilecek. Burada router.push yapmana gerek yok.
-
+      if (result.success) {
+        router.refresh(); 
+        router.push('/admin/categories');
+      } else {
+        setError(result.error || 'Kategori oluşturulurken bir hata oluştu');
+      }
     } catch (err) {
-      // Eğer Server Action redirect yaparsa bazen Next.js bunu hata gibi fırlatabilir.
-      // Ancak genellikle client-side try-catch bunu yutmazsa sayfa değişir.
-      // Basit bir hata yakalama:
-      setError(err instanceof Error ? err.message : 'Beklenmedik bir hata oluştu');
+      setError(err instanceof Error ? err.message : 'Kategori oluşturulurken beklenmedik bir hata oluştu');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const flatCategories = flattenCategories(categories);
+  const flatCategories = flattenCategories(availableCategories);
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
@@ -89,7 +92,7 @@ export default function CategoryForm({ categories }: CategoryFormProps) {
         </div>
       )}
 
-      {/* Form Alanları Aynen Kalıyor */}
+      {/* İsim Alanı */}
       <div>
         <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
           Kategori Adı *
@@ -106,9 +109,11 @@ export default function CategoryForm({ categories }: CategoryFormProps) {
             }
           }}
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
+          placeholder="Örn: Motor Parçaları"
         />
       </div>
 
+      {/* Slug Alanı */}
       <div>
         <label htmlFor="slug" className="block text-gray-700 font-medium mb-2">
           Slug (URL) *
@@ -125,12 +130,14 @@ export default function CategoryForm({ categories }: CategoryFormProps) {
           }}
           pattern="[a-z0-9-]+"
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
+          placeholder="orn-motor-parcalari"
         />
         <p className="text-xs text-gray-500 mt-1">
-          Sadece küçük harf, rakam ve tire kullanılabilir
+          Sadece küçük harf, rakam ve tire kullanılabilir.
         </p>
       </div>
 
+      {/* Üst Kategori Seçimi */}
       <div>
         <label htmlFor="parentId" className="block text-gray-700 font-medium mb-2">
           Üst Kategori (Opsiyonel)
@@ -151,6 +158,7 @@ export default function CategoryForm({ categories }: CategoryFormProps) {
         </select>
       </div>
 
+      {/* Resim Yükleme */}
       <div>
         <label className="block text-gray-700 font-medium mb-2">
           Kategori Görseli (Opsiyonel)
@@ -165,12 +173,30 @@ export default function CategoryForm({ categories }: CategoryFormProps) {
         />
       </div>
 
+      {/* Sıra Numarası */}
+      <div>
+        <label htmlFor="displayOrder" className="block text-gray-700 font-medium mb-2">
+          Sıra Numarası
+        </label>
+        <input
+          type="number"
+          id="displayOrder"
+          name="displayOrder"
+          min="0"
+          value={displayOrder}
+          onChange={(e) => setDisplayOrder(parseInt(e.target.value, 10))}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
+        />
+      </div>
+
+      {/* Aktiflik Durumu */}
       <div className="flex items-center">
         <input
           type="checkbox"
           id="isActive"
           name="isActive"
-          defaultChecked
+          checked={isActive}
+          onChange={(e) => setIsActive(e.target.checked)}
           className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
         />
         <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
@@ -178,6 +204,7 @@ export default function CategoryForm({ categories }: CategoryFormProps) {
         </label>
       </div>
 
+      {/* Butonlar */}
       <div className="flex space-x-4">
         <button
           type="submit"
