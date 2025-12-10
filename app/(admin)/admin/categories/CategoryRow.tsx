@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import DeleteCategoryButton from './DeleteCategoryButton';
-import ToggleCategoryActiveButton from './ToggleCategoryActiveButton';
+
+// DÜZELTME BURADA YAPILDI: Süslü parantez içine alındı (Named Import)
+import { DeleteCategoryButton } from './DeleteCategoryButton';
+import { ToggleCategoryActiveButton } from './ToggleCategoryActiveButton';
 
 interface Category {
   id: number;
@@ -149,4 +151,3 @@ export default function CategoryRow({ category, level, parentName }: CategoryRow
     </>
   );
 }
-

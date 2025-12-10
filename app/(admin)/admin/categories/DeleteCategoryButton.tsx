@@ -1,43 +1,55 @@
-'use server';
+'use client';
 
-// app/server-actions/categoryActions.ts
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { deleteCategory } from '@/app/server-actions/categoryActions';
 
-// Prisma kullanıyorsan import'u açabilirsin:
-// import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
-
-// 1. Kategoriyi ID'ye göre getirme (Edit sayfası için gerekli)
-export async function getCategoryById(id: number) {
-  try {
-    // DB Bağlantısı varsa: const category = await prisma.category.findUnique({ where: { id } });
-    
-    // Geçici Mock Data (Build hatası vermemesi için):
-    return {
-      id: id,
-      name: "Örnek Kategori",
-      slug: "ornek-kategori",
-      description: "Bu kategori düzenleme testi içindir."
-    };
-  } catch (error) {
-    console.error('Kategori getirme hatası:', error);
-    return null;
-  }
+interface DeleteCategoryButtonProps {
+  categoryId: number;
+  categoryName: string;
 }
 
-// 2. Kategori Silme (Delete butonu için gerekli)
-export async function deleteCategory(id: number) {
-  try {
-    // DB silme kodu buraya gelecek:
-    // await prisma.category.delete({ where: { id } });
-    
-    console.log(`Kategori silindi ID: ${id}`);
+// ÖNEMLİ DEĞİŞİKLİK:
+// Burada "export default function" yerine sadece "export function" kullanıyoruz.
+// Bu sayede CategoryRow.tsx içindeki { DeleteCategoryButton } importu hatasız çalışır.
 
-    // Silme işleminden sonra listeyi yenilemek için cache temizlenir
-    revalidatePath('/admin/categories');
-    
-    return { success: true };
-  } catch (error) {
-    console.error('Kategori silme hatası:', error);
-    return { success: false, error: 'Silme işlemi sırasında sunucu hatası.' };
-  }
+export function DeleteCategoryButton({
+  categoryId,
+  categoryName,
+}: DeleteCategoryButtonProps) {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    if (!confirm(`"${categoryName}" kategorisini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await deleteCategory(categoryId);
+      
+      if (result.success) {
+        // Silme başarılıysa sayfayı yenile
+        router.refresh();
+      } else {
+        alert(result.error || 'Kategori silinirken bir hata oluştu.');
+      }
+    } catch (error) {
+      alert('Beklenmedik bir hata oluştu.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDelete}
+      disabled={loading}
+      className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+      title="Kategoriyi Sil"
+    >
+      {loading ? 'Siliniyor...' : 'Sil'}
+    </button>
+  );
 }
