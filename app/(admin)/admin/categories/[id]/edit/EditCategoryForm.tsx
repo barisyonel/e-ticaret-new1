@@ -6,7 +6,9 @@ import { updateCategory } from '@/app/server-actions/categoryActions';
 import Link from 'next/link';
 import { generateSlug } from '@/lib/utils/slug';
 import ImageUpload from '@/components/ImageUpload';
-import { Category } from '@/lib/repositories/CategoryRepository';
+// Eğer CategoryRepository importu hata verirse, aşağıdaki satırı silip
+// dosyanın en altına manuel interface ekleyebilirsin.
+import { Category } from '@/lib/repositories/CategoryRepository'; 
 
 interface EditCategoryFormProps {
   category: Category;
@@ -17,20 +19,25 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // State tanımları
   const [image, setImage] = useState<string | null>(category.image || null);
   const [slug, setSlug] = useState(category.slug);
-  const [isSlugManual, setIsSlugManual] = useState(true); // Assume manual since editing
+  const [isSlugManual, setIsSlugManual] = useState(true);
   const [parentId, setParentId] = useState<number | null>(category.parentId);
   const [displayOrder, setDisplayOrder] = useState(category.displayOrder);
   const [isActive, setIsActive] = useState(category.isActive);
 
-  // Flatten category tree for dropdown
+  // Kategorileri hiyerarşik yapı için düzleştirme fonksiyonu
   const flattenCategories = (cats: Category[], level: number = 0): Array<Category & { level: number; displayName: string }> => {
     let result: Array<Category & { level: number; displayName: string }> = [];
     cats.forEach((cat) => {
-      result.push({ ...cat, level, displayName: '  '.repeat(level) + cat.name });
-      if (cat.children && cat.children.length > 0) {
-        result = result.concat(flattenCategories(cat.children, level + 1));
+      // Kendisini listeye ekleme (sonsuz döngü olmasın diye)
+      if (cat.id !== category.id) {
+        result.push({ ...cat, level, displayName: '— '.repeat(level) + cat.name });
+        if (cat.children && cat.children.length > 0) {
+          result = result.concat(flattenCategories(cat.children, level + 1));
+        }
       }
     });
     return result;
@@ -44,33 +51,37 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
     try {
       const formData = new FormData(e.currentTarget);
       
-      // Set image (single image for category)
+      // Image alanını güncelle
       if (image) {
         formData.set('image', image);
       } else {
-        formData.set('image', ''); // Empty string to remove image
+        formData.set('image', ''); 
       }
 
-      // Set parentId (can be null)
+      // Parent ID (null kontrolü)
       if (parentId) {
         formData.set('parentId', parentId.toString());
       } else {
-        formData.set('parentId', 'null');
+        formData.delete('parentId'); 
       }
 
-      // Set other fields
+      // Diğer alanları manuel set ediyoruz
+      formData.set('slug', slug);
       formData.set('displayOrder', displayOrder.toString());
       formData.set('isActive', isActive ? 'true' : 'false');
 
+      // Server Action Çağrısı
       const result = await updateCategory(category.id, formData);
 
-      if (result.success && result.data) {
+      // DÜZELTME: Sadece success kontrolü yapıyoruz, data beklemiyoruz.
+      if (result.success) {
+        router.refresh(); 
         router.push('/admin/categories');
       } else {
         setError(result.error || 'Kategori güncellenirken bir hata oluştu');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kategori güncellenirken bir hata oluştu');
+      setError(err instanceof Error ? err.message : 'Kategori güncellenirken beklenmedik bir hata oluştu');
     } finally {
       setIsSubmitting(false);
     }
@@ -86,6 +97,7 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
         </div>
       )}
 
+      {/* İsim Alanı */}
       <div>
         <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
           Kategori Adı *
@@ -97,7 +109,6 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
           required
           defaultValue={category.name}
           onChange={(e) => {
-            // Auto-generate slug if user hasn't manually edited it
             if (!isSlugManual) {
               const autoSlug = generateSlug(e.target.value);
               setSlug(autoSlug);
@@ -107,6 +118,7 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
         />
       </div>
 
+      {/* Slug Alanı */}
       <div>
         <label htmlFor="slug" className="block text-gray-700 font-medium mb-2">
           Slug (URL) *
@@ -125,10 +137,11 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
         />
         <p className="text-xs text-gray-500 mt-1">
-          Sadece küçük harf, rakam ve tire kullanılabilir
+          Sadece küçük harf, rakam ve tire kullanılabilir.
         </p>
       </div>
 
+      {/* Üst Kategori Seçimi */}
       <div>
         <label htmlFor="parentId" className="block text-gray-700 font-medium mb-2">
           Üst Kategori (Opsiyonel)
@@ -147,11 +160,9 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
             </option>
           ))}
         </select>
-        <p className="text-xs text-gray-500 mt-1">
-          Bu kategoriyi bir üst kategorinin alt kategorisi yapmak için seçin
-        </p>
       </div>
 
+      {/* Resim Yükleme */}
       <div>
         <label className="block text-gray-700 font-medium mb-2">
           Kategori Görseli (Opsiyonel)
@@ -164,11 +175,9 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
           maxImages={1}
           folder="categories"
         />
-        <p className="text-xs text-gray-500 mt-1">
-          Kategori görseli yüklemek zorunlu değildir. Görseli kaldırmak için görseli silin.
-        </p>
       </div>
 
+      {/* Sıra Numarası */}
       <div>
         <label htmlFor="displayOrder" className="block text-gray-700 font-medium mb-2">
           Sıra Numarası
@@ -182,11 +191,9 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
           onChange={(e) => setDisplayOrder(parseInt(e.target.value, 10))}
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
         />
-        <p className="text-xs text-gray-500 mt-1">
-          Menülerde görüntülenme sırası (küçük sayılar önce görünür)
-        </p>
       </div>
 
+      {/* Aktiflik Durumu */}
       <div className="flex items-center">
         <input
           type="checkbox"
@@ -201,6 +208,7 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
         </label>
       </div>
 
+      {/* Butonlar */}
       <div className="flex space-x-4">
         <button
           type="submit"
@@ -223,4 +231,3 @@ export default function EditCategoryForm({ category, availableCategories }: Edit
     </form>
   );
 }
-

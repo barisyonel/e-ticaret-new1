@@ -10,49 +10,49 @@ interface ToggleCategoryActiveButtonProps {
   categoryName: string;
 }
 
-export default function ToggleCategoryActiveButton({
+// DÜZELTME: "export default function" YERİNE "export function" YAZIYORUZ
+export function ToggleCategoryActiveButton({
   categoryId,
-  isActive: initialIsActive,
+  isActive,
   categoryName,
 }: ToggleCategoryActiveButtonProps) {
-  const [isActive, setIsActive] = useState(initialIsActive);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleToggle = async () => {
-    if (loading) return;
+    setIsLoading(true);
+    try {
+      // Server action'ı çağırıyoruz
+      const result = await toggleCategoryActive(categoryId, !isActive);
 
-    const confirmMessage = isActive
-      ? `"${categoryName}" kategorisini pasif yapmak istediğinize emin misiniz? Pasif kategoriler sitede görünmeyecektir.`
-      : `"${categoryName}" kategorisini aktif yapmak istediğinize emin misiniz?`;
-
-    if (!confirm(confirmMessage)) {
-      return;
+      if (!result.success) {
+        alert(result.error || 'Durum değiştirilirken bir hata oluştu.');
+      } else {
+        // Başarılıysa sayfayı yenile (veriyi güncellemek için)
+        router.refresh();
+      }
+    } catch (error) {
+      alert('Beklenmedik bir hata oluştu.');
+    } finally {
+      setIsLoading(false);
     }
-
-    setLoading(true);
-    const result = await toggleCategoryActive(categoryId, !isActive);
-    if (result.success) {
-      setIsActive(!isActive);
-      router.refresh();
-    } else {
-      alert(result.error || 'Kategori durumu güncellenirken bir hata oluştu.');
-    }
-    setLoading(false);
   };
 
   return (
     <button
       onClick={handleToggle}
-      disabled={loading}
-      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-        isActive
-          ? 'bg-green-100 text-green-800 hover:bg-green-200'
-          : 'bg-red-100 text-red-800 hover:bg-red-200'
-      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+      disabled={isLoading}
+      className={`
+        px-3 py-1 rounded-full text-xs font-semibold transition-colors
+        ${isActive 
+          ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}
+        ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+      `}
     >
-      {loading ? 'Güncelleniyor...' : isActive ? 'Aktif' : 'Pasif'}
+      {isLoading 
+        ? '...' 
+        : (isActive ? 'Aktif' : 'Pasif')}
     </button>
   );
 }
-

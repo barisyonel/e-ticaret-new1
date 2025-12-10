@@ -1,65 +1,48 @@
-import { getCategoryById, getCategoryTree } from '@/app/server-actions/categoryActions';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { getCategoryById, getCategoryTree } from '@/app/server-actions/categoryActions';
 import EditCategoryForm from './EditCategoryForm';
 
-export default async function EditCategoryPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const categoryId = parseInt(id, 10);
-  
+interface EditCategoryPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function EditCategoryPage({ params }: EditCategoryPageProps) {
+  const categoryId = parseInt(params.id);
+
   if (isNaN(categoryId)) {
     notFound();
   }
 
-  // Get category to edit
-  const categoryResult = await getCategoryById(categoryId, true);
-  if (!categoryResult.success || !categoryResult.data) {
+  // Verileri paralel olarak çekiyoruz
+  // DÜZELTME: getCategoryById artık sadece ID alıyor (2. parametre silindi)
+  const [category, categories] = await Promise.all([
+    getCategoryById(categoryId),
+    getCategoryTree()
+  ]);
+
+  // Eğer kategori bulunamazsa 404
+  // DÜZELTME: Artık direkt category null mu diye bakıyoruz (success/data yok)
+  if (!category) {
     notFound();
   }
 
-  const category = categoryResult.data;
-
-  // Get all categories for parent selection (exclude current category and its children to prevent circular reference)
-  const categoriesResult = await getCategoryTree(true);
-  const allCategories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
-
-  // Filter out current category and its children
-  const filterCategory = (cats: any[], excludeId: number): any[] => {
-    return cats
-      .filter((cat) => cat.id !== excludeId)
-      .map((cat) => {
-        if (cat.children && cat.children.length > 0) {
-          return {
-            ...cat,
-            children: filterCategory(cat.children, excludeId),
-          };
-        }
-        return cat;
-      });
-  };
-
-  const availableCategories = filterCategory(allCategories, categoryId);
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Kategori Düzenle</h1>
-          <Link
-            href="/admin/categories"
-            className="text-pink-600 hover:text-pink-700"
-          >
-            ← Geri Dön
-          </Link>
+    <div className="max-w-5xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Kategori Düzenle</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            "{category.name}" kategorisinin bilgilerini güncelleyin.
+          </p>
         </div>
-
-        <EditCategoryForm category={category} availableCategories={availableCategories} />
       </div>
+
+      <EditCategoryForm 
+        category={category} 
+        availableCategories={categories} 
+      />
     </div>
   );
 }
-
