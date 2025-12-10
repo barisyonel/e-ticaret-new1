@@ -15,15 +15,16 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     notFound();
   }
 
-  // Verileri paralel olarak çekiyoruz
-  // DÜZELTME: getCategoryById artık sadece ID alıyor (2. parametre silindi)
+  // HATA ÇÖZÜMÜ:
+  // 1. getCategoryById artık tek parametre (id) alıyor. ', true' silindi.
+  // 2. getCategoryTree parametre almıyor.
   const [category, categories] = await Promise.all([
     getCategoryById(categoryId),
     getCategoryTree()
   ]);
 
-  // Eğer kategori bulunamazsa 404
-  // DÜZELTME: Artık direkt category null mu diye bakıyoruz (success/data yok)
+  // HATA ÇÖZÜMÜ:
+  // Artık response { success, data } formatında değil, direkt veri dönüyor.
   if (!category) {
     notFound();
   }
