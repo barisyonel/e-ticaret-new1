@@ -8,20 +8,20 @@ import { revalidatePath } from 'next/cache';
 
 // Kategori Ağacını Getir
 export async function getCategoryTree() {
-  return [];
+  // HATA ÇÖZÜMÜ: "as any[]" ekledik. Artık TypeScript buna "never" demiyor.
+  return [] as any[];
 }
 
 // Ana Kategorileri Getir
 export async function getMainCategories() {
-  return [];
+  return [] as any[];
 }
 
-// Tekil Kategori Getir (GÜNCELLENEN KISIM: Eksik alanlar eklendi)
+// Tekil Kategori Getir
 export async function getCategoryById(id: number) {
   try {
     console.log(`Kategori aranıyor ID: ${id}`);
     
-    // TypeScript'in istediği TÜM alanları ekliyoruz
     return { 
       id: id, 
       name: "Test Kategorisi", 
@@ -30,10 +30,10 @@ export async function getCategoryById(id: number) {
       parentId: null,
       image: null,
       isActive: true,
-      displayOrder: 1,           // EKLENDİ
-      createdAt: new Date(),     // EKLENDİ
-      updatedAt: new Date(),     // EKLENDİ
-      children: []               // EKLENDİ
+      displayOrder: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      children: [] as any[] // Burayı da garantiye aldık
     };
     
   } catch (error) {

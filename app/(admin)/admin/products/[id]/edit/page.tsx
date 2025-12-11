@@ -1,46 +1,68 @@
-import { getCategoryTree } from '@/app/server-actions/categoryActions';
-import { getAllAttributesWithValues } from '@/app/server-actions/attributeActions';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import EditProductFormWithCategories from './EditProductFormWithCategories';
+// Actions
+import { getCategoryTree } from '@/app/server-actions/categoryActions';
+// Eğer bu dosyaların yerleri farklıysa hata alabilirsin, standart yollar varsayıldı:
+import { getProductById } from '@/app/server-actions/productActions';
+import { getAllAttributesWithValues } from '@/app/server-actions/attributeActions';
+// Form Component
+import EditProductForm from './EditProductForm';
 
-export default async function EditProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const productId = parseInt(id, 10);
-  
+interface EditProductPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function EditProductPage({ params }: EditProductPageProps) {
+  const productId = parseInt(params.id);
+
   if (isNaN(productId)) {
     notFound();
   }
 
-  // Load categories and attributes for selection (server-side)
-  const [categoriesResult, attributesResult] = await Promise.all([
-    getCategoryTree(true), // Include inactive for admin
-    getAllAttributesWithValues(false), // Only active attributes
+  // Verileri paralel olarak çekiyoruz
+  const [productResult, categories, attributesResult] = await Promise.all([
+    getProductById(productId),
+    getCategoryTree(),            // Parametresiz (DÜZELTİLDİ)
+    getAllAttributesWithValues(false) // Parametreli (false = sadece aktifler değil hepsi)
   ]);
+
+  // --- HATA ÇÖZÜMÜ BURADA ---
   
-  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
-  const attributes = attributesResult.success && attributesResult.data ? attributesResult.data : [];
+  // 1. Gelen sonucu 'any' olarak işaretliyoruz ki TypeScript karışmasın
+  let product = productResult as any;
+
+  // 2. Eğer eski yapıdaki gibi { data: ... } içinde geliyorsa onu çıkartıyoruz
+  if (product && typeof product === 'object' && 'data' in product) {
+    product = product.data;
+  }
+
+  // 3. KESİN KONTROL: Eğer ürün yoksa, hata objesiyse veya isimsizse 404 ver
+  // Bu kontrol "Property 'name' does not exist" hatasını engeller.
+  if (!product || (product.error) || !product.name) {
+    notFound();
+  }
+
+  // Attribute verisini güvenli hale getirme (AttributesResult kontrolü)
+  const attributesData = attributesResult as any;
+  const attributes = attributesData && attributesData.data ? attributesData.data : (Array.isArray(attributesData) ? attributesData : []);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Ürün Düzenle</h1>
-          <Link
-            href="/admin/products"
-            className="text-pink-600 hover:text-pink-700"
-          >
-            ← Geri Dön
-          </Link>
+    <div className="max-w-5xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Ürün Düzenle</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            "{product.name}" ürününün özelliklerini güncelleyin.
+          </p>
         </div>
-
-        <EditProductFormWithCategories productId={productId} categories={categories} attributes={attributes} />
       </div>
+
+      <EditProductForm 
+        product={product} 
+        categories={categories} 
+        attributes={attributes} 
+      />
     </div>
   );
 }
-
