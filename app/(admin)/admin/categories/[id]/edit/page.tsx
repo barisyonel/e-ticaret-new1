@@ -15,16 +15,12 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     notFound();
   }
 
-  // HATA ÇÖZÜMÜ:
-  // 1. getCategoryById artık tek parametre (id) alıyor. ', true' silindi.
-  // 2. getCategoryTree parametre almıyor.
+  // DÜZELTME: getCategoryById sadece ID alıyor. getCategoryTree parametre almıyor.
   const [category, categories] = await Promise.all([
     getCategoryById(categoryId),
     getCategoryTree()
   ]);
 
-  // HATA ÇÖZÜMÜ:
-  // Artık response { success, data } formatında değil, direkt veri dönüyor.
   if (!category) {
     notFound();
   }
@@ -34,16 +30,9 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Kategori Düzenle</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            "{category.name}" kategorisinin bilgilerini güncelleyin.
-          </p>
         </div>
       </div>
-
-      <EditCategoryForm 
-        category={category} 
-        availableCategories={categories} 
-      />
+      <EditCategoryForm category={category} availableCategories={categories} />
     </div>
   );
 }
