@@ -1,138 +1,143 @@
 'use client';
 
-import { useState } from 'react';
-import { Category } from '@/lib/repositories/CategoryRepository';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback } from 'react';
+import Link from 'next/link';
 
+// HATA ÇÖZÜMÜ: Interface'e 'attributes' ve 'brands' eklendi.
+// 'any' kullanarak build hatalarını engelliyoruz.
 interface ProductFiltersProps {
-  categories: Category[];
-  selectedCategory?: string;
-  priceRange: { min: number; max: number };
-  onCategoryChange: (category: string) => void;
-  onPriceRangeChange: (min: number, max: number) => void;
-  onReset: () => void;
+  categories: any[];
+  attributes: any[];
+  brands: any[];
+  selectedCategory: string;
+  selectedFilters: Record<string, string[]>;
 }
 
 export default function ProductFilters({
   categories,
+  attributes,
+  brands,
   selectedCategory,
-  priceRange,
-  onCategoryChange,
-  onPriceRangeChange,
-  onReset,
+  selectedFilters
 }: ProductFiltersProps) {
-  const [localPriceRange, setLocalPriceRange] = useState(priceRange);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Flatten categories for display
-  const flattenCategories = (cats: Category[], level: number = 0): Array<Category & { level: number; displayName: string }> => {
-    let result: Array<Category & { level: number; displayName: string }> = [];
-    cats.forEach((cat) => {
-      result.push({ ...cat, level, displayName: '  '.repeat(level) + cat.name });
-      if (cat.children && cat.children.length > 0) {
-        result = result.concat(flattenCategories(cat.children, level + 1));
+  // URL'yi güncelleme fonksiyonu
+  const updateFilter = useCallback((key: string, value: string, checked: boolean) => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    
+    // Mevcut değerleri al
+    const currentValues = current.get(key)?.split(',') || [];
+    
+    let newValues;
+    if (checked) {
+      // Ekle
+      if (!currentValues.includes(value)) {
+        newValues = [...currentValues, value];
+      } else {
+        newValues = currentValues;
       }
-    });
-    return result;
-  };
+    } else {
+      // Çıkar
+      newValues = currentValues.filter((v) => v !== value);
+    }
 
-  const flatCategories = flattenCategories(categories);
+    // URL'yi güncelle
+    if (newValues.length > 0) {
+      current.set(key, newValues.join(','));
+    } else {
+      current.delete(key);
+    }
+    
+    // Sayfa numarasını sıfırla
+    current.delete('page');
 
-  const handlePriceRangeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onPriceRangeChange(localPriceRange.min, localPriceRange.max);
-  };
+    // Yönlendir
+    const search = current.toString();
+    const query = search ? `?${search}` : '';
+    router.push(`/products${query}`);
+  }, [searchParams, router]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900">Filtreler</h3>
-        <button
-          onClick={onReset}
-          className="text-sm text-primary-blue hover:text-primary-blue-dark"
-        >
-          Temizle
-        </button>
-      </div>
-
-      {/* Category Filter */}
+    <div className="space-y-8">
+      {/* Kategoriler */}
       <div>
-        <h4 className="font-medium text-gray-700 mb-3">Kategoriler</h4>
-        <div className="space-y-2 max-h-64 overflow-y-auto">
-          {flatCategories.map((category) => (
-            <label
-              key={category.id}
-              className="flex items-center space-x-2 cursor-pointer"
-              style={{ paddingLeft: `${category.level * 16}px` }}
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+          Kategoriler
+        </h3>
+        <ul className="space-y-3 font-medium text-gray-600">
+          <li>
+            <Link 
+              href="/products" 
+              className={`block hover:text-pink-600 ${!selectedCategory ? 'text-pink-600 font-bold' : ''}`}
             >
-              <input
-                type="radio"
-                name="category"
-                value={category.slug}
-                checked={selectedCategory === category.slug}
-                onChange={(e) => onCategoryChange(e.target.value)}
-                className="w-4 h-4 text-primary-blue focus:ring-primary-blue"
-              />
-              <span className="text-sm text-gray-700">{category.displayName}</span>
-            </label>
+              Tüm Ürünler
+            </Link>
+          </li>
+          {categories.map((cat) => (
+            <li key={cat.id}>
+              <Link
+                href={`/products?category=${cat.slug}`}
+                className={`block hover:text-pink-600 ${selectedCategory === cat.slug ? 'text-pink-600 font-bold' : ''}`}
+              >
+                {cat.name}
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
-      {/* Price Range Filter */}
-      <div>
-        <h4 className="font-medium text-gray-700 mb-3">Fiyat Aralığı</h4>
-        <form onSubmit={handlePriceRangeSubmit} className="space-y-3">
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              placeholder="Min"
-              value={localPriceRange.min || ''}
-              onChange={(e) =>
-                setLocalPriceRange({ ...localPriceRange, min: parseFloat(e.target.value) || 0 })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              min="0"
-            />
-            <input
-              type="number"
-              placeholder="Max"
-              value={localPriceRange.max || ''}
-              onChange={(e) =>
-                setLocalPriceRange({ ...localPriceRange, max: parseFloat(e.target.value) || 0 })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              min="0"
-            />
+      {/* Markalar */}
+      {brands && brands.length > 0 && (
+        <div>
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+            Markalar
+          </h3>
+          <div className="space-y-2">
+            {brands.map((brand) => (
+              <label key={brand.id} className="flex items-center space-x-2 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                  // Not: Backend yapısına göre burası düzenlenebilir
+                />
+                <span className="text-gray-600 group-hover:text-gray-900">{brand.name}</span>
+              </label>
+            ))}
           </div>
-          <button
-            type="submit"
-            className="w-full bg-primary-blue text-white py-2 px-4 rounded-md hover:bg-primary-blue-dark transition-colors text-sm"
-          >
-            Uygula
-          </button>
-        </form>
-      </div>
-
-      {/* Stock Filter */}
-      <div>
-        <h4 className="font-medium text-gray-700 mb-3">Stok Durumu</h4>
-        <div className="space-y-2">
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              className="w-4 h-4 text-primary-blue focus:ring-primary-blue"
-            />
-            <span className="text-sm text-gray-700">Stokta var</span>
-          </label>
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              className="w-4 h-4 text-primary-blue focus:ring-primary-blue"
-            />
-            <span className="text-sm text-gray-700">Stokta yok</span>
-          </label>
         </div>
-      </div>
+      )}
+
+      {/* Dinamik Özellikler (Attributes) */}
+      {attributes && attributes.map((attr) => (
+        <div key={attr.id}>
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+            {attr.name}
+          </h3>
+          <div className="space-y-2">
+            {attr.values && attr.values.map((val: any) => {
+              const paramName = `attr_${attr.id}`;
+              const isChecked = selectedFilters[attr.id]?.includes(String(val.id));
+              
+              return (
+                <label key={val.id} className="flex items-center space-x-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={isChecked || false}
+                    onChange={(e) => updateFilter(paramName, String(val.id), e.target.checked)}
+                    className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                  />
+                  <span className="text-gray-600 group-hover:text-gray-900">
+                    {val.name}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
-

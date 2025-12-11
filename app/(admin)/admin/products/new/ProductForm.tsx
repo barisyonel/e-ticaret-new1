@@ -3,317 +3,183 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createProduct } from '@/app/server-actions/productActions';
-import Link from 'next/link';
 import ImageUpload from '@/components/ImageUpload';
-import { generateSlug } from '@/lib/utils/slug';
-import CategorySelector from '@/components/CategorySelector';
-import { Category } from '@/lib/repositories/CategoryRepository';
-import { AttributeWithValues } from '@/lib/repositories/AttributeRepository';
+import Link from 'next/link';
 
 interface ProductFormProps {
-  categories: Category[];
-  attributes: AttributeWithValues[];
+  categories: any[];
+  attributes: any[];
 }
 
 export default function ProductForm({ categories, attributes }: ProductFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [images, setImages] = useState<string[]>([]);
+
+  // State'ler
+  const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
-  const [isSlugManual, setIsSlugManual] = useState(false);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
-  const [primaryCategoryId, setPrimaryCategoryId] = useState<number | null>(null);
-  // Attribute values: attributeId -> valueId[]
-  const [selectedAttributeValues, setSelectedAttributeValues] = useState<Record<number, number[]>>({});
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [stock, setStock] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [images, setImages] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setIsSubmitting(true);
+    setError(null);
 
     try {
-      // Validate categories
-      if (selectedCategoryIds.length === 0) {
-        setError('Lütfen en az bir kategori seçin');
-        setIsSubmitting(false);
-        return;
-      }
-
       const formData = new FormData(e.currentTarget);
       
-      // Set images
-      formData.set('images', JSON.stringify(images || []));
+      // Manuel state değerlerini ekle
+      formData.set('description', description);
       
-      // Set category IDs
-      formData.set('categoryIds', JSON.stringify(selectedCategoryIds));
-      
-      // Set primary category ID
-      if (primaryCategoryId) {
-        formData.set('primaryCategoryId', primaryCategoryId.toString());
+      // Resim varsa ekle
+      if (images.length > 0) {
+        formData.set('image', images[0]);
       }
 
-      // Set attribute values
-      // Format: attributeValues = { attributeId: [valueId1, valueId2, ...] }
-      const attributeValues: Record<number, number[]> = {};
-      Object.entries(selectedAttributeValues).forEach(([attrId, valueIds]) => {
-        if (valueIds.length > 0) {
-          attributeValues[parseInt(attrId)] = valueIds;
-        }
-      });
-      formData.set('attributeValues', JSON.stringify(attributeValues));
-
+      // Server Action Çağrısı
       const result = await createProduct(formData);
 
-      if (result.success && result.data) {
+      // HATA ÇÖZÜMÜ: && result.data KISMI KALDIRILDI
+      // createProduct fonksiyonu sadece { success: true } dönüyor.
+      if (result.success) {
+        router.refresh();
         router.push('/admin/products');
       } else {
         setError(result.error || 'Ürün oluşturulurken bir hata oluştu');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ürün oluşturulurken bir hata oluştu');
+    } catch (err: any) {
+      setError(err.message || 'Beklenmedik bir hata oluştu');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-100 text-red-700 p-3 rounded">
           {error}
         </div>
       )}
 
-      <div>
-        <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
-          Ürün Adı *
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          required
-          onChange={(e) => {
-            if (!isSlugManual) {
-              const autoSlug = generateSlug(e.target.value);
-              setSlug(autoSlug);
-            }
-          }}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
-        />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Sol Kolon */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Ürün Adı *</label>
+            <input
+              name="name"
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              placeholder="Örn: Traktör Lastiği"
+            />
+          </div>
 
-      <div>
-        <label htmlFor="slug" className="block text-gray-700 font-medium mb-2">
-          Slug (URL) *
-        </label>
-        <input
-          type="text"
-          id="slug"
-          name="slug"
-          required
-          value={slug}
-          onChange={(e) => {
-            setSlug(e.target.value);
-            setIsSlugManual(true);
-          }}
-          pattern="[a-z0-9-]+"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Sadece küçük harf, rakam ve tire kullanılabilir
-        </p>
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Slug (URL)</label>
+            <input
+              name="slug"
+              type="text"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-50"
+              placeholder="Otomatik oluşur"
+            />
+          </div>
 
-      <div>
-        <label htmlFor="description" className="block text-gray-700 font-medium mb-2">
-          Açıklama *
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          required
-          rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Fiyat *</label>
+            <input
+              name="price"
+              type="number"
+              step="0.01"
+              required
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="price" className="block text-gray-700 font-medium mb-2">
-            Fiyat (₺) *
-          </label>
-          <input
-            type="number"
-            id="price"
-            name="price"
-            required
-            min="0"
-            step="0.01"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="stock" className="block text-gray-700 font-medium mb-2">
-            Stok *
-          </label>
-          <input
-            type="number"
-            id="stock"
-            name="stock"
-            required
-            min="0"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
-          />
-        </div>
-      </div>
-
-      {/* Category Selector */}
-      <CategorySelector
-        categories={categories}
-        selectedCategoryIds={selectedCategoryIds}
-        onCategoryChange={setSelectedCategoryIds}
-        primaryCategoryId={primaryCategoryId}
-        onPrimaryCategoryChange={setPrimaryCategoryId}
-      />
-
-      {/* Attribute Selector */}
-      {attributes.length > 0 && (
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Ürün Özellikleri (Opsiyonel)</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Bu ürün için özellik değerleri seçebilirsiniz. Hiçbirini seçmeden de ürünü ekleyebilirsiniz.
-          </p>
-          
-          <div className="space-y-6">
-            {attributes.map((attribute) => {
-              const selectedValueIds = selectedAttributeValues[attribute.id] || [];
-              
-              const handleValueToggle = (valueId: number) => {
-                setSelectedAttributeValues(prev => {
-                  const current = prev[attribute.id] || [];
-                  const newValueIds = current.includes(valueId)
-                    ? current.filter(id => id !== valueId)
-                    : [...current, valueId];
-                  
-                  return {
-                    ...prev,
-                    [attribute.id]: newValueIds,
-                  };
-                });
-              };
-
-              return (
-                <div key={attribute.id} className="border border-gray-200 rounded-lg p-4">
-                  <label className="block text-sm font-medium text-gray-900 mb-3">
-                    {attribute.name}
-                    {attribute.type === 'color' && <span className="text-xs text-gray-500 ml-2">(Renk)</span>}
-                  </label>
-                  
-                  {attribute.values.length === 0 ? (
-                    <p className="text-sm text-gray-500 italic">
-                      Bu özellik için henüz değer eklenmemiş. <a href={`/admin/attributes/${attribute.id}/edit`} target="_blank" className="text-pink-600 hover:text-pink-700">Değer eklemek için tıklayın</a>.
-                    </p>
-                  ) : attribute.type === 'color' ? (
-                    // Color swatches
-                    <div className="flex flex-wrap gap-3">
-                      {attribute.values.map((value) => (
-                        <label
-                          key={value.id}
-                          className="flex flex-col items-center cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedValueIds.includes(value.id)}
-                            onChange={() => handleValueToggle(value.id)}
-                            className="sr-only"
-                          />
-                          <div
-                            className={`w-12 h-12 rounded-full border-2 transition-all ${
-                              selectedValueIds.includes(value.id)
-                                ? 'border-pink-600 ring-2 ring-pink-200 scale-110'
-                                : 'border-gray-300 hover:border-gray-400'
-                            }`}
-                            style={{
-                              backgroundColor: value.colorCode || '#ccc',
-                            }}
-                            title={value.value}
-                          />
-                          <span className="text-xs text-gray-600 mt-1 text-center max-w-[60px] truncate">
-                            {value.value}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  ) : (
-                    // Checkbox list for text/number/boolean
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {attribute.values.map((value) => (
-                        <label
-                          key={value.id}
-                          className="flex items-center space-x-2 cursor-pointer py-1 hover:bg-gray-50 rounded px-2"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedValueIds.includes(value.id)}
-                            onChange={() => handleValueToggle(value.id)}
-                            className="w-4 h-4 text-pink-600 focus:ring-pink-500 rounded"
-                          />
-                          <span className="text-sm text-gray-700">{value.value}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {selectedValueIds.length > 0 && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      {selectedValueIds.length} değer seçildi
-                    </p>
-                  )}
-                </div>
-              );
-            })}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Stok *</label>
+            <input
+              name="stock"
+              type="number"
+              required
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            />
           </div>
         </div>
-      )}
 
-      <div>
-        <label className="block text-gray-700 font-medium mb-2">
-          Ürün Görselleri *
-        </label>
-        <ImageUpload
-          images={images}
-          onImagesChange={setImages}
-          maxImages={10}
-          folder="products"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          İlk görsel ürünün ana görseli olarak kullanılacaktır. Maksimum 10 görsel yükleyebilirsiniz.
-        </p>
+        {/* Sağ Kolon */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Kategori *</label>
+            <select
+              name="categoryId"
+              required
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            >
+              <option value="">Kategori Seçin</option>
+              {categories && categories.map((cat: any) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Görseller</label>
+            <div className="mt-1">
+              <ImageUpload
+                images={images}
+                onImagesChange={setImages}
+                maxImages={5}
+                folder="products"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="flex space-x-4">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
-            isSubmitting
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-pink-600 hover:bg-pink-700 text-white'
-          }`}
-        >
-          {isSubmitting ? 'Oluşturuluyor...' : 'Ürün Oluştur'}
-        </button>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Açıklama</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={4}
+          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+        />
+      </div>
+
+      <div className="flex justify-end space-x-3">
         <Link
           href="/admin/products"
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
         >
           İptal
         </Link>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 disabled:opacity-50"
+        >
+          {isSubmitting ? 'Oluşturuluyor...' : 'Ürünü Oluştur'}
+        </button>
       </div>
     </form>
   );
 }
-

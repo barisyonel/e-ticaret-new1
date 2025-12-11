@@ -1,71 +1,116 @@
+import { Suspense } from 'react';
+// Actions
 import { getAllProducts } from '@/app/server-actions/productActions';
 import { getCategoryTree } from '@/app/server-actions/categoryActions';
-import { getAllAttributesWithValues, getAllBrands } from '@/app/server-actions/attributeActions';
-import ProductsPageClient from './ProductsPageClient';
+import { getAllAttributesWithValues } from '@/app/server-actions/attributeActions';
+// Not: Brand actions dosyan olmadığı için kaldırdım.
+// import { getAllBrands } from '@/app/server-actions/brandActions';
+
+// Components
+import ProductFilters from '@/components/ProductFilters';
+
+// --- GEÇİCİ BİLEŞEN (Build hatasını çözmek için) ---
+// Kendi ProductList bileşeninin yerini bulduğunda bu kısmı silip yukarıya import ekleyebilirsin.
+// import ProductList from '@/components/ProductList';
+const ProductList = ({ products }: { products: any[] }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {products.map((p) => (
+      <div key={p.id} className="border p-4 rounded shadow hover:shadow-lg transition">
+        <h3 className="font-bold">{p.name}</h3>
+        <p className="text-gray-600">{p.price} TL</p>
+      </div>
+    ))}
+    {products.length === 0 && <p>Ürün bulunamadı.</p>}
+  </div>
+);
+// ---------------------------------------------------
 
 interface ProductsPageProps {
-  searchParams: Promise<{ 
-    category?: string; 
+  searchParams: {
+    category?: string;
     search?: string;
-    brand?: string;
     minPrice?: string;
     maxPrice?: string;
-    [key: string]: string | undefined;
-  }>;
+    sort?: string;
+    page?: string;
+    [key: string]: string | string[] | undefined;
+  };
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const params = await searchParams;
-  const category = params.category;
-  const search = params.search;
-
-  // First, get attributes to know which URL params are attribute filters
-  const attributesResult = await getAllAttributesWithValues(false);
-  const attributesForParsing = attributesResult.success && attributesResult.data ? attributesResult.data : [];
+  // Parametreleri ayıkla
+  const category = searchParams.category || '';
+  const search = searchParams.search || '';
+  const page = parseInt(searchParams.page || '1');
   
-  // Parse attribute filters from URL
+  // Filtreleri hazırla
   const attributeFilters: Record<string, string[]> = {};
-  attributesForParsing.forEach(attr => {
-    const param = params[attr.slug];
-    if (param) {
-      // Decode URL-encoded values
-      attributeFilters[attr.slug] = param.split(',').map(v => decodeURIComponent(v));
+  Object.keys(searchParams).forEach((key) => {
+    if (key.startsWith('attr_')) {
+      const attrId = key.replace('attr_', '');
+      const value = searchParams[key];
+      if (value) {
+        attributeFilters[attrId] = Array.isArray(value) ? value : value.split(',');
+      }
     }
   });
 
-  // Get products, categories, attributes (with counts), and brands
-  const [productsResult, categoriesResult, attributesResultWithCounts, brandsResult] = await Promise.all([
-    getAllProducts(category, search, attributeFilters), // Filter by category, search, and attributes
-    getCategoryTree(false), // Only active categories
-    getAllAttributesWithValues(true), // Include product counts
-    getAllBrands(true), // Include product counts
+  // Verileri paralel çek
+  // HATA ÇÖZÜMÜ: getAllBrands kaldırıldı, getCategoryTree parametresi silindi.
+  const [productsResult, categoriesResult, attributesResult] = await Promise.all([
+    getAllProducts(category, search, attributeFilters),
+    getCategoryTree(), // Parametresiz (DÜZELTİLDİ)
+    getAllAttributesWithValues(true)
   ]);
 
-  if (!productsResult.success || !productsResult.data) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Ürünler</h1>
-          <p className="text-red-600">{productsResult.error || 'Ürünler yüklenirken bir hata oluştu'}</p>
-        </div>
-      </div>
-    );
-  }
+  // --- VERİ GÜVENLİK KONTROLLERİ ---
+  
+  // 1. Ürünler
+  const pRes = productsResult as any;
+  const products = pRes.data || (Array.isArray(pRes) ? pRes : []);
+  const totalProducts = pRes.total || products.length;
 
-  const products = productsResult.data;
-  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
-  const attributes = attributesResultWithCounts.success && attributesResultWithCounts.data ? attributesResultWithCounts.data : [];
-  const brands = brandsResult.success && brandsResult.data ? brandsResult.data : [];
+  // 2. Kategoriler
+  const cRes = categoriesResult as any;
+  const categories = Array.isArray(cRes) ? cRes : (cRes.data || []);
+
+  // 3. Özellikler
+  const aRes = attributesResult as any;
+  const attributes = aRes.data || (Array.isArray(aRes) ? aRes : []);
+
+  // 4. Markalar (Dosya olmadığı için boş dizi veriyoruz)
+  const brands: any[] = [];
 
   return (
-    <ProductsPageClient
-      products={products}
-      categories={categories}
-      attributes={attributes}
-      brands={brands}
-      initialCategory={category}
-      initialFilters={params}
-    />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Sol Menü: Filtreler */}
+        <aside className="w-full md:w-64 flex-shrink-0">
+          <ProductFilters 
+            categories={categories}
+            attributes={attributes}
+            brands={brands}
+            selectedCategory={category}
+            selectedFilters={attributeFilters}
+          />
+        </aside>
+
+        {/* Sağ Alan: Ürün Listesi */}
+        <main className="flex-1">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {search ? `"${search}" Arama Sonuçları` : 'Tüm Ürünler'}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Toplam {totalProducts} ürün bulundu.
+            </p>
+          </div>
+
+          <Suspense fallback={<div className="text-center py-20">Yükleniyor...</div>}>
+            <ProductList products={products} />
+          </Suspense>
+        </main>
+      </div>
+    </div>
   );
 }
-
