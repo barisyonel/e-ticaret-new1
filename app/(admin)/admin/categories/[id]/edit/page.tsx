@@ -15,11 +15,14 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     notFound();
   }
 
-  // DÜZELTME: getCategoryById sadece ID alıyor. getCategoryTree parametre almıyor.
-  const [category, categories] = await Promise.all([
-    getCategoryById(categoryId),
-    getCategoryTree()
+  // Admin panelinde tüm kategorileri göster (aktif ve pasif)
+  const [categoryResult, categoriesResult] = await Promise.all([
+    getCategoryById(categoryId, true),
+    getCategoryTree(true)
   ]);
+
+  const category = categoryResult.success && categoryResult.data ? categoryResult.data : null;
+  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
 
   if (!category) {
     notFound();

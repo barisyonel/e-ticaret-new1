@@ -42,11 +42,24 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-white hover:text-accent-yellow transition focus:outline-none rounded-lg hover:bg-primary-blue-dark"
+        className="flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-2 text-white hover:text-accent-yellow transition focus:outline-none rounded-lg hover:bg-primary-blue-dark"
       >
-        <span className="font-semibold text-sm">{userName}</span>
+        <span className="hidden sm:inline font-semibold text-xs lg:text-sm truncate max-w-[80px] lg:max-w-none">{userName}</span>
         <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className="w-5 h-5 lg:w-4 lg:h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+        <svg
+          className={`hidden lg:block w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -61,7 +74,7 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
+        <div className="absolute right-0 mt-2 w-48 lg:w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
           <div className="px-4 py-2 border-b border-gray-200">
             <p className="text-sm font-semibold text-gray-900">{userName}</p>
             <p className="text-xs text-gray-500">{userRole === 'ADMIN' ? 'Yönetici' : 'Kullanıcı'}</p>

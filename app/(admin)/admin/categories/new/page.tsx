@@ -2,8 +2,9 @@ import { getCategoryTree } from '@/app/server-actions/categoryActions';
 import CategoryForm from './CategoryForm';
 
 export default async function NewCategoryPage() {
-  // DÜZELTME: Parantez içi boş olmalı. (true) yazmamalısın.
-  const categories = await getCategoryTree();
+  // Admin panelinde tüm kategorileri göster (aktif ve pasif)
+  const result = await getCategoryTree(true);
+  const categories = result.success && result.data ? result.data : [];
 
   return (
     <div className="max-w-5xl mx-auto">

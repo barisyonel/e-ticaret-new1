@@ -1,83 +1,228 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { CategoryRepository } from '@/lib/repositories/CategoryRepository';
+import { Category } from '@/lib/repositories/CategoryRepository';
 
-// ---------------------------------------------------------
-// 1. VERİ GETİRME İŞLEMLERİ (READ)
-// ---------------------------------------------------------
-
-// Kategori Ağacını Getir
-export async function getCategoryTree() {
-  // HATA ÇÖZÜMÜ: "as any[]" ekledik. Artık TypeScript buna "never" demiyor.
-  return [] as any[];
+export interface ActionResponse<T = void> {
+  success: boolean;
+  error?: string;
+  data?: T;
 }
 
-// Ana Kategorileri Getir
-export async function getMainCategories() {
-  return [] as any[];
-}
-
-// Tekil Kategori Getir
-export async function getCategoryById(id: number) {
+// Kategori ağacını getir (hierarchical structure)
+export async function getCategoryTree(includeInactive: boolean = false): Promise<ActionResponse<Category[]>> {
   try {
-    console.log(`Kategori aranıyor ID: ${id}`);
-    
-    return { 
-      id: id, 
-      name: "Test Kategorisi", 
-      slug: "test-kategorisi", 
-      description: "Bu bir test kategorisidir.",
-      parentId: null,
-      image: null,
-      isActive: true,
-      displayOrder: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      children: [] as any[] // Burayı da garantiye aldık
+    const repo = new CategoryRepository();
+    const categories = await repo.findCategoryTree(includeInactive);
+
+    return {
+      success: true,
+      data: categories,
     };
-    
   } catch (error) {
-    console.error("getCategoryById Hatası:", error);
-    return null;
+    console.error('Get category tree error:', error);
+    return {
+      success: false,
+      error: 'Kategoriler yüklenirken bir hata oluştu',
+      data: [],
+    };
   }
 }
 
-// ---------------------------------------------------------
-// 2. VERİ DEĞİŞTİRME İŞLEMLERİ (WRITE)
-// ---------------------------------------------------------
-
-export async function createCategoryAction(formData: FormData) {
+// Ana kategorileri getir (sadece parent_id IS NULL olanlar)
+export async function getMainCategories(includeInactive: boolean = false): Promise<ActionResponse<Category[]>> {
   try {
-    revalidatePath('/admin/categories');
-    return { success: true };
+    const repo = new CategoryRepository();
+    const allCategories = await repo.getAll(includeInactive);
+    const mainCategories = allCategories.filter(cat => cat.parentId === null);
+
+    return {
+      success: true,
+      data: mainCategories,
+    };
   } catch (error) {
-    return { success: false, error: 'Oluşturma hatası' };
+    console.error('Get main categories error:', error);
+    return {
+      success: false,
+      error: 'Kategoriler yüklenirken bir hata oluştu',
+      data: [],
+    };
   }
 }
 
-export async function updateCategory(id: number, formData: FormData) {
+// ID'ye göre kategori getir
+export async function getCategoryById(id: number, includeInactive: boolean = false): Promise<ActionResponse<Category>> {
   try {
-    revalidatePath('/admin/categories');
-    return { success: true };
+    const repo = new CategoryRepository();
+    const category = await repo.findById(id, includeInactive);
+
+    if (!category) {
+      return {
+        success: false,
+        error: 'Kategori bulunamadı',
+      };
+    }
+
+    return {
+      success: true,
+      data: category,
+    };
   } catch (error) {
-    return { success: false, error: 'Güncelleme hatası' };
+    console.error('Get category by id error:', error);
+    return {
+      success: false,
+      error: 'Kategori yüklenirken bir hata oluştu',
+    };
   }
 }
 
-export async function deleteCategory(id: number) {
+// Kategori oluştur
+export async function createCategoryAction(formData: FormData): Promise<ActionResponse<Category>> {
   try {
+    const repo = new CategoryRepository();
+    const name = formData.get('name') as string;
+    const slug = formData.get('slug') as string;
+    const parentIdStr = formData.get('parentId') as string | null;
+    const image = formData.get('image') as string | null;
+    const displayOrderStr = formData.get('displayOrder') as string | null;
+    const isActiveStr = formData.get('isActive') as string | null;
+
+    const parentId = parentIdStr && parentIdStr !== 'null' ? parseInt(parentIdStr) : null;
+    const displayOrder = displayOrderStr ? parseInt(displayOrderStr) : 0;
+    const isActive = isActiveStr ? isActiveStr === 'true' : true;
+
+    const category = await repo.create({
+      name,
+      slug: slug || name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, ''),
+      parentId,
+      image: image || null,
+      isActive,
+    });
+
+    // Update display order if provided
+    if (displayOrder !== 0) {
+      await repo.update(category.id, { displayOrder } as any);
+    }
+
     revalidatePath('/admin/categories');
-    return { success: true };
+    revalidatePath('/');
+
+    return {
+      success: true,
+      data: category,
+    };
   } catch (error) {
-    return { success: false, error: "Silme hatası" };
+    console.error('Create category error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Kategori oluşturulurken bir hata oluştu',
+    };
   }
 }
 
-export async function toggleCategoryActive(id: number, isActive: boolean) {
+// Kategori güncelle
+export async function updateCategory(id: number, formData: FormData): Promise<ActionResponse<Category>> {
   try {
+    const repo = new CategoryRepository();
+    const name = formData.get('name') as string;
+    const slug = formData.get('slug') as string;
+    const parentIdStr = formData.get('parentId') as string | null;
+    const image = formData.get('image') as string | null;
+    const displayOrderStr = formData.get('displayOrder') as string | null;
+    const isActiveStr = formData.get('isActive') as string | null;
+
+    const parentId = parentIdStr && parentIdStr !== 'null' ? parseInt(parentIdStr) : null;
+    const displayOrder = displayOrderStr ? parseInt(displayOrderStr) : 0;
+    const isActive = isActiveStr ? isActiveStr === 'true' : true;
+
+    const updates: any = {
+      name,
+      slug: slug || name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, ''),
+      parentId,
+      image: image || null,
+      isActive,
+      displayOrder,
+    };
+
+    const category = await repo.update(id, updates);
+
+    if (!category) {
+      return {
+        success: false,
+        error: 'Kategori bulunamadı',
+      };
+    }
+
     revalidatePath('/admin/categories');
-    return { success: true };
+    revalidatePath('/');
+
+    return {
+      success: true,
+      data: category,
+    };
   } catch (error) {
-    return { success: false, error: 'Durum değiştirilemedi' };
+    console.error('Update category error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Kategori güncellenirken bir hata oluştu',
+    };
+  }
+}
+
+// Kategori sil
+export async function deleteCategory(id: number): Promise<ActionResponse> {
+  try {
+    const repo = new CategoryRepository();
+    const deleted = await repo.delete(id);
+
+    if (!deleted) {
+      return {
+        success: false,
+        error: 'Kategori silinemedi veya bulunamadı',
+      };
+    }
+
+    revalidatePath('/admin/categories');
+    revalidatePath('/');
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('Delete category error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Kategori silinirken bir hata oluştu',
+    };
+  }
+}
+
+// Kategori aktif/pasif durumunu değiştir
+export async function toggleCategoryActive(id: number, isActive: boolean): Promise<ActionResponse<Category>> {
+  try {
+    const repo = new CategoryRepository();
+    const category = await repo.update(id, { isActive });
+
+    if (!category) {
+      return {
+        success: false,
+        error: 'Kategori bulunamadı',
+      };
+    }
+
+    revalidatePath('/admin/categories');
+    revalidatePath('/');
+
+    return {
+      success: true,
+      data: category,
+    };
+  } catch (error) {
+    console.error('Toggle category active error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Kategori durumu değiştirilirken bir hata oluştu',
+    };
   }
 }

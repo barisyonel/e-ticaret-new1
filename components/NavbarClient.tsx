@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import UserMenu from './UserMenu';
 import NotificationBell from './NotificationBell';
 import { useCompare } from '@/app/context/CompareContext';
+import { useCart } from '@/app/context/CartContext';
 
 interface NavbarClientProps {
   user: {
@@ -19,6 +20,8 @@ interface NavbarClientProps {
 export default function NavbarClient({ user }: NavbarClientProps) {
   const [favoriteCount, setFavoriteCount] = useState(0);
   const { compareItems } = useCompare();
+  const { getItemCount } = useCart();
+  const cartCount = getItemCount();
 
   useEffect(() => {
     const loadFavoriteCount = async () => {
@@ -126,10 +129,15 @@ export default function NavbarClient({ user }: NavbarClientProps) {
           />
         </svg>
         <span className="hidden lg:inline lg:ml-2 text-sm font-semibold">Sepetim</span>
+        {cartCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-accent-yellow text-primary-blue-dark text-[10px] rounded-full w-4 h-4 lg:w-5 lg:h-5 flex items-center justify-center font-bold shadow-lg">
+            {cartCount > 99 ? '99+' : cartCount}
+          </span>
+        )}
       </Link>
 
       {/* User Menu */}
-      <div className="hidden lg:block ml-2">
+      <div className="ml-2">
         <UserMenu userName={user.name} userRole={user.role} />
       </div>
     </div>

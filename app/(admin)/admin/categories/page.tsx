@@ -4,9 +4,9 @@ import { getCategoryTree } from '@/app/server-actions/categoryActions';
 import CategoryRow from './CategoryRow'; 
 
 export default async function CategoriesPage() {
-  // DÜZELTME 1: Parametre (true) kaldırıldı.
-  // DÜZELTME 2: Artık result.data diye bir şey yok, direkt array geliyor.
-  const categories = await getCategoryTree();
+  // Admin panelinde tüm kategorileri göster (aktif ve pasif)
+  const result = await getCategoryTree(true);
+  const categories = result.success && result.data ? result.data : [];
 
   return (
     <div className="max-w-6xl mx-auto">

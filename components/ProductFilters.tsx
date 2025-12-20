@@ -1,86 +1,27 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
 import Link from 'next/link';
 
-// HATA ÇÖZÜMÜ: Interface'e 'attributes' ve 'brands' eklendi.
-// 'any' kullanarak build hatalarını engelliyoruz.
-interface ProductFiltersProps {
-  categories: any[];
-  attributes: any[];
-  brands: any[];
-  selectedCategory: string;
-  selectedFilters: Record<string, string[]>;
-}
-
+// Her şeyi kabul eden esnek yapı
 export default function ProductFilters({
-  categories,
-  attributes,
-  brands,
-  selectedCategory,
-  selectedFilters
-}: ProductFiltersProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // URL'yi güncelleme fonksiyonu
-  const updateFilter = useCallback((key: string, value: string, checked: boolean) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    
-    // Mevcut değerleri al
-    const currentValues = current.get(key)?.split(',') || [];
-    
-    let newValues;
-    if (checked) {
-      // Ekle
-      if (!currentValues.includes(value)) {
-        newValues = [...currentValues, value];
-      } else {
-        newValues = currentValues;
-      }
-    } else {
-      // Çıkar
-      newValues = currentValues.filter((v) => v !== value);
-    }
-
-    // URL'yi güncelle
-    if (newValues.length > 0) {
-      current.set(key, newValues.join(','));
-    } else {
-      current.delete(key);
-    }
-    
-    // Sayfa numarasını sıfırla
-    current.delete('page');
-
-    // Yönlendir
-    const search = current.toString();
-    const query = search ? `?${search}` : '';
-    router.push(`/products${query}`);
-  }, [searchParams, router]);
-
+  categories = [],
+  attributes = [],
+  brands = [],
+  selectedCategory = '',
+  selectedFilters = {}
+}: any) {
+  
   return (
-    <div className="space-y-8">
-      {/* Kategoriler */}
+    <div className="space-y-6">
       <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-          Kategoriler
-        </h3>
-        <ul className="space-y-3 font-medium text-gray-600">
-          <li>
-            <Link 
-              href="/products" 
-              className={`block hover:text-pink-600 ${!selectedCategory ? 'text-pink-600 font-bold' : ''}`}
-            >
-              Tüm Ürünler
-            </Link>
-          </li>
-          {categories.map((cat) => (
+        <h3 className="font-bold mb-3">Kategoriler</h3>
+        <ul className="space-y-2">
+          <li><Link href="/products" className="hover:text-pink-600">Tümü</Link></li>
+          {categories.map((cat: any) => (
             <li key={cat.id}>
-              <Link
+              <Link 
                 href={`/products?category=${cat.slug}`}
-                className={`block hover:text-pink-600 ${selectedCategory === cat.slug ? 'text-pink-600 font-bold' : ''}`}
+                className={selectedCategory === cat.slug ? 'text-pink-600 font-bold' : ''}
               >
                 {cat.name}
               </Link>
@@ -89,55 +30,16 @@ export default function ProductFilters({
         </ul>
       </div>
 
-      {/* Markalar */}
-      {brands && brands.length > 0 && (
+      {brands.length > 0 && (
         <div>
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-            Markalar
-          </h3>
-          <div className="space-y-2">
-            {brands.map((brand) => (
-              <label key={brand.id} className="flex items-center space-x-2 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                  // Not: Backend yapısına göre burası düzenlenebilir
-                />
-                <span className="text-gray-600 group-hover:text-gray-900">{brand.name}</span>
-              </label>
-            ))}
-          </div>
+          <h3 className="font-bold mb-3">Markalar</h3>
+          {brands.map((brand: any) => (
+            <div key={brand.id} className="flex items-center gap-2 mb-1">
+              <input type="checkbox" /> <span>{brand.name}</span>
+            </div>
+          ))}
         </div>
       )}
-
-      {/* Dinamik Özellikler (Attributes) */}
-      {attributes && attributes.map((attr) => (
-        <div key={attr.id}>
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-            {attr.name}
-          </h3>
-          <div className="space-y-2">
-            {attr.values && attr.values.map((val: any) => {
-              const paramName = `attr_${attr.id}`;
-              const isChecked = selectedFilters[attr.id]?.includes(String(val.id));
-              
-              return (
-                <label key={val.id} className="flex items-center space-x-2 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={isChecked || false}
-                    onChange={(e) => updateFilter(paramName, String(val.id), e.target.checked)}
-                    className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                  />
-                  <span className="text-gray-600 group-hover:text-gray-900">
-                    {val.name}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
-      ))}
     </div>
   );
 }

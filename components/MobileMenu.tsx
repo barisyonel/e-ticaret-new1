@@ -69,93 +69,99 @@ export default function MobileMenu({ categories, isOpen, onClose }: MobileMenuPr
           {/* Categories */}
           <div className="flex-1 overflow-y-auto">
             <div className="p-2">
-              {mainCategories.map((category) => {
-                const hasChildren = category.children && category.children.length > 0;
-                const isActive = activeCategory === category.id;
+              {mainCategories.length === 0 ? (
+                <div className="p-4 text-center text-gray-500">
+                  <p className="text-sm">Kategoriler yükleniyor...</p>
+                </div>
+              ) : (
+                mainCategories.map((category) => {
+                  const hasChildren = category.children && category.children.length > 0;
+                  const isActive = activeCategory === category.id;
 
-                return (
-                  <div key={category.id} className="mb-1">
-                    <div
-                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                        isActive ? 'bg-pink-50 text-primary-blue' : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => setActiveCategory(isActive ? null : category.id)}
-                    >
-                      <Link
-                        href={`/products?category=${category.slug}`}
-                        className="flex-1 font-medium"
-                        onClick={onClose}
+                  return (
+                    <div key={category.id} className="mb-1">
+                      <div
+                        className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                          isActive ? 'bg-primary-blue/10 text-primary-blue' : 'hover:bg-gray-50 text-gray-900'
+                        }`}
+                        onClick={() => setActiveCategory(isActive ? null : category.id)}
                       >
-                        {category.name}
-                      </Link>
-                      {hasChildren && (
-                        <svg
-                          className={`w-5 h-5 transition-transform ${
-                            isActive ? 'rotate-90' : ''
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                        <Link
+                          href={`/products?category=${category.slug}`}
+                          className="flex-1 font-medium"
+                          onClick={onClose}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
+                          {category.name}
+                        </Link>
+                        {hasChildren && (
+                          <svg
+                            className={`w-5 h-5 transition-transform text-gray-500 ${
+                              isActive ? 'rotate-90' : ''
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+
+                      {/* Subcategories */}
+                      {hasChildren && isActive && (
+                        <div className="ml-4 mt-1 space-y-1">
+                          {category.children?.map((subcategory) => (
+                            <div key={subcategory.id}>
+                              <Link
+                                href={`/products?category=${subcategory.slug}`}
+                                className="block p-2 text-sm text-gray-700 hover:text-primary-blue hover:bg-primary-blue/5 rounded-lg transition-colors"
+                                onClick={onClose}
+                              >
+                                {subcategory.name}
+                              </Link>
+                              {/* Child categories */}
+                              {subcategory.children && subcategory.children.length > 0 && (
+                                <div className="ml-4 space-y-1">
+                                  {subcategory.children.map((child) => (
+                                    <Link
+                                      key={child.id}
+                                      href={`/products?category=${child.slug}`}
+                                      className="block p-2 text-xs text-gray-600 hover:text-primary-blue hover:bg-primary-blue/5 rounded-lg transition-colors"
+                                      onClick={onClose}
+                                    >
+                                      {child.name}
+                                    </Link>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
-
-                    {/* Subcategories */}
-                    {hasChildren && isActive && (
-                      <div className="ml-4 mt-1 space-y-1">
-                        {category.children?.map((subcategory) => (
-                          <div key={subcategory.id}>
-                            <Link
-                              href={`/products?category=${subcategory.slug}`}
-                              className="block p-2 text-sm text-gray-700 hover:text-primary-blue hover:bg-pink-50 rounded-lg transition-colors"
-                              onClick={onClose}
-                            >
-                              {subcategory.name}
-                            </Link>
-                            {/* Child categories */}
-                            {subcategory.children && subcategory.children.length > 0 && (
-                              <div className="ml-4 space-y-1">
-                                {subcategory.children.map((child) => (
-                                  <Link
-                                    key={child.id}
-                                    href={`/products?category=${child.slug}`}
-                                    className="block p-2 text-xs text-gray-600 hover:text-primary-blue hover:bg-pink-50 rounded-lg transition-colors"
-                                    onClick={onClose}
-                                  >
-                                    {child.name}
-                                  </Link>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 
           {/* Footer Links */}
-          <div className="border-t border-gray-200 p-4 space-y-2">
+          <div className="border-t border-gray-200 p-4 space-y-2 bg-gray-50">
             <Link
               href="/hakkimizda"
-              className="block py-2 text-gray-700 hover:text-primary-blue transition-colors"
+              className="block py-2.5 px-3 text-gray-700 hover:text-primary-blue hover:bg-white rounded-lg transition-colors font-medium"
               onClick={onClose}
             >
               Hakkımızda
             </Link>
             <Link
               href="/iletisim"
-              className="block py-2 text-gray-700 hover:text-primary-blue transition-colors"
+              className="block py-2.5 px-3 text-gray-700 hover:text-primary-blue hover:bg-white rounded-lg transition-colors font-medium"
               onClick={onClose}
             >
               Yardım & Destek
