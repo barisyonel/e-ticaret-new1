@@ -40,7 +40,7 @@ async function createNotificationsTable() {
           is_read BIT NOT NULL DEFAULT 0,
           read_at DATETIME2 NULL,
           created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
-          
+
           CONSTRAINT FK_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
 
@@ -49,7 +49,7 @@ async function createNotificationsTable() {
         CREATE INDEX IX_notifications_is_read ON notifications(is_read);
         CREATE INDEX IX_notifications_created_at ON notifications(created_at);
         CREATE INDEX IX_notifications_type ON notifications(type);
-        
+
         PRINT 'Notifications table created successfully';
       END
       ELSE

@@ -31,7 +31,7 @@ export default function LoginModal({ isOpen, onClose, redirectTo }: LoginModalPr
   const handleLogin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const redirectUrl = redirectTo 
+    const redirectUrl = redirectTo
       ? `/auth/login?redirect=${encodeURIComponent(redirectTo)}`
       : '/auth/login';
     // Use window.location for full navigation to prevent event bubbling
@@ -51,12 +51,12 @@ export default function LoginModal({ isOpen, onClose, redirectTo }: LoginModalPr
   };
 
   const modalContent = (
-    <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50" 
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
       onClick={handleBackdropClick}
     >
-      <div 
-        className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4" 
+      <div
+        className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-xl font-bold text-gray-900 mb-4">Giriş Yapın</h3>

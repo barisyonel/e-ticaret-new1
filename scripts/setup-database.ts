@@ -192,11 +192,11 @@ async function createTables() {
 
 async function createDatabase() {
   console.log('📦 Creating database if not exists...');
-  
+
   // Parse database name from DATABASE_URL
   const dbUrl = process.env.DATABASE_URL || '';
   let dbName = 'auraguzellikmerkezi2';
-  
+
   // Extract database name from connection string
   if (dbUrl.includes('Initial Catalog=')) {
     const match = dbUrl.match(/Initial Catalog=([^;]+)/i);
@@ -209,28 +209,28 @@ async function createDatabase() {
       dbName = match[1].trim();
     }
   }
-  
+
   // Connect to master database first
   const originalUrl = process.env.DATABASE_URL;
   const masterUrl = dbUrl
     .replace(/Initial Catalog=[^;]+/i, 'Initial Catalog=master')
     .replace(/Database=[^;]+/i, 'Database=master');
-  
+
   process.env.DATABASE_URL = masterUrl;
-  
+
   // Clear connection pool to force reconnection
   await closeConnection();
-  
+
   try {
     const connection = await getConnection();
-    
+
     // Check if database exists
     const dbExists = await executeQueryOne<{ exists: number }>(`
-      SELECT COUNT(*) as [exists] 
-      FROM sys.databases 
+      SELECT COUNT(*) as [exists]
+      FROM sys.databases
       WHERE name = '${dbName.replace(/'/g, "''")}'
     `);
-    
+
     if (dbExists && dbExists.exists === 0) {
       // Create database
       await executeNonQuery(`CREATE DATABASE [${dbName}]`);
@@ -238,7 +238,7 @@ async function createDatabase() {
     } else {
       console.log(`ℹ️  Database '${dbName}' already exists`);
     }
-    
+
     await closeConnection();
   } finally {
     // Restore original DATABASE_URL
@@ -249,11 +249,11 @@ async function createDatabase() {
 async function main() {
   try {
     console.log('🚀 Starting database setup...\n');
-    
+
     // Create database if not exists
     await createDatabase();
     console.log('');
-    
+
     // Test connection to target database
     await getConnection();
     console.log('✅ Database connection successful\n');

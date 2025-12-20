@@ -36,7 +36,7 @@ async function createPriceAlertsTable() {
           notified_at DATETIME2 NULL,
           created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
           updated_at DATETIME2 NOT NULL DEFAULT GETDATE(),
-          
+
           CONSTRAINT FK_price_alerts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
           CONSTRAINT FK_price_alerts_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
           CONSTRAINT UQ_price_alerts_user_product UNIQUE (user_id, product_id)
@@ -45,7 +45,7 @@ async function createPriceAlertsTable() {
         CREATE INDEX IX_price_alerts_user_id ON price_alerts(user_id);
         CREATE INDEX IX_price_alerts_product_id ON price_alerts(product_id);
         CREATE INDEX IX_price_alerts_is_active ON price_alerts(is_active);
-        
+
         PRINT 'Price alerts table created successfully';
       END
       ELSE

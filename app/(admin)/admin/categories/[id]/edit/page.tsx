@@ -1,6 +1,9 @@
-import { notFound } from 'next/navigation';
-import { getCategoryById, getCategoryTree } from '@/app/server-actions/categoryActions';
-import EditCategoryForm from './EditCategoryForm';
+import { notFound } from "next/navigation";
+import {
+  getCategoryById,
+  getCategoryTree,
+} from "@/app/server-actions/categoryActions";
+import EditCategoryForm from "./EditCategoryForm";
 
 interface EditCategoryPageProps {
   params: {
@@ -8,7 +11,9 @@ interface EditCategoryPageProps {
   };
 }
 
-export default async function EditCategoryPage({ params }: EditCategoryPageProps) {
+export default async function EditCategoryPage({
+  params,
+}: EditCategoryPageProps) {
   const categoryId = parseInt(params.id);
 
   if (isNaN(categoryId)) {
@@ -18,11 +23,15 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
   // Admin panelinde tüm kategorileri göster (aktif ve pasif)
   const [categoryResult, categoriesResult] = await Promise.all([
     getCategoryById(categoryId, true),
-    getCategoryTree(true)
+    getCategoryTree(true),
   ]);
 
-  const category = categoryResult.success && categoryResult.data ? categoryResult.data : null;
-  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
+  const category =
+    categoryResult.success && categoryResult.data ? categoryResult.data : null;
+  const categories =
+    categoriesResult.success && categoriesResult.data
+      ? categoriesResult.data
+      : [];
 
   if (!category) {
     notFound();

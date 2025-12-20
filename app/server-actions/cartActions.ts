@@ -38,7 +38,7 @@ export interface ActionResponse<T = void> {
 export async function getCartItems() {
   try {
     const user = await getOptionalUser();
-    
+
     let items;
     if (user) {
       items = await CartRepository.findByUserId(user.id);
@@ -228,7 +228,7 @@ export async function removeFromCart(cartItemId: number): Promise<ActionResponse
 export async function clearCart(): Promise<ActionResponse> {
   try {
     const user = await getOptionalUser();
-    
+
     if (user) {
       await CartRepository.clearUserCart(user.id);
     } else {
@@ -263,7 +263,7 @@ export async function mergeCart(): Promise<ActionResponse> {
 
     const cookieStore = await cookies();
     const sessionId = cookieStore.get('cart_session_id')?.value;
-    
+
     if (sessionId) {
       await CartRepository.mergeCarts(user.id, sessionId);
     }

@@ -45,12 +45,12 @@ interface ForeignKeyInfo {
 async function exportDatabase() {
   try {
     console.log('📦 Veritabanı export işlemi başlatılıyor...\n');
-    
+
     await getConnection();
-    
+
     // Get all tables
     const tables = await executeQuery<TableInfo>(`
-      SELECT 
+      SELECT
         t.name as name,
         s.name as schema
       FROM sys.tables t
@@ -58,36 +58,36 @@ async function exportDatabase() {
       WHERE s.name = 'dbo'
       ORDER BY t.name
     `);
-    
+
     if (tables.length === 0) {
       console.log('❌ Hiç tablo bulunamadı!');
       return;
     }
-    
+
     console.log(`✅ ${tables.length} tablo bulundu:\n`);
     tables.forEach((table, index) => {
       console.log(`   ${index + 1}. ${table.name}`);
     });
-    
+
     // Create export directory
     const exportDir = resolve(process.cwd(), 'database-export');
     if (!existsSync(exportDir)) {
       mkdirSync(exportDir, { recursive: true });
     }
-    
+
     // Export schema and data for each table
     const allScripts: string[] = [];
     allScripts.push('-- Database Export');
     allScripts.push(`-- Generated: ${new Date().toISOString()}`);
     allScripts.push('-- This script contains all tables, data, and constraints\n');
     allScripts.push('SET IDENTITY_INSERT OFF;\n');
-    
+
     for (const table of tables) {
       console.log(`\n📋 Exporting ${table.name}...`);
-      
+
       // Get table structure
       const columns = await executeQuery<ColumnInfo & { precision: number; scale: number; max_length: number }>(`
-        SELECT 
+        SELECT
           c.name as column_name,
           t.name as data_type,
           c.max_length,
@@ -102,7 +102,7 @@ async function exportDatabase() {
         WHERE c.object_id = OBJECT_ID('${table.name}')
         ORDER BY c.column_id
       `);
-      
+
       // Get primary key
       const primaryKey = await executeQuery<{ column_name: string }>(`
         SELECT c.name as column_name
@@ -113,10 +113,10 @@ async function exportDatabase() {
         AND i.is_primary_key = 1
         ORDER BY ic.key_ordinal
       `);
-      
+
       // Get foreign keys
       const foreignKeys = await executeQuery<ForeignKeyInfo>(`
-        SELECT 
+        SELECT
           fk.name as constraint_name,
           OBJECT_NAME(fk.parent_object_id) as table_name,
           COL_NAME(fc.parent_object_id, fc.parent_column_id) as column_name,
@@ -126,10 +126,10 @@ async function exportDatabase() {
         INNER JOIN sys.foreign_key_columns fc ON fk.object_id = fc.constraint_object_id
         WHERE fk.parent_object_id = OBJECT_ID('${table.name}')
       `);
-      
+
       // Get indexes
       const indexes = await executeQuery<{ index_name: string; columns: string }>(`
-        SELECT 
+        SELECT
           i.name as index_name,
           STRING_AGG(c.name, ', ') WITHIN GROUP (ORDER BY ic.key_ordinal) as columns
         FROM sys.indexes i
@@ -140,7 +140,7 @@ async function exportDatabase() {
         AND i.is_unique_constraint = 0
         GROUP BY i.name
       `);
-      
+
       // Build CREATE TABLE statement
       allScripts.push(`\n-- ============================================`);
       allScripts.push(`-- Table: ${table.name}`);
@@ -148,11 +148,11 @@ async function exportDatabase() {
       allScripts.push(`IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = '${table.name}')`);
       allScripts.push(`BEGIN`);
       allScripts.push(`    CREATE TABLE [${table.name}] (`);
-      
+
       const columnDefs: string[] = [];
       for (const col of columns) {
         let def = `        [${col.column_name}] `;
-        
+
         // Data type
         const colWithDetails = col as any;
         if (col.data_type === 'nvarchar' || col.data_type === 'varchar') {
@@ -163,35 +163,35 @@ async function exportDatabase() {
         } else {
           def += col.data_type.toUpperCase();
         }
-        
+
         // Identity
         if (col.is_identity) {
           def += ' IDENTITY(1,1)';
         }
-        
+
         // Nullable
         if (col.is_nullable === 'NO') {
           def += ' NOT NULL';
         }
-        
+
         // Default
         if (col.column_default) {
           const defaultValue = col.column_default.replace(/^\(|\)$/g, '');
           def += ` DEFAULT ${defaultValue}`;
         }
-        
+
         columnDefs.push(def);
       }
-      
+
       allScripts.push(columnDefs.join(',\n'));
       allScripts.push(`    );\n`);
-      
+
       // Add primary key
       if (primaryKey.length > 0) {
         const pkColumns = primaryKey.map(pk => `[${pk.column_name}]`).join(', ');
         allScripts.push(`    ALTER TABLE [${table.name}] ADD CONSTRAINT [PK_${table.name}] PRIMARY KEY (${pkColumns});\n`);
       }
-      
+
       allScripts.push(`    PRINT '✅ ${table.name} table created';`);
       allScripts.push(`END`);
       allScripts.push(`ELSE`);
@@ -199,7 +199,7 @@ async function exportDatabase() {
       allScripts.push(`    PRINT 'ℹ️  ${table.name} table already exists';`);
       allScripts.push(`END`);
       allScripts.push(`GO\n`);
-      
+
       // Add indexes
       for (const index of indexes) {
         allScripts.push(`IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = '${index.index_name}')`);
@@ -208,7 +208,7 @@ async function exportDatabase() {
         allScripts.push(`END`);
         allScripts.push(`GO\n`);
       }
-      
+
       // Add foreign keys
       for (const fk of foreignKeys) {
         allScripts.push(`IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE name = '${fk.constraint_name}')`);
@@ -218,24 +218,24 @@ async function exportDatabase() {
         allScripts.push(`END`);
         allScripts.push(`GO\n`);
       }
-      
+
       // Export data
       const data = await executeQuery<any>(`SELECT * FROM [${table.name}]`);
       if (data.length > 0) {
         allScripts.push(`-- Data for ${table.name}`);
-        
+
         const identityColumns = columns.filter(c => c.is_identity);
         const hasIdentity = identityColumns.length > 0;
-        
+
         if (hasIdentity) {
           allScripts.push(`SET IDENTITY_INSERT [${table.name}] ON;`);
           allScripts.push(`GO\n`);
         }
-        
+
         for (const row of data) {
           const columnNames = columns.map(c => `[${c.column_name}]`).join(', ');
           const values: string[] = [];
-          
+
           for (const col of columns) {
             const value = row[col.column_name];
             if (value === null || value === undefined) {
@@ -253,29 +253,29 @@ async function exportDatabase() {
               values.push(String(value));
             }
           }
-          
+
           allScripts.push(`INSERT INTO [${table.name}] (${columnNames}) VALUES (${values.join(', ')});`);
         }
-        
+
         if (hasIdentity) {
           allScripts.push(`SET IDENTITY_INSERT [${table.name}] OFF;`);
         }
         allScripts.push(`GO\n`);
-        
+
         console.log(`   ✅ ${data.length} kayıt export edildi`);
       } else {
         console.log(`   ℹ️  Tablo boş`);
       }
     }
-    
+
     // Write to file
     const outputFile = resolve(exportDir, 'database-export.sql');
     writeFileSync(outputFile, allScripts.join('\n'), 'utf-8');
-    
+
     console.log(`\n✅ Export tamamlandı!`);
     console.log(`📁 Dosya: ${outputFile}`);
     console.log(`\n💡 Sonraki adım: Bu dosyayı yeni veritabanında çalıştırın.`);
-    
+
   } catch (error: any) {
     console.error('❌ Export hatası:', error.message);
     console.error(error);

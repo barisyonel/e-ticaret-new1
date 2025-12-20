@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { toggleCategoryActive } from '@/app/server-actions/categoryActions';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toggleCategoryActive } from "@/app/server-actions/categoryActions";
 
 interface ToggleCategoryActiveButtonProps {
   categoryId: number;
@@ -26,13 +26,13 @@ export function ToggleCategoryActiveButton({
       const result = await toggleCategoryActive(categoryId, !isActive);
 
       if (!result.success) {
-        alert(result.error || 'Durum değiştirilirken bir hata oluştu.');
+        alert(result.error || "Durum değiştirilirken bir hata oluştu.");
       } else {
         // Başarılıysa sayfayı yenile (veriyi güncellemek için)
         router.refresh();
       }
     } catch (error) {
-      alert('Beklenmedik bir hata oluştu.');
+      alert("Beklenmedik bir hata oluştu.");
     } finally {
       setIsLoading(false);
     }
@@ -44,15 +44,15 @@ export function ToggleCategoryActiveButton({
       disabled={isLoading}
       className={`
         px-3 py-1 rounded-full text-xs font-semibold transition-colors
-        ${isActive 
-          ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}
-        ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+        ${
+          isActive
+            ? "bg-green-100 text-green-800 hover:bg-green-200"
+            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+        }
+        ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
       `}
     >
-      {isLoading 
-        ? '...' 
-        : (isActive ? 'Aktif' : 'Pasif')}
+      {isLoading ? "..." : isActive ? "Aktif" : "Pasif"}
     </button>
   );
 }

@@ -110,7 +110,7 @@ export default function NotificationList({ initialNotifications, unreadCount: in
 
   const getNotificationLink = (notification: Notification) => {
     if (!notification.dataJson) return '/profile';
-    
+
     try {
       const data = JSON.parse(notification.dataJson);
       switch (notification.type) {
@@ -229,8 +229,8 @@ function NotificationCard({
 }) {
   return (
     <div className={`bg-white rounded-lg shadow-md p-5 border-l-4 ${
-      !notification.isRead 
-        ? 'border-primary-blue bg-blue-50/30' 
+      !notification.isRead
+        ? 'border-primary-blue bg-blue-50/30'
         : 'border-gray-300'
     }`}>
       <div className="flex items-start gap-4">

@@ -72,10 +72,10 @@ export default function AllCategoriesMenu({ categories }: AllCategoriesMenuProps
     >
       {/* TÜM KATEGORİLER Button - Premium Design */}
       <button className={`
-        flex items-center gap-2 px-6 py-3.5 text-sm font-bold text-white 
+        flex items-center gap-2 px-6 py-3.5 text-sm font-bold text-white
         transition-all duration-300 h-full
-        ${isOpen 
-          ? 'bg-accent-yellow text-primary-blue-dark shadow-lg' 
+        ${isOpen
+          ? 'bg-accent-yellow text-primary-blue-dark shadow-lg'
           : 'hover:bg-white/10 hover:text-accent-yellow'
         }
         border-r-2 border-white/20 rounded-l-lg
@@ -95,10 +95,10 @@ export default function AllCategoriesMenu({ categories }: AllCategoriesMenuProps
           />
         </svg>
         <span>TÜM KATEGORİLER</span>
-        <svg 
+        <svg
           className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-          fill="none" 
-          stroke="currentColor" 
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
@@ -107,14 +107,14 @@ export default function AllCategoriesMenu({ categories }: AllCategoriesMenuProps
 
       {/* Mega Menu Dropdown - Premium Design */}
       {isOpen && (
-        <div 
+        <div
           className="fixed top-[calc(96px)] left-0 right-0 bg-white border-t-2 border-accent-yellow shadow-2xl z-[100] animate-fadeInUp"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           {/* Top Gradient Bar */}
           <div className="h-1 bg-gradient-to-r from-primary-blue via-accent-yellow to-primary-blue"></div>
-          
+
           <div className="container mx-auto px-4">
             <div className="flex">
               {/* Left Sidebar - Premium Design */}
@@ -128,7 +128,7 @@ export default function AllCategoriesMenu({ categories }: AllCategoriesMenuProps
                       Kategoriler
                     </h3>
                   </div>
-                  
+
                   {mainCategories.map((category) => {
                     const isSelected = selectedCategory?.id === category.id;
                     const hasChildren = category.children && category.children.length > 0;
@@ -138,8 +138,8 @@ export default function AllCategoriesMenu({ categories }: AllCategoriesMenuProps
                         key={category.id}
                         className={`
                           relative mb-1 rounded-lg transition-all duration-200
-                          ${isSelected 
-                            ? 'bg-primary-blue shadow-md' 
+                          ${isSelected
+                            ? 'bg-primary-blue shadow-md'
                             : 'hover:bg-white hover:shadow-sm'
                           }
                         `}
@@ -177,7 +177,7 @@ export default function AllCategoriesMenu({ categories }: AllCategoriesMenuProps
                             </svg>
                           )}
                         </Link>
-                        
+
                         {/* Selected Indicator */}
                         {isSelected && (
                           <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent-yellow rounded-l-full"></div>
@@ -224,7 +224,7 @@ export default function AllCategoriesMenu({ categories }: AllCategoriesMenuProps
                           >
                             {subcategory.name}
                           </Link>
-                          
+
                           {/* Child Categories */}
                           {subcategory.children && subcategory.children.length > 0 && (
                             <ul className="space-y-2 mt-3">

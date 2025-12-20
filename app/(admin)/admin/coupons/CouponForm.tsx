@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createCoupon, updateCoupon } from '@/app/server-actions/couponActions';
-import { showToast } from '@/components/ToastContainer';
-import Link from 'next/link';
-import { DiscountType } from '@/lib/repositories/CouponRepository';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createCoupon, updateCoupon } from "@/app/server-actions/couponActions";
+import { showToast } from "@/components/ToastContainer";
+import Link from "next/link";
+import { DiscountType } from "@/lib/repositories/CouponRepository";
 
 interface CouponFormProps {
   coupon?: {
@@ -27,15 +27,19 @@ export default function CouponForm({ coupon }: CouponFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    code: coupon?.code || '',
-    description: coupon?.description || '',
-    discountType: coupon?.discountType || 'PERCENTAGE' as DiscountType,
+    code: coupon?.code || "",
+    description: coupon?.description || "",
+    discountType: coupon?.discountType || ("PERCENTAGE" as DiscountType),
     discountValue: coupon?.discountValue || 0,
-    minPurchaseAmount: coupon?.minPurchaseAmount?.toString() || '',
-    maxDiscountAmount: coupon?.maxDiscountAmount?.toString() || '',
-    usageLimit: coupon?.usageLimit?.toString() || '',
-    validFrom: coupon?.validFrom ? new Date(coupon.validFrom).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    validUntil: coupon?.validUntil ? new Date(coupon.validUntil).toISOString().split('T')[0] : '',
+    minPurchaseAmount: coupon?.minPurchaseAmount?.toString() || "",
+    maxDiscountAmount: coupon?.maxDiscountAmount?.toString() || "",
+    usageLimit: coupon?.usageLimit?.toString() || "",
+    validFrom: coupon?.validFrom
+      ? new Date(coupon.validFrom).toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0],
+    validUntil: coupon?.validUntil
+      ? new Date(coupon.validUntil).toISOString().split("T")[0]
+      : "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,10 +49,10 @@ export default function CouponForm({ coupon }: CouponFormProps) {
     try {
       const formDataObj = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== '') {
+        if (value !== "") {
           formDataObj.append(key, value.toString());
-        } else if (key === 'validUntil') {
-          formDataObj.append(key, '');
+        } else if (key === "validUntil") {
+          formDataObj.append(key, "");
         }
       });
 
@@ -58,35 +62,45 @@ export default function CouponForm({ coupon }: CouponFormProps) {
 
       if (result.success) {
         showToast(
-          coupon ? 'Kupon güncellendi' : 'Kupon oluşturuldu',
-          'success'
+          coupon ? "Kupon güncellendi" : "Kupon oluşturuldu",
+          "success",
         );
-        router.push('/admin/coupons');
+        router.push("/admin/coupons");
         router.refresh();
       } else {
-        showToast(result.error || 'Bir hata oluştu', 'error');
+        showToast(result.error || "Bir hata oluştu", "error");
       }
     } catch (error) {
-      showToast('Bir hata oluştu', 'error');
+      showToast("Bir hata oluştu", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6 lg:p-8 border-2 border-gray-200 max-w-3xl">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-xl shadow-lg p-6 lg:p-8 border-2 border-gray-200 max-w-3xl"
+    >
       <div className="space-y-6">
         {/* Code */}
         <div>
-          <label htmlFor="code" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label
+            htmlFor="code"
+            className="block text-sm font-semibold text-gray-700 mb-2"
+          >
             Kupon Kodu *
           </label>
           <input
@@ -103,7 +117,10 @@ export default function CouponForm({ coupon }: CouponFormProps) {
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label
+            htmlFor="description"
+            className="block text-sm font-semibold text-gray-700 mb-2"
+          >
             Açıklama
           </label>
           <textarea
@@ -120,24 +137,30 @@ export default function CouponForm({ coupon }: CouponFormProps) {
         {/* Discount Type and Value */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="discountType" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="discountType"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               İndirim Tipi *
             </label>
-              <select
-                id="discountType"
-                name="discountType"
-                required
-                value={formData.discountType}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-primary-blue transition-all"
-              >
-                <option value="PERCENTAGE">Yüzde (%)</option>
-                <option value="FIXED">Sabit Tutar (₺)</option>
-              </select>
+            <select
+              id="discountType"
+              name="discountType"
+              required
+              value={formData.discountType}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-primary-blue transition-all"
+            >
+              <option value="PERCENTAGE">Yüzde (%)</option>
+              <option value="FIXED">Sabit Tutar (₺)</option>
+            </select>
           </div>
 
           <div>
-            <label htmlFor="discountValue" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="discountValue"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               İndirim Değeri *
             </label>
             <input
@@ -157,7 +180,10 @@ export default function CouponForm({ coupon }: CouponFormProps) {
         {/* Min Purchase Amount and Max Discount */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="minPurchaseAmount" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="minPurchaseAmount"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Minimum Alışveriş Tutarı (₺)
             </label>
             <input
@@ -174,7 +200,10 @@ export default function CouponForm({ coupon }: CouponFormProps) {
           </div>
 
           <div>
-            <label htmlFor="maxDiscountAmount" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="maxDiscountAmount"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Maksimum İndirim (₺)
             </label>
             <input
@@ -193,7 +222,10 @@ export default function CouponForm({ coupon }: CouponFormProps) {
 
         {/* Usage Limit */}
         <div>
-          <label htmlFor="usageLimit" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label
+            htmlFor="usageLimit"
+            className="block text-sm font-semibold text-gray-700 mb-2"
+          >
             Kullanım Limiti
           </label>
           <input
@@ -206,13 +238,18 @@ export default function CouponForm({ coupon }: CouponFormProps) {
             className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-primary-blue transition-all"
             placeholder="Boş bırakılırsa sınırsız"
           />
-          <p className="text-xs text-gray-500 mt-1">Boş bırakılırsa kupon sınırsız kullanılabilir</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Boş bırakılırsa kupon sınırsız kullanılabilir
+          </p>
         </div>
 
         {/* Valid From and Until */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="validFrom" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="validFrom"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Geçerlilik Başlangıcı *
             </label>
             <input
@@ -227,7 +264,10 @@ export default function CouponForm({ coupon }: CouponFormProps) {
           </div>
 
           <div>
-            <label htmlFor="validUntil" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="validUntil"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Geçerlilik Bitişi
             </label>
             <input
@@ -238,7 +278,9 @@ export default function CouponForm({ coupon }: CouponFormProps) {
               onChange={handleChange}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-primary-blue transition-all"
             />
-            <p className="text-xs text-gray-500 mt-1">Boş bırakılırsa süresiz geçerli</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Boş bırakılırsa süresiz geçerli
+            </p>
           </div>
         </div>
 
@@ -249,7 +291,11 @@ export default function CouponForm({ coupon }: CouponFormProps) {
             disabled={isSubmitting}
             className="flex-1 px-6 py-3 bg-accent-yellow text-primary-blue-dark rounded-lg hover:bg-accent-yellow-light transition-all font-bold shadow-md hover:shadow-lg disabled:opacity-50"
           >
-            {isSubmitting ? 'Kaydediliyor...' : coupon ? 'Güncelle' : 'Kupon Oluştur'}
+            {isSubmitting
+              ? "Kaydediliyor..."
+              : coupon
+                ? "Güncelle"
+                : "Kupon Oluştur"}
           </button>
           <Link
             href="/admin/coupons"
@@ -262,4 +308,3 @@ export default function CouponForm({ coupon }: CouponFormProps) {
     </form>
   );
 }
-

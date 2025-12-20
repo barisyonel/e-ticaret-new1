@@ -35,22 +35,22 @@ export default async function HomePage() {
       {/* Kategoriler Bölümü */}
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-8">Popüler Kategoriler</h2>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {mainCategories.length > 0 ? (
             mainCategories.map((cat: any) => (
-              <Link 
-                key={cat.id} 
+              <Link
+                key={cat.id}
                 href={`/category/${cat.slug}`}
                 className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-4 flex flex-col items-center text-center border border-gray-100"
               >
                 <div className="w-full aspect-square relative bg-gray-100 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
                   {cat.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img 
-                      src={cat.image} 
-                      alt={cat.name} 
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" 
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
                     <span className="text-4xl">📦</span>

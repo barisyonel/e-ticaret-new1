@@ -25,15 +25,15 @@ async function fixOrderStatusHistory() {
 
     // Check current columns
     console.log('📋 Checking current table structure...');
-    
+
     // Add missing columns if they don't exist
     console.log('   Adding missing columns...');
-    
+
     // Check and add admin_user_id column
     await executeNonQuery(`
       IF NOT EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'admin_user_id'
       )
       BEGIN
@@ -50,8 +50,8 @@ async function fixOrderStatusHistory() {
     // Check and add old_status column
     await executeNonQuery(`
       IF NOT EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'old_status'
       )
       BEGIN
@@ -68,8 +68,8 @@ async function fixOrderStatusHistory() {
     // Check and add new_status column
     await executeNonQuery(`
       IF NOT EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'new_status'
       )
       BEGIN
@@ -86,15 +86,15 @@ async function fixOrderStatusHistory() {
     // Check if 'note' column exists, if not check for 'notes' and rename it
     await executeNonQuery(`
       IF NOT EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'note'
       )
       BEGIN
         -- If 'notes' exists, rename it to 'note'
         IF EXISTS (
-          SELECT * FROM sys.columns 
-          WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+          SELECT * FROM sys.columns
+          WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
           AND name = 'notes'
         )
         BEGIN
@@ -118,13 +118,13 @@ async function fixOrderStatusHistory() {
     // If status column exists but new_status doesn't, we need to migrate data
     await executeNonQuery(`
       IF EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'status'
       )
       AND EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'new_status'
       )
       BEGIN
@@ -139,17 +139,17 @@ async function fixOrderStatusHistory() {
     // Add foreign key for admin_user_id if it doesn't exist
     await executeNonQuery(`
       IF NOT EXISTS (
-        SELECT * FROM sys.foreign_keys 
+        SELECT * FROM sys.foreign_keys
         WHERE name = 'FK_order_status_history_admin_user'
       )
       AND EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'admin_user_id'
       )
       BEGIN
         ALTER TABLE order_status_history
-        ADD CONSTRAINT FK_order_status_history_admin_user 
+        ADD CONSTRAINT FK_order_status_history_admin_user
         FOREIGN KEY (admin_user_id) REFERENCES users(id);
         PRINT '✅ Foreign key for admin_user_id added';
       END
@@ -160,7 +160,7 @@ async function fixOrderStatusHistory() {
     `);
 
     console.log('\n✅ order_status_history table fixed successfully!');
-    
+
   } catch (error: any) {
     console.error('❌ Error:', error.message);
     throw error;

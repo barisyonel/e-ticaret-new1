@@ -7,7 +7,7 @@ export default function Hero() {
     <section className="relative w-full bg-blue-900 text-white overflow-hidden min-h-[500px] flex items-center border-b-8 border-yellow-400">
       {/* Arkaplan Deseni */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-800 via-blue-900 to-black opacity-90 z-10" />
-      
+
       {/* İçerik Alanı (Container ile ortalanmış ve padding verilmiş) */}
       <div className="relative z-20 container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center">
         <div className="max-w-3xl py-12 md:py-0"> {/* Mobilde dikey boşluk eklendi */}
@@ -22,21 +22,21 @@ export default function Hero() {
             Traktörünüzün performansını koruyun. %100 orijinal motor, şanzıman ve kaporta parçaları en uygun fiyatlarla kapınızda.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link 
-              href="/products" 
+            <Link
+              href="/products"
               className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 px-8 py-4 rounded-lg font-bold transition-all shadow-lg hover:shadow-yellow-400/50 transform hover:-translate-y-1 flex items-center gap-2"
             >
               <span>🔍</span> Parça Ara
             </Link>
-            <Link 
-              href="/categories" 
+            <Link
+              href="/categories"
               className="bg-transparent hover:bg-white/10 text-white border-2 border-white/30 px-8 py-4 rounded-lg font-bold transition-all backdrop-blur-sm"
             >
               Kategoriler
             </Link>
           </div>
         </div>
-        
+
         {/* Dekoratif Çark İkonu (Mobilde gizli) */}
         <div className="hidden md:block absolute right-0 bottom-0 opacity-10 pointer-events-none">
            <svg width="400" height="400" viewBox="0 0 24 24" fill="currentColor" className="text-white transform translate-x-1/4 translate-y-1/4">

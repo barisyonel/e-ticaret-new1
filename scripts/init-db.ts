@@ -37,7 +37,7 @@ async function initDatabase() {
     const batches = sqlScript.split(/^\s*GO\s*$/gim);
 
     console.log('🔄 Veritabanı oluşturuluyor...');
-    
+
     for (const batch of batches) {
       const trimmedBatch = batch.trim();
       if (trimmedBatch.length > 0 && !trimmedBatch.startsWith('--')) {

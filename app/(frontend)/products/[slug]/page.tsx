@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getProductBySlug } from '@/app/server-actions/productActions';
 // Eğer bu dosya yoksa hata almamak için yorum satırına alabilirsin:
-// import { getProductRating } from '@/app/server-actions/reviewActions'; 
+// import { getProductRating } from '@/app/server-actions/reviewActions';
 import ProductImageGallery from './ProductImageGallery';
 
 interface ProductDetailPageProps {
@@ -77,7 +77,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               {product.stock > 0 ? 'Sepete Ekle' : 'Stok Yok'}
             </button>
           </div>
-          
+
           <div className="mt-6 text-sm text-gray-500">
             <p>Kategori ID: {product.categoryId}</p>
             <p>Ürün Kodu: {product.slug}</p>

@@ -17,12 +17,12 @@ export default function UpdateUserRoleButton({ userId, currentRole }: UpdateUser
 
   const handleRoleChange = async () => {
     if (isUpdating) return;
-    
+
     const newRole = currentRole === UserRole.ADMIN ? UserRole.USER : UserRole.ADMIN;
-    const confirmMessage = newRole === UserRole.ADMIN 
+    const confirmMessage = newRole === UserRole.ADMIN
       ? 'Bu kullanıcıyı yönetici yapmak istediğinizden emin misiniz?'
       : 'Bu kullanıcının yönetici yetkisini kaldırmak istediğinizden emin misiniz?';
-    
+
     if (!confirm(confirmMessage)) {
       return;
     }
@@ -30,7 +30,7 @@ export default function UpdateUserRoleButton({ userId, currentRole }: UpdateUser
     setIsUpdating(true);
     try {
       const result = await updateUserRole(userId, newRole);
-      
+
       if (result.success) {
         showToast(`Kullanıcı rolü başarıyla güncellendi`, 'success');
         router.refresh();

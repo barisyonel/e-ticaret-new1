@@ -1,14 +1,17 @@
-'use client';
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 interface ReportsFormProps {
   defaultStartDate: string;
   defaultEndDate: string;
 }
 
-export default function ReportsForm({ defaultStartDate, defaultEndDate }: ReportsFormProps) {
+export default function ReportsForm({
+  defaultStartDate,
+  defaultEndDate,
+}: ReportsFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [startDate, setStartDate] = useState(defaultStartDate);
@@ -17,8 +20,8 @@ export default function ReportsForm({ defaultStartDate, defaultEndDate }: Report
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams(searchParams.toString());
-    params.set('startDate', startDate);
-    params.set('endDate', endDate);
+    params.set("startDate", startDate);
+    params.set("endDate", endDate);
     router.push(`/admin/reports?${params.toString()}`);
   };
 
@@ -28,14 +31,16 @@ export default function ReportsForm({ defaultStartDate, defaultEndDate }: Report
     start.setDate(start.getDate() - days);
 
     const params = new URLSearchParams();
-    params.set('startDate', start.toISOString().split('T')[0]);
-    params.set('endDate', end.toISOString().split('T')[0]);
+    params.set("startDate", start.toISOString().split("T")[0]);
+    params.set("endDate", end.toISOString().split("T")[0]);
     router.push(`/admin/reports?${params.toString()}`);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Tarih Aralığı Seçin</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">
+        Tarih Aralığı Seçin
+      </h2>
 
       {/* Quick Filters */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -72,7 +77,10 @@ export default function ReportsForm({ defaultStartDate, defaultEndDate }: Report
       {/* Date Inputs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="startDate"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Başlangıç Tarihi
           </label>
           <input
@@ -85,7 +93,10 @@ export default function ReportsForm({ defaultStartDate, defaultEndDate }: Report
           />
         </div>
         <div>
-          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="endDate"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Bitiş Tarihi
           </label>
           <input
@@ -109,4 +120,3 @@ export default function ReportsForm({ defaultStartDate, defaultEndDate }: Report
     </form>
   );
 }
-

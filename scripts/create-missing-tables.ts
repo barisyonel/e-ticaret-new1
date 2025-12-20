@@ -22,9 +22,9 @@ import { executeNonQuery, getConnection, closeConnection } from '../lib/db-setup
 async function createMissingTables() {
   try {
     console.log('📦 Eksik tablolar oluşturuluyor...\n');
-    
+
     await getConnection();
-    
+
     // 1. Categories table
     console.log('📋 Creating categories table...');
     await executeNonQuery(`
@@ -49,7 +49,7 @@ async function createMissingTables() {
       END
     `);
     console.log('   ✅ categories table');
-    
+
     // 2. Product categories (many-to-many)
     console.log('📋 Creating product_categories table...');
     await executeNonQuery(`
@@ -68,7 +68,7 @@ async function createMissingTables() {
       END
     `);
     console.log('   ✅ product_categories table');
-    
+
     // 3. Add missing columns to products table
     console.log('📋 Adding missing columns to products table...');
     try {
@@ -83,7 +83,7 @@ async function createMissingTables() {
     } catch (e: any) {
       if (!e.message?.includes('already exists')) console.log('   ℹ️  is_active column already exists');
     }
-    
+
     try {
       await executeNonQuery(`
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('products') AND name = 'primary_category_id')
@@ -96,7 +96,7 @@ async function createMissingTables() {
     } catch (e: any) {
       if (!e.message?.includes('already exists')) console.log('   ℹ️  primary_category_id column already exists');
     }
-    
+
     try {
       await executeNonQuery(`
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('products') AND name = 'brand')
@@ -108,7 +108,7 @@ async function createMissingTables() {
     } catch (e: any) {
       if (!e.message?.includes('already exists')) console.log('   ℹ️  brand column already exists');
     }
-    
+
     // 4. Product attributes
     console.log('📋 Creating product_attributes table...');
     await executeNonQuery(`
@@ -130,7 +130,7 @@ async function createMissingTables() {
       END
     `);
     console.log('   ✅ product_attributes table');
-    
+
     // 5. Attribute values
     console.log('📋 Creating attribute_values table...');
     await executeNonQuery(`
@@ -153,7 +153,7 @@ async function createMissingTables() {
       END
     `);
     console.log('   ✅ attribute_values table');
-    
+
     // 6. Product attribute values (many-to-many)
     console.log('📋 Creating product_attribute_values table...');
     await executeNonQuery(`
@@ -172,7 +172,7 @@ async function createMissingTables() {
       END
     `);
     console.log('   ✅ product_attribute_values table');
-    
+
     // 7. Favorites
     console.log('📋 Creating favorites table...');
     await executeNonQuery(`
@@ -193,10 +193,10 @@ async function createMissingTables() {
       END
     `);
     console.log('   ✅ favorites table');
-    
+
     // 8. Order status history
     console.log('📋 Creating/updating order_status_history table...');
-    
+
     // Create table if it doesn't exist
     await executeNonQuery(`
       IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
@@ -218,7 +218,7 @@ async function createMissingTables() {
         PRINT '✅ order_status_history table created';
       END
     `);
-    
+
     // Add missing columns if table exists - split into separate queries
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
@@ -231,7 +231,7 @@ async function createMissingTables() {
         END
       END
     `);
-    
+
     // Add foreign key separately
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
@@ -242,7 +242,7 @@ async function createMissingTables() {
         PRINT '✅ Foreign key for admin_user_id added';
       END
     `);
-    
+
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
       BEGIN
@@ -252,7 +252,7 @@ async function createMissingTables() {
           ALTER TABLE order_status_history ADD old_status NVARCHAR(50) NULL;
           PRINT '✅ old_status column added';
         END
-        
+
         -- Add new_status if missing
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.order_status_history') AND name = 'new_status')
         BEGIN
@@ -261,7 +261,7 @@ async function createMissingTables() {
         END
       END
     `);
-    
+
     // Migrate data from status to new_status
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
@@ -272,7 +272,7 @@ async function createMissingTables() {
         PRINT '✅ Migrated status data to new_status';
       END
     `);
-    
+
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
       BEGIN
@@ -283,7 +283,7 @@ async function createMissingTables() {
           EXEC sp_rename 'order_status_history.notes', 'note', 'COLUMN';
           PRINT '✅ notes column renamed to note';
         END
-        
+
         -- Add note if missing
         IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.order_status_history') AND name = 'note')
         AND NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.order_status_history') AND name = 'notes')
@@ -294,10 +294,10 @@ async function createMissingTables() {
       END
     `);
     console.log('   ✅ order_status_history table');
-    
+
     console.log('\n✅ Tüm eksik tablolar oluşturuldu!');
     console.log('💡 Tabloları kontrol etmek için: npm run check-tables');
-    
+
   } catch (error: any) {
     console.error('❌ Hata:', error.message);
     throw error;

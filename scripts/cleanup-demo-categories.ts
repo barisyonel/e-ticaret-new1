@@ -32,7 +32,7 @@ if (!process.env.DATABASE_URL) {
 // Parse DATABASE_URL
 function parseDatabaseUrl() {
   const dbUrl = process.env.DATABASE_URL!;
-  
+
   if (dbUrl.includes('Server=') && !dbUrl.includes('Data Source=')) {
     const parts = dbUrl.split(';').filter(p => p.trim());
     const config: any = {
@@ -86,7 +86,7 @@ function parseDatabaseUrl() {
 async function getConnection() {
   const dbConfig = parseDatabaseUrl();
   const isNamedInstance = dbConfig.options?.instanceName && dbConfig.options?.instanceName !== 'MSSQLLocalDB';
-  
+
   const sqlConfig: any = {
     server: dbConfig.server,
     database: dbConfig.database,
@@ -122,7 +122,7 @@ async function getConnection() {
 
 async function cleanupDemoCategories() {
   let pool: any = null;
-  
+
   try {
     console.log('🧹 Demo/Deneme kategorileri temizleniyor...\n');
 
@@ -134,13 +134,13 @@ async function cleanupDemoCategories() {
     console.log('📋 Yeni profesyonel kategoriler alınıyor...');
     const categoriesRequest = pool.request();
     const categoriesResult = await categoriesRequest.query(
-      `SELECT id, name, slug FROM categories 
-       WHERE parent_id IS NULL 
-       AND is_active = 1 
+      `SELECT id, name, slug FROM categories
+       WHERE parent_id IS NULL
+       AND is_active = 1
        AND LOWER(name) NOT LIKE '%deneme%'
        ORDER BY display_order, name`
     );
-    
+
     const professionalCategories = categoriesResult.recordset;
     console.log(`✓ ${professionalCategories.length} profesyonel kategori bulundu\n`);
 
@@ -153,10 +153,10 @@ async function cleanupDemoCategories() {
     console.log('🔍 "deneme" kategorileri bulunuyor...');
     const demoCategoriesRequest = pool.request();
     const demoCategoriesResult = await demoCategoriesRequest.query(
-      `SELECT id, name FROM categories 
+      `SELECT id, name FROM categories
        WHERE LOWER(name) LIKE '%deneme%'`
     );
-    
+
     const demoCategories = demoCategoriesResult.recordset;
     console.log(`✓ ${demoCategories.length} adet "deneme" kategorisi bulundu\n`);
 
@@ -183,7 +183,7 @@ async function cleanupDemoCategories() {
       );
 
       const products = productsResult.recordset;
-      
+
       if (products.length === 0) {
         console.log(`⏭️  "${demoCategory.name}" kategorisine bağlı ürün yok`);
         continue;
@@ -195,9 +195,9 @@ async function cleanupDemoCategories() {
       for (const product of products) {
         // Ürünün adına göre kategori seç (basit bir eşleştirme)
         let targetCategoryId = defaultCategoryId;
-        
+
         const productNameLower = product.name.toLowerCase();
-        
+
         // Kategori eşleştirme mantığı
         if (productNameLower.includes('motor') || productNameLower.includes('piston') || productNameLower.includes('silindir')) {
           const cat = professionalCategories.find((c: any) => c.slug === 'motor-parcalari');
@@ -239,7 +239,7 @@ async function cleanupDemoCategories() {
         updatePrimaryRequest.input('productId', sql.Int, product.id);
         updatePrimaryRequest.input('newCategoryId', sql.Int, targetCategoryId);
         await updatePrimaryRequest.query(
-          `UPDATE products 
+          `UPDATE products
            SET primary_category_id = @newCategoryId, updated_at = GETDATE()
            WHERE id = @productId`
         );
@@ -249,7 +249,7 @@ async function cleanupDemoCategories() {
         removeOldRequest.input('productId', sql.Int, product.id);
         removeOldRequest.input('oldCategoryId', sql.Int, demoCategory.id);
         await removeOldRequest.query(
-          `DELETE FROM product_categories 
+          `DELETE FROM product_categories
            WHERE product_id = @productId AND category_id = @oldCategoryId`
         );
 
@@ -277,7 +277,7 @@ async function cleanupDemoCategories() {
     console.log('🔕 "deneme" kategorileri pasif yapılıyor...');
     const deactivateRequest = pool.request();
     const deactivateResult = await deactivateRequest.query(
-      `UPDATE categories 
+      `UPDATE categories
        SET is_active = 0, updated_at = GETDATE()
        WHERE LOWER(name) LIKE '%deneme%'`
     );
@@ -314,10 +314,3 @@ if (require.main === module) {
 }
 
 export { cleanupDemoCategories };
-
-
-
-
-
-
-

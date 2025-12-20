@@ -10,7 +10,7 @@ export default function ProductFilters({
   selectedCategory = '',
   selectedFilters = {}
 }: any) {
-  
+
   return (
     <div className="space-y-6">
       <div>
@@ -19,7 +19,7 @@ export default function ProductFilters({
           <li><Link href="/products" className="hover:text-pink-600">Tümü</Link></li>
           {categories.map((cat: any) => (
             <li key={cat.id}>
-              <Link 
+              <Link
                 href={`/products?category=${cat.slug}`}
                 className={selectedCategory === cat.slug ? 'text-pink-600 font-bold' : ''}
               >

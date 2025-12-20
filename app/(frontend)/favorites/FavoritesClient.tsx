@@ -35,7 +35,7 @@ export default function FavoritesClient({ initialFavorites }: FavoritesClientPro
   useEffect(() => {
     const handleFavoriteChange = async (event: Event) => {
       const customEvent = event as CustomEvent<{ productId: number; isFavorite: boolean }>;
-      
+
       // If a favorite was removed, update the list immediately
       if (customEvent.detail?.isFavorite === false) {
         setFavorites(prev => prev.filter(fav => fav.productId !== customEvent.detail.productId));
@@ -116,7 +116,7 @@ export default function FavoritesClient({ initialFavorites }: FavoritesClientPro
                         className="object-cover transition-transform duration-300 hover:scale-110"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
-                      
+
                       {/* Favorite Button */}
                       <div className="absolute top-2 right-2 z-10">
                         <FavoriteButton productId={favorite.product.id} size="md" />
@@ -128,7 +128,7 @@ export default function FavoritesClient({ initialFavorites }: FavoritesClientPro
                       <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">
                         {favorite.product.name}
                       </h3>
-                      
+
                       {/* Price */}
                       <div className="flex items-center justify-between">
                         <span className="text-lg font-bold text-pink-600">

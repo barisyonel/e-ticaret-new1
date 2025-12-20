@@ -77,7 +77,7 @@ export default function ProductDetailInfo({ product, rating }: ProductDetailInfo
         <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4 leading-tight">
           {product.name}
         </h1>
-        
+
         {/* Rating */}
         <div className="flex items-center gap-3 mb-4">
           <div className="flex items-center gap-1">
@@ -140,21 +140,21 @@ export default function ProductDetailInfo({ product, rating }: ProductDetailInfo
       {/* Product Specifications */}
       <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 space-y-3">
         <h3 className="text-lg font-extrabold text-gray-900 mb-4">Ürün Özellikleri</h3>
-        
+
         {product.sku && (
           <div className="flex items-center justify-between py-2 border-b border-gray-200">
             <span className="text-sm font-semibold text-gray-600">Barkodu:</span>
             <span className="text-sm font-bold text-gray-900">{product.sku}</span>
           </div>
         )}
-        
+
         <div className="flex items-center justify-between py-2 border-b border-gray-200">
           <span className="text-sm font-semibold text-gray-600">Stok Miktarı:</span>
           <span className={`text-sm font-bold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
             {product.stock > 0 ? 'Stokta Var' : 'Stokta Yok'}
           </span>
         </div>
-        
+
         {product.brand && (
           <div className="flex items-center justify-between py-2">
             <span className="text-sm font-semibold text-gray-600">Markası:</span>
@@ -186,7 +186,7 @@ export default function ProductDetailInfo({ product, rating }: ProductDetailInfo
           <FavoriteButton productId={product.id} size="md" />
           <span>Favorilerime Ekle</span>
         </button>
-        
+
         <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 rounded-lg hover:border-primary-blue hover:bg-primary-blue/10 transition-all font-semibold text-gray-700">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

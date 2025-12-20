@@ -23,16 +23,16 @@ import { executeQuery, getConnection, closeConnection } from '../lib/db-setup';
 async function checkTables() {
   try {
     console.log('🔍 Checking database tables...\n');
-    
+
     await getConnection();
-    
+
     // List all tables
     const tables = await executeQuery<{ table_name: string }>(`
       SELECT name as table_name
       FROM sys.tables
       ORDER BY name
     `);
-    
+
     if (tables.length === 0) {
       console.log('❌ Hiç tablo bulunamadı!');
       console.log('   Lütfen `npm run setup-db` komutunu çalıştırın.');
@@ -42,13 +42,13 @@ async function checkTables() {
         console.log(`   ${index + 1}. ${table.table_name}`);
       });
     }
-    
+
     // List all columns for each table
     if (tables.length > 0) {
       console.log('\n📋 Tablo detayları:\n');
       for (const table of tables) {
         const columns = await executeQuery<{ column_name: string; data_type: string; is_nullable: string }>(`
-          SELECT 
+          SELECT
             COLUMN_NAME as column_name,
             DATA_TYPE as data_type,
             IS_NULLABLE as is_nullable
@@ -56,7 +56,7 @@ async function checkTables() {
           WHERE TABLE_NAME = '${table.table_name}'
           ORDER BY ORDINAL_POSITION
         `);
-        
+
         console.log(`   📊 ${table.table_name}:`);
         columns.forEach(col => {
           const nullable = col.is_nullable === 'YES' ? '(NULL)' : '(NOT NULL)';
@@ -65,7 +65,7 @@ async function checkTables() {
         console.log('');
       }
     }
-    
+
   } catch (error) {
     console.error('❌ Hata:', error);
   } finally {

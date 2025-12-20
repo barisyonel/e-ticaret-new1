@@ -46,8 +46,8 @@ export default function MegaMenu({ categories }: MegaMenuProps) {
               href={`/products?category=${category.slug}`}
               className={`
                 relative flex items-center gap-2 px-5 py-3.5 text-sm font-semibold transition-all duration-300
-                ${isHovered 
-                  ? 'text-accent-yellow' 
+                ${isHovered
+                  ? 'text-accent-yellow'
                   : 'text-white/90 hover:text-white'
                 }
                 group-hover:bg-white/10 rounded-lg mx-0.5
@@ -57,10 +57,10 @@ export default function MegaMenu({ categories }: MegaMenuProps) {
               <div className="flex-shrink-0">
                 <CategoryIcon slug={category.slug} className="w-5 h-5" />
               </div>
-              
+
               {/* Category Name */}
               <span className="whitespace-nowrap">{category.name}</span>
-              
+
               {/* Dropdown Arrow */}
               {hasChildren && (
                 <svg
@@ -89,7 +89,7 @@ export default function MegaMenu({ categories }: MegaMenuProps) {
               <div className="fixed top-[calc(96px)] left-0 right-0 bg-white border-t-2 border-accent-yellow shadow-2xl z-[100] animate-fadeInUp">
                 {/* Top Gradient Bar */}
                 <div className="h-1 bg-gradient-to-r from-primary-blue via-accent-yellow to-primary-blue"></div>
-                
+
                 <div className="container mx-auto px-4">
                   <div className="py-8">
                     {/* Category Header */}
@@ -128,7 +128,7 @@ export default function MegaMenu({ categories }: MegaMenuProps) {
                             >
                               {subcategory.name}
                             </Link>
-                            
+
                             {/* Child Categories */}
                             {subcategory.children && subcategory.children.length > 0 && (
                               <ul className="space-y-2 mt-3">
@@ -149,7 +149,7 @@ export default function MegaMenu({ categories }: MegaMenuProps) {
                           </div>
                         ))}
                       </div>
-                      
+
                       {/* Category Image (if exists) */}
                       {category.image && (
                         <div className="col-span-1">

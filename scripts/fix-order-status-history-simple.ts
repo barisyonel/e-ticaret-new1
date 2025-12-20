@@ -27,8 +27,8 @@ async function fixOrderStatusHistorySimple() {
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
       AND EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'status'
       )
       BEGIN
@@ -46,8 +46,8 @@ async function fixOrderStatusHistorySimple() {
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
       AND NOT EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'new_status'
       )
       BEGIN
@@ -61,8 +61,8 @@ async function fixOrderStatusHistorySimple() {
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
       AND EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'new_status'
       )
       BEGIN
@@ -70,7 +70,7 @@ async function fixOrderStatusHistorySimple() {
         UPDATE order_status_history
         SET new_status = 'PENDING'
         WHERE new_status IS NULL;
-        
+
         -- Try to make it NOT NULL
         BEGIN TRY
           ALTER TABLE order_status_history
@@ -87,8 +87,8 @@ async function fixOrderStatusHistorySimple() {
     await executeNonQuery(`
       IF EXISTS (SELECT * FROM sys.tables WHERE name = 'order_status_history')
       AND EXISTS (
-        SELECT * FROM sys.columns 
-        WHERE object_id = OBJECT_ID(N'dbo.order_status_history') 
+        SELECT * FROM sys.columns
+        WHERE object_id = OBJECT_ID(N'dbo.order_status_history')
         AND name = 'old_status'
       )
       BEGIN
@@ -104,7 +104,7 @@ async function fixOrderStatusHistorySimple() {
     `);
 
     console.log('✅ Fix completed!');
-    
+
   } catch (error: any) {
     console.error('❌ Error:', error.message);
     throw error;

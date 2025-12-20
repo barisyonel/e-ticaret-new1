@@ -1,6 +1,6 @@
-import { notFound } from 'next/navigation';
-import { getAttributeById } from '@/app/server-actions/attributeActions';
-import EditAttributeForm from './EditAttributeForm';
+import { notFound } from "next/navigation";
+import { getAttributeById } from "@/app/server-actions/attributeActions";
+import EditAttributeForm from "./EditAttributeForm";
 
 interface EditAttributePageProps {
   params: {
@@ -8,7 +8,9 @@ interface EditAttributePageProps {
   };
 }
 
-export default async function EditAttributePage({ params }: EditAttributePageProps) {
+export default async function EditAttributePage({
+  params,
+}: EditAttributePageProps) {
   const attributeId = parseInt(params.id);
 
   if (isNaN(attributeId)) {

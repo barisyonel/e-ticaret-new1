@@ -8,10 +8,10 @@ export default async function ProfilePage() {
   const user = await requireUser();
 
   const orders = await getOrdersForUser(user.id);
-  
+
   const favoritesResult = await getFavorites();
   const favorites = favoritesResult.success && favoritesResult.data ? favoritesResult.data : [];
-  
+
   // Calculate statistics
   const totalSpent = orders.reduce((sum, order) => sum + order.total, 0);
   const pendingOrders = orders.filter(o => o.status === 'PENDING' || o.status === 'CONFIRMED').length;

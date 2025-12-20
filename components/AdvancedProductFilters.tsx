@@ -123,7 +123,7 @@ export default function AdvancedProductFilters({
     const newCategories = selectedFilters.categories.includes(categorySlug)
       ? selectedFilters.categories.filter(c => c !== categorySlug)
       : [...selectedFilters.categories, categorySlug];
-    
+
     onFilterChange({
       ...selectedFilters,
       categories: newCategories,
@@ -134,7 +134,7 @@ export default function AdvancedProductFilters({
     const newBrands = selectedFilters.brands.includes(brand)
       ? selectedFilters.brands.filter(b => b !== brand)
       : [...selectedFilters.brands, brand];
-    
+
     onFilterChange({
       ...selectedFilters,
       brands: newBrands,
@@ -146,7 +146,7 @@ export default function AdvancedProductFilters({
     const newValues = currentValues.includes(valueSlug)
       ? currentValues.filter(v => v !== valueSlug)
       : [...currentValues, valueSlug];
-    
+
     onFilterChange({
       ...selectedFilters,
       attributes: {
@@ -224,9 +224,9 @@ export default function AdvancedProductFilters({
 
         {/* Brand Filter */}
         {brands.length > 0 && (
-          <FilterSection 
-            title="Marka" 
-            searchable 
+          <FilterSection
+            title="Marka"
+            searchable
             searchPlaceholder="Marka Ara"
             onSearch={setBrandSearch}
           >

@@ -22,45 +22,45 @@ import { executeNonQuery, getConnection, closeConnection } from '../lib/db-setup
 async function importDatabase() {
   try {
     const sqlFile = resolve(process.cwd(), 'database-export', 'database-export.sql');
-    
+
     if (!existsSync(sqlFile)) {
       console.error('❌ Export dosyası bulunamadı!');
       console.error(`   Beklenen konum: ${sqlFile}`);
       console.error('   Önce export işlemini çalıştırın: npm run export-db');
       process.exit(1);
     }
-    
+
     console.log('📦 Veritabanı import işlemi başlatılıyor...\n');
     console.log(`📁 Dosya: ${sqlFile}\n`);
-    
+
     await getConnection();
-    
+
     // Read SQL file
     const sqlContent = readFileSync(sqlFile, 'utf-8');
-    
+
     // Split by GO statements
     const statements = sqlContent
       .split(/\bGO\b/gi)
       .map(s => s.trim())
       .filter(s => s.length > 0 && !s.startsWith('--'));
-    
+
     console.log(`📋 ${statements.length} SQL statement bulundu\n`);
-    
+
     let successCount = 0;
     let errorCount = 0;
-    
+
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i].trim();
-      
+
       // Skip empty statements and comments
       if (!statement || statement.startsWith('--')) {
         continue;
       }
-      
+
       try {
         await executeNonQuery(statement);
         successCount++;
-        
+
         // Show progress for every 10 statements
         if ((i + 1) % 10 === 0) {
           console.log(`   ✅ ${i + 1}/${statements.length} statement işlendi...`);
@@ -82,14 +82,14 @@ async function importDatabase() {
         }
       }
     }
-    
+
     console.log(`\n✅ Import tamamlandı!`);
     console.log(`   ✅ Başarılı: ${successCount}`);
     if (errorCount > 0) {
       console.log(`   ⚠️  Hatalı: ${errorCount}`);
     }
     console.log(`\n💡 Tabloları kontrol etmek için: npm run check-tables`);
-    
+
   } catch (error: any) {
     console.error('❌ Import hatası:', error.message);
     throw error;

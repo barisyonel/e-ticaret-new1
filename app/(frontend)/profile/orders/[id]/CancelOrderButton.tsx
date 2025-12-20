@@ -47,7 +47,7 @@ export default function CancelOrderButton({ orderId, existingRequest }: CancelOr
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-red-200">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">İptal Talebi</h2>
-      
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}

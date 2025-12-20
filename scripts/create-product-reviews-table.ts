@@ -39,12 +39,12 @@ async function createProductReviewsTable() {
           CONSTRAINT FK_product_reviews_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
           CONSTRAINT UQ_product_reviews_user_product UNIQUE (product_id, user_id)
         );
-        
+
         CREATE INDEX IX_product_reviews_product_id ON product_reviews(product_id);
         CREATE INDEX IX_product_reviews_user_id ON product_reviews(user_id);
         CREATE INDEX IX_product_reviews_is_approved ON product_reviews(is_approved);
         CREATE INDEX IX_product_reviews_rating ON product_reviews(rating);
-        
+
         PRINT '✅ product_reviews table created';
       END
       ELSE
@@ -54,7 +54,7 @@ async function createProductReviewsTable() {
     `);
 
     console.log('✅ product_reviews table created successfully!');
-    
+
   } catch (error: any) {
     console.error('❌ Error:', error.message);
     throw error;

@@ -1,20 +1,27 @@
 // app/(admin)/admin/products/new/page.tsx
 
-import { getCategoryTree } from '@/app/server-actions/categoryActions';
-import { getAllAttributesWithValues } from '@/app/server-actions/attributeActions';
+import { getCategoryTree } from "@/app/server-actions/categoryActions";
+import { getAllAttributesWithValues } from "@/app/server-actions/attributeActions";
 // Eğer bileşen ismin farklıysa (örn: NewProductForm) burayı düzelt:
-import ProductForm from './ProductForm'; 
+import ProductForm from "./ProductForm";
 
 export default async function NewProductPage() {
   // Verileri paralel olarak çekiyoruz
-  const [categories, attributesResult] = await Promise.all([
-    getCategoryTree(), // HATA ÇÖZÜMÜ: Parametre (true) kaldırıldı. Direkt array döner.
-    getAllAttributesWithValues(false) // Bu fonksiyon eski yapıda olabilir, parametre kalabilir.
+  const [categoriesResult, attributesResult] = await Promise.all([
+    getCategoryTree(true), // Admin panelinde tüm kategorileri göster
+    getAllAttributesWithValues(false), // Bu fonksiyon eski yapıda olabilir, parametre kalabilir.
   ]);
+
+  // Kategori verisini güvenli hale getirme
+  const categories =
+    categoriesResult.success && categoriesResult.data
+      ? categoriesResult.data
+      : [];
 
   // Attribute verisini güvenli hale getirme (result.data kontrolü)
   const attributesData = attributesResult as any;
-  const attributes = attributesData && attributesData.data ? attributesData.data : [];
+  const attributes =
+    attributesData && attributesData.data ? attributesData.data : [];
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -27,10 +34,7 @@ export default async function NewProductPage() {
         </div>
       </div>
 
-      <ProductForm 
-        categories={categories} // Artık direkt array
-        attributes={attributes} 
-      />
+      <ProductForm categories={categories} attributes={attributes} />
     </div>
   );
 }

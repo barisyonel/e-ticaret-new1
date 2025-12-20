@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 // DÜZELTME BURADA YAPILDI: Süslü parantez içine alındı (Named Import)
-import { DeleteCategoryButton } from './DeleteCategoryButton';
-import { ToggleCategoryActiveButton } from './ToggleCategoryActiveButton';
+import { DeleteCategoryButton } from "./DeleteCategoryButton";
+import { ToggleCategoryActiveButton } from "./ToggleCategoryActiveButton";
 
 interface Category {
   id: number;
@@ -25,25 +25,31 @@ interface CategoryRowProps {
   parentName: string | null;
 }
 
-export default function CategoryRow({ category, level, parentName }: CategoryRowProps) {
+export default function CategoryRow({
+  category,
+  level,
+  parentName,
+}: CategoryRowProps) {
   const [isExpanded, setIsExpanded] = useState(level === 0); // Ana kategoriler varsayılan olarak açık
   const hasChildren = category.children && category.children.length > 0;
   const indent = level * 32; // 32px per level
 
   // Level indicators
   const levelColors = [
-    'border-l-4 border-blue-500', // Level 0 (Main category)
-    'border-l-4 border-green-500', // Level 1 (Subcategory)
-    'border-l-4 border-purple-500', // Level 2 (Child category)
+    "border-l-4 border-blue-500", // Level 0 (Main category)
+    "border-l-4 border-green-500", // Level 1 (Subcategory)
+    "border-l-4 border-purple-500", // Level 2 (Child category)
   ];
-  const levelColor = levelColors[level] || 'border-l-4 border-gray-400';
+  const levelColor = levelColors[level] || "border-l-4 border-gray-400";
 
-  const levelLabels = ['Ana Kategori', 'Alt Kategori', 'Alt Alt Kategori'];
+  const levelLabels = ["Ana Kategori", "Alt Kategori", "Alt Alt Kategori"];
   const levelLabel = levelLabels[level] || `Seviye ${level + 1}`;
 
   return (
     <>
-      <tr className={`hover:bg-gray-50 ${levelColor} ${!category.isActive ? 'opacity-60' : ''}`}>
+      <tr
+        className={`hover:bg-gray-50 ${levelColor} ${!category.isActive ? "opacity-60" : ""}`}
+      >
         <td className="px-6 py-4" style={{ paddingLeft: `${16 + indent}px` }}>
           <div className="flex items-center space-x-3">
             {/* Expand/Collapse Button */}
@@ -51,20 +57,25 @@ export default function CategoryRow({ category, level, parentName }: CategoryRow
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 transition-colors"
-                aria-label={isExpanded ? 'Kapat' : 'Aç'}
+                aria-label={isExpanded ? "Kapat" : "Aç"}
               >
                 <svg
-                  className={`w-4 h-4 text-gray-600 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                  className={`w-4 h-4 text-gray-600 transition-transform ${isExpanded ? "rotate-90" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             )}
-            {!hasChildren && <div className="w-6" />} {/* Spacer for alignment */}
-
+            {!hasChildren && <div className="w-6" />}{" "}
+            {/* Spacer for alignment */}
             {/* Level indicator */}
             <div className="flex flex-col items-center min-w-[60px]">
               {level === 0 && <span className="text-2xl">📁</span>}
@@ -72,17 +83,16 @@ export default function CategoryRow({ category, level, parentName }: CategoryRow
               {level === 2 && <span className="text-lg">📄</span>}
               <span className="text-xs text-gray-500 mt-1">{levelLabel}</span>
             </div>
-
             {/* Category name and parent info */}
             <div className="flex-1">
               <div className="flex items-center space-x-2">
                 <span
                   className={`font-medium ${
                     level === 0
-                      ? 'text-lg text-gray-900'
+                      ? "text-lg text-gray-900"
                       : level === 1
-                      ? 'text-base text-gray-800'
-                      : 'text-sm text-gray-700'
+                        ? "text-base text-gray-800"
+                        : "text-sm text-gray-700"
                   }`}
                 >
                   {category.name}
@@ -95,7 +105,7 @@ export default function CategoryRow({ category, level, parentName }: CategoryRow
               </div>
               {parentName && (
                 <div className="text-xs text-gray-500 mt-1">
-                  <span className="text-gray-400">←</span> Üst kategori:{' '}
+                  <span className="text-gray-400">←</span> Üst kategori:{" "}
                   <span className="font-medium">{parentName}</span>
                 </div>
               )}
@@ -103,7 +113,9 @@ export default function CategoryRow({ category, level, parentName }: CategoryRow
           </div>
         </td>
         <td className="px-6 py-4">
-          <code className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">{category.slug}</code>
+          <code className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+            {category.slug}
+          </code>
         </td>
         <td className="px-6 py-4">
           {category.image ? (
@@ -123,7 +135,9 @@ export default function CategoryRow({ category, level, parentName }: CategoryRow
           )}
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
-          <span className="text-sm font-medium text-gray-600">{category.displayOrder}</span>
+          <span className="text-sm font-medium text-gray-600">
+            {category.displayOrder}
+          </span>
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
           <ToggleCategoryActiveButton
@@ -140,13 +154,21 @@ export default function CategoryRow({ category, level, parentName }: CategoryRow
             Düzenle
           </Link>
           <span className="text-gray-300">|</span>
-          <DeleteCategoryButton categoryId={category.id} categoryName={category.name} />
+          <DeleteCategoryButton
+            categoryId={category.id}
+            categoryName={category.name}
+          />
         </td>
       </tr>
       {hasChildren &&
         isExpanded &&
         category.children!.map((child) => (
-          <CategoryRow key={child.id} category={child} level={level + 1} parentName={category.name} />
+          <CategoryRow
+            key={child.id}
+            category={child}
+            level={level + 1}
+            parentName={category.name}
+          />
         ))}
     </>
   );

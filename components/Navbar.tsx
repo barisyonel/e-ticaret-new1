@@ -23,7 +23,7 @@ export default async function Navbar() {
           <div className="absolute top-0 left-0 w-32 h-32 bg-accent-yellow rounded-full blur-2xl"></div>
           <div className="absolute bottom-0 right-0 w-40 h-40 bg-accent-yellow rounded-full blur-2xl"></div>
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex justify-between items-center h-11 text-sm">
             {/* Left Side - Contact Info */}

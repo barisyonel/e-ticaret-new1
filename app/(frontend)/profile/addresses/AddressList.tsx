@@ -32,7 +32,7 @@ export default function AddressList({ initialAddresses }: AddressListProps) {
 
     setDeletingId(id);
     const result = await deleteAddress(id);
-    
+
     if (result.success) {
       setAddresses(addresses.filter(addr => addr.id !== id));
       showToast('Adres başarıyla silindi', 'success');
@@ -44,7 +44,7 @@ export default function AddressList({ initialAddresses }: AddressListProps) {
 
   const handleSetDefault = async (id: number) => {
     const result = await setDefaultAddress(id);
-    
+
     if (result.success) {
       setAddresses(addresses.map(addr => ({
         ...addr,

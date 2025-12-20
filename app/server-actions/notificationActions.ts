@@ -169,7 +169,7 @@ export async function createNotification(data: {
     // Only admin can create notifications for other users
     // Regular users can only create notifications for themselves
     const currentUser = await requireUser();
-    
+
     if (data.userId !== currentUser.id && currentUser.role !== 'ADMIN') {
       return {
         success: false,

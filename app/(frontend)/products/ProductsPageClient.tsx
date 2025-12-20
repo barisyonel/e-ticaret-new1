@@ -176,29 +176,29 @@ function ProductsPageContent({
     // Build URL - ensure it's a valid path
     const queryString = params.toString();
     const newUrl = queryString ? `/products?${queryString}` : '/products';
-    
+
     // Update state first
     setSelectedFilters(filters);
-    
+
     // Update URL using window.history.replaceState to avoid page refresh
     // This updates the URL without triggering a server-side render
     if (typeof window !== 'undefined') {
       window.history.replaceState({}, '', newUrl);
     }
-    
+
     // Fetch filtered products in the background using startTransition
     // This prevents blocking the UI and only updates the products list
     startTransition(async () => {
       const category = filters.categories.length > 0 ? filters.categories[0] : undefined;
       const attributeFilters: Record<string, string[]> = {};
-      
+
       // Convert attribute slugs to the format expected by getAllProducts
       Object.entries(filters.attributes).forEach(([attrSlug, values]) => {
         if (values.length > 0) {
           attributeFilters[attrSlug] = values;
         }
       });
-      
+
       const result = await getAllProducts(category, undefined, attributeFilters);
       if (result.success && result.data) {
         setProducts(result.data);
@@ -218,12 +218,12 @@ function ProductsPageContent({
       attributes: {},
     };
     setSelectedFilters(emptyFilters);
-    
+
     // Update URL using window.history.replaceState to avoid page refresh
     if (typeof window !== 'undefined') {
       window.history.replaceState({}, '', '/products');
     }
-    
+
     // Fetch all products
     startTransition(async () => {
       const result = await getAllProducts();
@@ -401,7 +401,7 @@ function ProductsPageContent({
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6 xl:gap-7">
                 {filteredProducts.map((product, index) => (
-                  <div 
+                  <div
                     key={product.id}
                     className="animate-fadeInUp"
                     style={{ animationDelay: `${(index % 20) * 0.05}s` }}

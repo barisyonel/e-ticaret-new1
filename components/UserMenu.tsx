@@ -79,7 +79,7 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
             <p className="text-sm font-semibold text-gray-900">{userName}</p>
             <p className="text-xs text-gray-500">{userRole === 'ADMIN' ? 'Yönetici' : 'Kullanıcı'}</p>
           </div>
-          
+
           <Link
             href="/profile"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
@@ -87,7 +87,7 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
           >
             👤 Profilim
           </Link>
-          
+
           <Link
             href="/profile/orders"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
@@ -95,7 +95,7 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
           >
             📦 Siparişlerim
           </Link>
-          
+
           <Link
             href="/profile/settings"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
@@ -103,7 +103,7 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
           >
             ⚙️ Ayarlar
           </Link>
-          
+
           {userRole === 'ADMIN' && (
             <Link
               href="/admin"
@@ -113,7 +113,7 @@ export default function UserMenu({ userName, userRole }: UserMenuProps) {
               🔐 Yönetim Paneli
             </Link>
           )}
-          
+
           <div className="border-t border-gray-200 mt-2 pt-2">
             <button
               onClick={handleLogout}

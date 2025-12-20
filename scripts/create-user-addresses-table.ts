@@ -41,10 +41,10 @@ async function createUserAddressesTable() {
           updated_at DATETIME2 NOT NULL DEFAULT GETDATE(),
           CONSTRAINT FK_user_addresses_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
-        
+
         CREATE INDEX IX_user_addresses_user_id ON user_addresses(user_id);
         CREATE INDEX IX_user_addresses_is_default ON user_addresses(is_default);
-        
+
         PRINT '✅ user_addresses table created';
       END
       ELSE
@@ -54,7 +54,7 @@ async function createUserAddressesTable() {
     `);
 
     console.log('✅ user_addresses table created successfully!');
-    
+
   } catch (error: any) {
     console.error('❌ Error:', error.message);
     throw error;

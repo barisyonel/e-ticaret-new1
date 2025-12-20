@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { deleteCategory } from '@/app/server-actions/categoryActions';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { deleteCategory } from "@/app/server-actions/categoryActions";
 
 interface DeleteCategoryButtonProps {
   categoryId: number;
@@ -21,22 +21,26 @@ export function DeleteCategoryButton({
   const router = useRouter();
 
   const handleDelete = async () => {
-    if (!confirm(`"${categoryName}" kategorisini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) {
+    if (
+      !confirm(
+        `"${categoryName}" kategorisini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`,
+      )
+    ) {
       return;
     }
 
     setLoading(true);
     try {
       const result = await deleteCategory(categoryId);
-      
+
       if (result.success) {
         // Silme başarılıysa sayfayı yenile
         router.refresh();
       } else {
-        alert(result.error || 'Kategori silinirken bir hata oluştu.');
+        alert(result.error || "Kategori silinirken bir hata oluştu.");
       }
     } catch (error) {
-      alert('Beklenmedik bir hata oluştu.');
+      alert("Beklenmedik bir hata oluştu.");
     } finally {
       setLoading(false);
     }
@@ -49,7 +53,7 @@ export function DeleteCategoryButton({
       className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
       title="Kategoriyi Sil"
     >
-      {loading ? 'Siliniyor...' : 'Sil'}
+      {loading ? "Siliniyor..." : "Sil"}
     </button>
   );
 }

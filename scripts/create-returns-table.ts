@@ -40,11 +40,11 @@ async function createReturnsTable() {
           CONSTRAINT FK_order_returns_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE NO ACTION,
           CONSTRAINT FK_order_returns_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
-        
+
         CREATE INDEX IX_order_returns_order_id ON order_returns(order_id);
         CREATE INDEX IX_order_returns_user_id ON order_returns(user_id);
         CREATE INDEX IX_order_returns_status ON order_returns(status);
-        
+
         PRINT '✅ order_returns table created';
       END
       ELSE
@@ -66,10 +66,10 @@ async function createReturnsTable() {
           CONSTRAINT FK_return_items_return FOREIGN KEY (return_id) REFERENCES order_returns(id) ON DELETE CASCADE,
           CONSTRAINT FK_return_items_order_item FOREIGN KEY (order_item_id) REFERENCES order_items(id) ON DELETE NO ACTION
         );
-        
+
         CREATE INDEX IX_return_items_return_id ON return_items(return_id);
         CREATE INDEX IX_return_items_order_item_id ON return_items(order_item_id);
-        
+
         PRINT '✅ return_items table created';
       END
       ELSE
@@ -79,7 +79,7 @@ async function createReturnsTable() {
     `);
 
     console.log('✅ Returns tables created successfully!');
-    
+
   } catch (error: any) {
     console.error('❌ Error:', error.message);
     throw error;

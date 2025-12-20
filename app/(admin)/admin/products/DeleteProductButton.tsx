@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { deleteProduct } from '@/app/server-actions/productActions';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { deleteProduct } from "@/app/server-actions/productActions";
 
 interface DeleteProductButtonProps {
   productId: number;
   productName: string;
 }
 
-export default function DeleteProductButton({ productId, productName }: DeleteProductButtonProps) {
+export default function DeleteProductButton({
+  productId,
+  productName,
+}: DeleteProductButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
@@ -21,10 +24,10 @@ export default function DeleteProductButton({ productId, productName }: DeletePr
       if (result.success) {
         router.refresh();
       } else {
-        alert(result.error || 'Ürün silinirken bir hata oluştu');
+        alert(result.error || "Ürün silinirken bir hata oluştu");
       }
     } catch (error) {
-      alert('Ürün silinirken bir hata oluştu');
+      alert("Ürün silinirken bir hata oluştu");
     } finally {
       setIsDeleting(false);
       setShowConfirm(false);
@@ -40,7 +43,7 @@ export default function DeleteProductButton({ productId, productName }: DeletePr
           disabled={isDeleting}
           className="text-red-600 hover:text-red-800 text-sm font-medium"
         >
-          {isDeleting ? 'Siliniyor...' : 'Evet, Sil'}
+          {isDeleting ? "Siliniyor..." : "Evet, Sil"}
         </button>
         <button
           onClick={() => setShowConfirm(false)}
@@ -61,4 +64,3 @@ export default function DeleteProductButton({ productId, productName }: DeletePr
     </button>
   );
 }
-

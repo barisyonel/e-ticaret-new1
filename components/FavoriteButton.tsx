@@ -12,10 +12,10 @@ interface FavoriteButtonProps {
   showText?: boolean;
 }
 
-export default function FavoriteButton({ 
-  productId, 
+export default function FavoriteButton({
+  productId,
   size = 'md',
-  showText = false 
+  showText = false
 }: FavoriteButtonProps) {
   const [favorited, setFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function FavoriteButton({
   useEffect(() => {
     const handleFavoriteChange = async (event: Event) => {
       const customEvent = event as CustomEvent<{ productId: number; isFavorite: boolean }>;
-      
+
       if (customEvent.detail?.productId === productId) {
         setFavorited(customEvent.detail.isFavorite);
       } else {
@@ -141,8 +141,8 @@ export default function FavoriteButton({
           onClick={handleToggle}
           disabled={isLoading}
           className={`${sizeClasses[size]} flex items-center justify-center transition-colors ${
-            favorited 
-              ? 'text-accent-yellow hover:text-accent-yellow-dark' 
+            favorited
+              ? 'text-accent-yellow hover:text-accent-yellow-dark'
               : 'text-gray-400 hover:text-accent-yellow'
           } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           title={favorited ? 'Favorilerden çıkar' : 'Favorilere ekle'}
@@ -166,7 +166,7 @@ export default function FavoriteButton({
             </span>
           )}
         </button>
-        
+
         {/* Error Message Toast */}
         {errorMessage && (
           <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 bg-red-600 text-white text-xs px-3 py-2 rounded-md shadow-lg whitespace-nowrap">

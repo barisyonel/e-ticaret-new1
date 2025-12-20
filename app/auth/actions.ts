@@ -6,23 +6,23 @@ import { z } from 'zod';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { UserRole } from '@/lib/types/UserRole';
 import { requireUser } from '@/lib/requireUser';
-import { 
-  hashPassword, 
-  comparePassword, 
-  createToken, 
+import {
+  hashPassword,
+  comparePassword,
+  createToken,
   verifyToken,
   JwtPayload
 } from '@/lib/auth/auth';
-import { 
-  setAuthCookie, 
-  getAuthCookie, 
-  removeAuthCookie 
+import {
+  setAuthCookie,
+  getAuthCookie,
+  removeAuthCookie
 } from '@/lib/auth/cookies';
 import { sendWelcomeEmail } from '@/lib/email';
 
 // Common weak passwords to reject
 const weakPasswords = [
-  '123456', 'password', '12345678', 'qwerty', 'abc123', 
+  '123456', 'password', '12345678', 'qwerty', 'abc123',
   '1234567', '12345', '123456789', '1234', 'password1',
   'admin', 'letmein', 'welcome', 'monkey', '1234567890'
 ];
@@ -85,11 +85,11 @@ export async function registerUser(
   try {
     const role = (formData.get('role') as UserRole) || UserRole.USER;
     const secretKeyValue = formData.get('secretKey');
-    
+
     // Convert null to undefined for USER role (field doesn't exist in form)
     // Only include secretKey if role is ADMIN or if it's actually provided
-    const secretKey = role === UserRole.USER 
-      ? undefined 
+    const secretKey = role === UserRole.USER
+      ? undefined
       : (secretKeyValue as string | null) || undefined;
 
     const rawData = {
@@ -180,7 +180,7 @@ export async function registerUser(
     const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
     const errorStack = error instanceof Error ? error.stack : '';
     console.error('Register error details:', { errorMessage, errorStack });
-    
+
     return {
       success: false,
       error: `Kayıt işlemi sırasında bir hata oluştu: ${errorMessage}`,

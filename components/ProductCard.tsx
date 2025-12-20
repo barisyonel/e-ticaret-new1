@@ -52,9 +52,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (isAdding || product.stock <= 0) return;
-    
+
     setIsAdding(true);
     try {
       await addItem(product.id, 1);
@@ -70,7 +70,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleToggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (isInCompare(product.id)) {
       removeFromCompare(product.id);
       showToast(`${product.name} karşılaştırmadan çıkarıldı`, 'info');
@@ -105,7 +105,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* Hover Glow Effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-accent-yellow/5 to-primary-blue/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-      
+
       <Link href={`/products/${product.slug}`} className="block flex-1 flex flex-col relative z-10">
         {/* Product Image Container - Wider Aspect Ratio */}
         <div className="relative w-full aspect-[4/3] overflow-hidden bg-white">
@@ -119,12 +119,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             priority={false}
           />
-          
+
           {/* Gradient Overlay on Hover */}
           <div className={`absolute inset-0 bg-gradient-to-t from-black/20 to-transparent transition-opacity duration-500 ${
             hovered ? 'opacity-100' : 'opacity-0'
           }`}></div>
-          
+
           {/* Favorite & Compare Buttons */}
           <div className="absolute top-3 right-3 z-20 flex gap-2" onClick={(e) => e.stopPropagation()}>
             <div className="bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-lg hover:bg-white transition-all">
@@ -142,7 +142,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </svg>
             </button>
           </div>
-          
+
           {/* Badges - Top Left */}
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             {product.stock > 10 && (
@@ -199,14 +199,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 min-h-[3.5rem] group-hover:text-primary-blue transition-colors duration-300 leading-tight">
             {product.name}
           </h3>
-          
+
           {/* SKU */}
           {product.sku && (
             <div className="mb-2">
               <span className="text-xs text-gray-400 font-mono">SKU: {product.sku}</span>
             </div>
           )}
-          
+
           {/* Rating & Stock Info */}
           <div className="flex items-center justify-between mb-4">
             {/* Rating */}
@@ -215,9 +215,9 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <>
                   <div className="flex text-accent-yellow">
                     {[...Array(5)].map((_, i) => (
-                      <svg 
-                        key={i} 
-                        className={`w-4 h-4 ${i < Math.round(rating.average) ? 'fill-current' : 'fill-gray-300'}`} 
+                      <svg
+                        key={i}
+                        className={`w-4 h-4 ${i < Math.round(rating.average) ? 'fill-current' : 'fill-gray-300'}`}
                         viewBox="0 0 20 20"
                       >
                         <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
@@ -244,19 +244,19 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </>
               )}
             </div>
-            
+
             {/* Stock Status */}
             {product.stock > 0 ? (
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full border ${
-                product.stock > 10 
-                  ? 'bg-green-50 text-green-700 border-green-200' 
+                product.stock > 10
+                  ? 'bg-green-50 text-green-700 border-green-200'
                   : product.stock > 5
                   ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
                   : 'bg-orange-50 text-orange-700 border-orange-200'
               }`}>
                 <span className={`w-2 h-2 rounded-full animate-pulse ${
-                  product.stock > 10 
-                    ? 'bg-green-500' 
+                  product.stock > 10
+                    ? 'bg-green-500'
                     : product.stock > 5
                     ? 'bg-yellow-500'
                     : 'bg-orange-500'
@@ -308,7 +308,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             >
               {/* Button Background Gradient on Hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-accent-yellow-light to-accent-yellow opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-              
+
               <span className="relative z-10 flex items-center justify-center gap-2">
                 {isAdding ? (
                   <>

@@ -21,18 +21,18 @@ export default function CategoryShowcase({ categories }: Props) {
            </h2>
            <p className="text-gray-500 text-sm mt-1">İhtiyacınız olan parçayı kategorilere göz atarak bulun</p>
         </div>
-        <Link 
-          href="/categories" 
+        <Link
+          href="/categories"
           className="text-blue-700 font-bold hover:text-blue-900 hover:underline flex items-center gap-1"
         >
           Tümünü Gör <span>→</span>
         </Link>
       </div>
-      
+
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {mainCategories.map((cat) => (
-          <Link 
-            key={cat.id} 
+          <Link
+            key={cat.id}
             href={`/category/${cat.slug}`}
             className="group block bg-white rounded-lg p-6 text-center border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-600 transition-all duration-300 relative overflow-hidden"
           >
@@ -41,17 +41,17 @@ export default function CategoryShowcase({ categories }: Props) {
 
             <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded flex items-center justify-center group-hover:bg-blue-50 transition-colors">
               {cat.image ? (
-                <img 
-                  src={cat.image} 
-                  alt={cat.name} 
-                  className="w-full h-full object-contain mix-blend-multiply" 
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="w-full h-full object-contain mix-blend-multiply"
                 />
               ) : (
                 // Eğer resim yoksa çark ikonu
                 <span className="text-3xl text-gray-400 group-hover:text-blue-600">⚙️</span>
               )}
             </div>
-            
+
             <h3 className="font-bold text-gray-800 text-sm uppercase group-hover:text-blue-700 transition-colors">
               {cat.name}
             </h3>

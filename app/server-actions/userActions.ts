@@ -48,7 +48,7 @@ export async function getUserById(userId: number) {
   try {
     await requireUser('ADMIN');
     const user = await UserRepository.findById(userId);
-    
+
     if (!user) {
       return {
         success: false,
@@ -130,7 +130,7 @@ export async function createUser(formData: FormData): Promise<ActionResponse<{ i
 export async function updateUserRole(userId: number, role: UserRole) {
   try {
     await requireUser('ADMIN');
-    
+
     // Prevent admin from removing their own admin role
     const currentUser = await requireUser('ADMIN');
     if (currentUser.id === userId && role !== UserRole.ADMIN) {
@@ -139,16 +139,16 @@ export async function updateUserRole(userId: number, role: UserRole) {
         error: 'Kendi admin yetkinizi kaldıramazsınız',
       };
     }
-    
+
     const updated = await UserRepository.update(userId, { role });
-    
+
     if (!updated) {
       return {
         success: false,
         error: 'Kullanıcı bulunamadı',
       };
     }
-    
+
     return {
       success: true,
       data: updated,
@@ -168,7 +168,7 @@ export async function updateUserRole(userId: number, role: UserRole) {
 export async function deleteUser(userId: number) {
   try {
     await requireUser('ADMIN');
-    
+
     // Prevent admin from deleting themselves
     const currentUser = await requireUser('ADMIN');
     if (currentUser.id === userId) {
@@ -177,16 +177,16 @@ export async function deleteUser(userId: number) {
         error: 'Kendi hesabınızı silemezsiniz',
       };
     }
-    
+
     const deleted = await UserRepository.delete(userId);
-    
+
     if (!deleted) {
       return {
         success: false,
         error: 'Kullanıcı bulunamadı veya silinemedi',
       };
     }
-    
+
     return {
       success: true,
     };

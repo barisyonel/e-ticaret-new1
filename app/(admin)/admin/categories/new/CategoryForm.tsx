@@ -1,37 +1,46 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createCategoryAction } from '@/app/server-actions/categoryActions';
-import Link from 'next/link';
-import { generateSlug } from '@/lib/utils/slug';
-import ImageUpload from '@/components/ImageUpload';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createCategoryAction } from "@/app/server-actions/categoryActions";
+import Link from "next/link";
+import { generateSlug } from "@/lib/utils/slug";
+import ImageUpload from "@/components/ImageUpload";
 // Eğer CategoryRepository importu hata verirse, aşağıdaki satırı silip
 // dosyanın en altına manuel interface ekleyebilirsin.
-import { Category } from '@/lib/repositories/CategoryRepository'; 
+import { Category } from "@/lib/repositories/CategoryRepository";
 
 interface CategoryFormProps {
   availableCategories: Category[];
 }
 
-export default function CategoryForm({ availableCategories }: CategoryFormProps) {
+export default function CategoryForm({
+  availableCategories,
+}: CategoryFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Form State'leri
   const [image, setImage] = useState<string | null>(null);
-  const [slug, setSlug] = useState('');
+  const [slug, setSlug] = useState("");
   const [isSlugManual, setIsSlugManual] = useState(false);
   const [parentId, setParentId] = useState<number | null>(null);
   const [displayOrder, setDisplayOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
 
   // Kategorileri hiyerarşik yapı için düzleştirme fonksiyonu
-  const flattenCategories = (cats: Category[], level: number = 0): Array<Category & { level: number; displayName: string }> => {
+  const flattenCategories = (
+    cats: Category[],
+    level: number = 0,
+  ): Array<Category & { level: number; displayName: string }> => {
     let result: Array<Category & { level: number; displayName: string }> = [];
     cats.forEach((cat) => {
-      result.push({ ...cat, level, displayName: '— '.repeat(level) + cat.name });
+      result.push({
+        ...cat,
+        level,
+        displayName: "— ".repeat(level) + cat.name,
+      });
       if (cat.children && cat.children.length > 0) {
         result = result.concat(flattenCategories(cat.children, level + 1));
       }
@@ -46,23 +55,23 @@ export default function CategoryForm({ availableCategories }: CategoryFormProps)
 
     try {
       const formData = new FormData(e.currentTarget);
-      
+
       // Image alanını ekle
       if (image) {
-        formData.set('image', image);
+        formData.set("image", image);
       }
 
       // Parent ID (null kontrolü)
       if (parentId) {
-        formData.set('parentId', parentId.toString());
+        formData.set("parentId", parentId.toString());
       } else {
-        formData.delete('parentId'); 
+        formData.delete("parentId");
       }
 
       // Diğer alanları manuel set ediyoruz
-      formData.set('slug', slug);
-      formData.set('displayOrder', displayOrder.toString());
-      formData.set('isActive', isActive ? 'true' : 'false');
+      formData.set("slug", slug);
+      formData.set("displayOrder", displayOrder.toString());
+      formData.set("isActive", isActive ? "true" : "false");
 
       // 🔥 DÜZELTME BURADA YAPILDI:
       // Eskiden: createCategoryAction(null, formData) idi.
@@ -70,13 +79,17 @@ export default function CategoryForm({ availableCategories }: CategoryFormProps)
       const result = await createCategoryAction(formData);
 
       if (result.success) {
-        router.refresh(); 
-        router.push('/admin/categories');
+        router.refresh();
+        router.push("/admin/categories");
       } else {
-        setError(result.error || 'Kategori oluşturulurken bir hata oluştu');
+        setError(result.error || "Kategori oluşturulurken bir hata oluştu");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kategori oluşturulurken beklenmedik bir hata oluştu');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Kategori oluşturulurken beklenmedik bir hata oluştu",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -85,7 +98,10 @@ export default function CategoryForm({ availableCategories }: CategoryFormProps)
   const flatCategories = flattenCategories(availableCategories);
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-lg shadow-md p-6 space-y-6"
+    >
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {error}
@@ -139,14 +155,19 @@ export default function CategoryForm({ availableCategories }: CategoryFormProps)
 
       {/* Üst Kategori Seçimi */}
       <div>
-        <label htmlFor="parentId" className="block text-gray-700 font-medium mb-2">
+        <label
+          htmlFor="parentId"
+          className="block text-gray-700 font-medium mb-2"
+        >
           Üst Kategori (Opsiyonel)
         </label>
         <select
           id="parentId"
           name="parentId"
-          value={parentId || ''}
-          onChange={(e) => setParentId(e.target.value ? parseInt(e.target.value, 10) : null)}
+          value={parentId || ""}
+          onChange={(e) =>
+            setParentId(e.target.value ? parseInt(e.target.value, 10) : null)
+          }
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900"
         >
           <option value="">Ana Kategori (Üst kategori yok)</option>
@@ -175,7 +196,10 @@ export default function CategoryForm({ availableCategories }: CategoryFormProps)
 
       {/* Sıra Numarası */}
       <div>
-        <label htmlFor="displayOrder" className="block text-gray-700 font-medium mb-2">
+        <label
+          htmlFor="displayOrder"
+          className="block text-gray-700 font-medium mb-2"
+        >
           Sıra Numarası
         </label>
         <input
@@ -211,11 +235,11 @@ export default function CategoryForm({ availableCategories }: CategoryFormProps)
           disabled={isSubmitting}
           className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
             isSubmitting
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-pink-600 hover:bg-pink-700 text-white'
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-pink-600 hover:bg-pink-700 text-white"
           }`}
         >
-          {isSubmitting ? 'Oluşturuluyor...' : 'Kategori Oluştur'}
+          {isSubmitting ? "Oluşturuluyor..." : "Kategori Oluştur"}
         </button>
         <Link
           href="/admin/categories"

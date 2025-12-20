@@ -2,7 +2,7 @@ export default function IletisimPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold text-center mb-8">İletişim</h1>
-      
+
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* İletişim Formu */}
@@ -18,7 +18,7 @@ export default function IletisimPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-gray-700 font-semibold mb-2">
                   E-posta
@@ -28,7 +28,7 @@ export default function IletisimPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-gray-700 font-semibold mb-2">
                   Konu
@@ -38,7 +38,7 @@ export default function IletisimPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-gray-700 font-semibold mb-2">
                   Mesajınız
@@ -48,7 +48,7 @@ export default function IletisimPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                 ></textarea>
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full bg-accent-yellow text-primary-blue-dark py-3 rounded-lg font-bold hover:bg-accent-yellow-light transition shadow-lg"
@@ -56,12 +56,12 @@ export default function IletisimPage() {
                 Gönder
               </button>
             </form>
-            
+
             <p className="text-center text-gray-500 text-sm mt-4">
               * Form işlevselliği yakında eklenecek
             </p>
           </div>
-          
+
           {/* İletişim Bilgileri */}
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-lg shadow-md">
@@ -71,7 +71,7 @@ export default function IletisimPage() {
                 İstanbul
               </p>
             </div>
-            
+
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold mb-4">📞 Telefon</h3>
               <p className="text-gray-600">
@@ -79,7 +79,7 @@ export default function IletisimPage() {
                 +90 YYY YYY YY YY
               </p>
             </div>
-            
+
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold mb-4">📧 E-posta</h3>
               <p className="text-gray-600">
@@ -87,7 +87,7 @@ export default function IletisimPage() {
                 randevu@newhollandbayi.com
               </p>
             </div>
-            
+
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold mb-4">🕐 Çalışma Saatleri</h3>
               <p className="text-gray-600">

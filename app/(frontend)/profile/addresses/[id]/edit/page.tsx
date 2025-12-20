@@ -10,7 +10,7 @@ export default async function EditAddressPage({
   params: { id: string };
 }) {
   await requireUser();
-  
+
   const addressId = parseInt(params.id, 10);
   if (isNaN(addressId)) {
     notFound();

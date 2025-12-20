@@ -1,5 +1,5 @@
-import { getCategoryTree } from '@/app/server-actions/categoryActions';
-import CategoryForm from './CategoryForm';
+import { getCategoryTree } from "@/app/server-actions/categoryActions";
+import CategoryForm from "./CategoryForm";
 
 export default async function NewCategoryPage() {
   // Admin panelinde tüm kategorileri göster (aktif ve pasif)

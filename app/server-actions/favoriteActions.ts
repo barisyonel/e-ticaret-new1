@@ -15,7 +15,7 @@ export interface ActionResponse<T = void> {
 export async function addToFavorites(productId: number): Promise<ActionResponse> {
   try {
     const user = await requireUser('USER');
-    
+
     // Check if already in favorites
     const isFavorite = await FavoritesRepository.isFavorite(user.id, productId);
     if (isFavorite) {
@@ -45,7 +45,7 @@ export async function addToFavorites(productId: number): Promise<ActionResponse>
 export async function removeFromFavorites(productId: number): Promise<ActionResponse> {
   try {
     const user = await requireUser('USER');
-    
+
     const removed = await FavoritesRepository.remove(user.id, productId);
     if (!removed) {
       return {
@@ -72,9 +72,9 @@ export async function removeFromFavorites(productId: number): Promise<ActionResp
 export async function toggleFavorite(productId: number): Promise<ActionResponse<{ isFavorite: boolean }>> {
   try {
     const user = await requireUser('USER');
-    
+
     const isFavorite = await FavoritesRepository.isFavorite(user.id, productId);
-    
+
     if (isFavorite) {
       await FavoritesRepository.remove(user.id, productId);
       return {
@@ -93,14 +93,14 @@ export async function toggleFavorite(productId: number): Promise<ActionResponse<
     if (error && typeof error === 'object' && 'digest' in error && error.digest?.includes('NEXT_REDIRECT')) {
       throw error; // Re-throw redirect errors
     }
-    
+
     console.error('Toggle favorite error:', error);
     console.error('Error details:', {
       message: error?.message,
       stack: error?.stack,
       name: error?.name,
     });
-    
+
     return {
       success: false,
       error: error?.message || 'Favori durumu değiştirilirken bir hata oluştu',
@@ -115,7 +115,7 @@ export async function isFavorite(productId: number): Promise<ActionResponse<{ is
   try {
     const { getOptionalUser } = await import('@/lib/requireUser');
     const user = await getOptionalUser();
-    
+
     if (!user) {
       // User is not logged in, return false
       return {
@@ -123,7 +123,7 @@ export async function isFavorite(productId: number): Promise<ActionResponse<{ is
         data: { isFavorite: false },
       };
     }
-    
+
     const isFav = await FavoritesRepository.isFavorite(user.id, productId);
 
     return {
@@ -146,13 +146,13 @@ export async function isFavorite(productId: number): Promise<ActionResponse<{ is
 export async function getFavorites() {
   try {
     const user = await requireUser('USER');
-    
+
     const favorites = await FavoritesRepository.findByUserId(user.id);
 
     // Parse product images safely
     const favoritesWithParsedImages = favorites.map(fav => {
       let images: string[] = [];
-      
+
       try {
         if (fav.product.images) {
           // If it's already an array, use it directly
@@ -187,7 +187,7 @@ export async function getFavorites() {
     if (error && typeof error === 'object' && 'digest' in error && error.digest?.includes('NEXT_REDIRECT')) {
       throw error; // Re-throw redirect errors
     }
-    
+
     console.error('Get favorites error:', error);
     console.error('Error details:', {
       message: error?.message,
@@ -195,7 +195,7 @@ export async function getFavorites() {
       name: error?.name,
       number: error?.number,
     });
-    
+
     return {
       success: false,
       error: error?.message || 'Favoriler yüklenirken bir hata oluştu',

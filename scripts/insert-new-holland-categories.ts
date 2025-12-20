@@ -30,7 +30,7 @@ if (!process.env.DATABASE_URL) {
 // Parse DATABASE_URL
 function parseDatabaseUrl() {
   const dbUrl = process.env.DATABASE_URL!;
-  
+
   if (dbUrl.includes('Server=') && !dbUrl.includes('Data Source=')) {
     const parts = dbUrl.split(';').filter(p => p.trim());
     const config: any = {
@@ -84,7 +84,7 @@ function parseDatabaseUrl() {
 async function getConnection() {
   const dbConfig = parseDatabaseUrl();
   const isNamedInstance = dbConfig.options?.instanceName && dbConfig.options?.instanceName !== 'MSSQLLocalDB';
-  
+
   const sqlConfig: any = {
     server: dbConfig.server,
     database: dbConfig.database,
@@ -141,7 +141,7 @@ const NEW_HOLLAND_CATEGORIES = [
 
 async function insertNewHollandCategories() {
   let pool: any = null;
-  
+
   try {
     console.log('🚀 New Holland kategorileri ekleniyor...\n');
 
@@ -151,10 +151,10 @@ async function insertNewHollandCategories() {
 
     // 1. "deneme" içeren kategorileri pasif yap (silme yerine, ürün referansları olduğu için)
     console.log('🔕 "deneme" içeren kategoriler pasif yapılıyor...');
-    
+
     const deactivateRequest = pool.request();
     const deactivateResult = await deactivateRequest.query(
-      `UPDATE categories 
+      `UPDATE categories
        SET is_active = 0, updated_at = GETDATE()
        WHERE LOWER(name) LIKE '%deneme%'`
     );
@@ -182,7 +182,7 @@ async function insertNewHollandCategories() {
           updateRequest.input('id', sql.Int, existing.id);
           updateRequest.input('displayOrder', sql.Int, category.order);
           await updateRequest.query(
-            `UPDATE categories 
+            `UPDATE categories
              SET parent_id = NULL, display_order = @displayOrder, updated_at = GETDATE()
              WHERE id = @id`
           );
@@ -201,7 +201,7 @@ async function insertNewHollandCategories() {
       insertRequest.input('slug', sql.NVarChar, category.slug);
       insertRequest.input('image', sql.NVarChar, IMAGE_URL);
       insertRequest.input('displayOrder', sql.Int, category.order);
-      
+
       await insertRequest.query(
         `INSERT INTO categories (name, slug, parent_id, image, display_order, is_active, created_at, updated_at)
          VALUES (@name, @slug, NULL, @image, @displayOrder, 1, GETDATE(), GETDATE())`

@@ -119,7 +119,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
 
       // Fetch all products at once (more efficient, with shorter lock time)
       const productsRequest = new sql.Request(transaction);
-      
+
       // Add parameters first
       productIds.forEach((id, i) => {
         productsRequest.input(`productId${i}`, sql.Int, id);
@@ -127,7 +127,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
 
       // Build IN clause with proper parameterization
       const placeholders = productIds.map((_, i) => `@productId${i}`).join(',');
-      
+
       // Try to query with is_active, if it fails fall back to stock > 0
       let productsResult;
       try {
@@ -157,7 +157,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       // Validate stock for all items
       for (const cartItem of cartItems) {
         const product = productMap.get(cartItem.productId);
-        
+
         if (!product) {
           throw new Error(`Ürün bulunamadı veya aktif değil: ${cartItem.productId}`);
         }
@@ -183,12 +183,12 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
         const updateStockRequest = new sql.Request(transaction);
         updateStockRequest.input('productId', sql.Int, cartItem.productId);
         updateStockRequest.input('quantity', sql.Int, cartItem.quantity);
-        
+
         // Try to update with is_active, if it fails fall back to stock only
         try {
           await updateStockRequest.query(`
             UPDATE products WITH (ROWLOCK)
-            SET 
+            SET
               stock = stock - @quantity,
               is_active = CASE WHEN (stock - @quantity) > 0 THEN 1 ELSE 0 END,
               updated_at = GETDATE()
@@ -199,7 +199,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
           if (error?.number === 207) {
             await updateStockRequest.query(`
               UPDATE products WITH (ROWLOCK)
-              SET 
+              SET
                 stock = stock - @quantity,
                 updated_at = GETDATE()
               WHERE id = @productId
@@ -218,11 +218,11 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       let couponId: number | null = null;
       const couponIdParam = formData.get('couponId');
       const discountAmountParam = formData.get('discountAmount');
-      
+
       if (couponIdParam && discountAmountParam) {
         couponId = parseInt(couponIdParam as string, 10);
         discountAmount = parseFloat(discountAmountParam as string);
-        
+
         // Validate coupon again before applying
         const coupon = await CouponRepository.findById(couponId);
         if (coupon) {
@@ -279,7 +279,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
         const couponUpdateRequest = new sql.Request(transaction);
         couponUpdateRequest.input('couponId', sql.Int, couponId);
         await couponUpdateRequest.query(`
-          UPDATE coupons 
+          UPDATE coupons
           SET used_count = used_count + 1, updated_at = GETDATE()
           WHERE id = @couponId
         `);
@@ -374,7 +374,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
           quantity: item.quantity,
           price: item.priceSnapshot,
         }));
-        
+
         await sendOrderConfirmationEmail(
           user.email,
           user.name,
@@ -426,7 +426,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
  */
 async function getOrdersForUser(userId: number) {
   const orders = await OrderRepository.findByUserId(userId);
-  
+
   // Fetch items for each order
   const ordersWithItems = await Promise.all(
     orders.map(async (order) => {
@@ -434,7 +434,7 @@ async function getOrdersForUser(userId: number) {
       return orderWithItems || { ...order, items: [] };
     })
   );
-  
+
   return ordersWithItems;
 }
 
@@ -454,7 +454,7 @@ export async function getUserOrders(isForAdmin: boolean = false, userIdOverride?
     }
 
     const ordersWithItems = await getOrdersForUser(targetUserId);
-    
+
     return {
       success: true,
       data: ordersWithItems,
@@ -475,7 +475,7 @@ export async function getOrderById(orderId: number) {
   try {
     const user = await requireUser();
     const order = await OrderRepository.findById(orderId);
-    
+
     if (!order) {
       return {
         success: false,
@@ -697,7 +697,7 @@ export async function cancelOrder(orderId: number, options?: CancelOrderOptions)
       updateRequest.input('status', sql.VarChar(50), OrderStatus.CANCELLED);
 
       await updateRequest.query(`
-        UPDATE orders 
+        UPDATE orders
         SET status = @status, updated_at = GETDATE()
         WHERE id = @orderId
       `);
@@ -713,7 +713,7 @@ export async function cancelOrder(orderId: number, options?: CancelOrderOptions)
           try {
             await restoreStockRequest.query(`
               UPDATE products WITH (ROWLOCK)
-              SET 
+              SET
                 stock = stock + @quantity,
                 is_active = CASE WHEN (stock + @quantity) > 0 THEN 1 ELSE 0 END,
                 updated_at = GETDATE()
@@ -724,7 +724,7 @@ export async function cancelOrder(orderId: number, options?: CancelOrderOptions)
             if (error?.number === 207) {
               await restoreStockRequest.query(`
                 UPDATE products WITH (ROWLOCK)
-                SET 
+                SET
                   stock = stock + @quantity,
                   updated_at = GETDATE()
                 WHERE id = @productId
@@ -859,7 +859,7 @@ export async function getAllOrders() {
     await requireUser('ADMIN');
 
     const orders = await OrderRepository.findAll();
-    
+
     return {
       success: true,
       data: orders.map(order => ({

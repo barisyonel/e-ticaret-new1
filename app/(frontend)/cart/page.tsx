@@ -152,7 +152,7 @@ export default function CartPage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Sipariş Özeti</h2>
-              
+
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-gray-700">
                   <span>Toplam Ürün ({itemCount} adet)</span>

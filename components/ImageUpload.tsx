@@ -80,7 +80,7 @@ export default function ImageUpload({
 
         const result = await response.json();
         console.log('Cloudinary upload result:', result);
-        
+
         if (result.secure_url) {
           uploadedUrls.push(result.secure_url);
           console.log('Added URL to array:', result.secure_url);
@@ -126,7 +126,7 @@ export default function ImageUpload({
         <label className="block text-gray-700 font-medium mb-2">
           Görseller {images.length > 0 && `(${images.length}/${maxImages})`}
         </label>
-        
+
         {uploadError && (
           <div className="mb-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {uploadError}

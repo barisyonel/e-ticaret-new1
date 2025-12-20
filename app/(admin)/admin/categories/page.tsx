@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import { getCategoryTree } from '@/app/server-actions/categoryActions';
+import Link from "next/link";
+import { getCategoryTree } from "@/app/server-actions/categoryActions";
 // Eğer CategoryRow importunda hata alırsan yolunu kontrol et
-import CategoryRow from './CategoryRow'; 
+import CategoryRow from "./CategoryRow";
 
 export default async function CategoriesPage() {
   // Admin panelinde tüm kategorileri göster (aktif ve pasif)
@@ -29,22 +29,40 @@ export default async function CategoriesPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Kategori Adı
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Slug
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Görsel
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Sıra
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Durum
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 İşlemler
               </th>
             </tr>
@@ -53,17 +71,20 @@ export default async function CategoriesPage() {
             {/* Array boş mu kontrolü */}
             {!categories || categories.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                <td
+                  colSpan={6}
+                  className="px-6 py-12 text-center text-gray-500"
+                >
                   Henüz hiç kategori eklenmemiş.
                 </td>
               </tr>
             ) : (
               categories.map((category) => (
-                <CategoryRow 
-                  key={category.id} 
-                  category={category} 
-                  level={0} 
-                  parentName={null} 
+                <CategoryRow
+                  key={category.id}
+                  category={category}
+                  level={0}
+                  parentName={null}
                 />
               ))
             )}

@@ -83,7 +83,7 @@ export default function NotificationBell() {
 
   const getNotificationLink = (notification: any) => {
     if (!notification.dataJson) return '/profile';
-    
+
     try {
       const data = JSON.parse(notification.dataJson);
       switch (notification.type) {

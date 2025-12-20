@@ -4,10 +4,10 @@ import NotificationList from './NotificationList';
 
 export default async function NotificationsPage() {
   const user = await requireUser();
-  
+
   const notificationsResult = await getUserNotifications({ limit: 50 });
-  const notifications = notificationsResult.success && notificationsResult.data 
-    ? notificationsResult.data.notifications 
+  const notifications = notificationsResult.success && notificationsResult.data
+    ? notificationsResult.data.notifications
     : [];
   const unreadCount = notificationsResult.success && notificationsResult.data
     ? notificationsResult.data.unreadCount
@@ -19,7 +19,7 @@ export default async function NotificationsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Bildirimlerim</h1>
           <p className="text-gray-600">
-            {unreadCount > 0 
+            {unreadCount > 0
               ? `${unreadCount} okunmamış bildiriminiz var`
               : 'Tüm bildirimleriniz okundu'
             }

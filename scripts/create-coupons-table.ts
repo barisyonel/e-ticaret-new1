@@ -42,12 +42,12 @@ async function createCouponsTable() {
           created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
           updated_at DATETIME2 NOT NULL DEFAULT GETDATE()
         );
-        
+
         CREATE INDEX IX_coupons_code ON coupons(code);
         CREATE INDEX IX_coupons_is_active ON coupons(is_active);
         CREATE INDEX IX_coupons_valid_from ON coupons(valid_from);
         CREATE INDEX IX_coupons_valid_until ON coupons(valid_until);
-        
+
         PRINT '✅ coupons table created';
       END
       ELSE
@@ -70,11 +70,11 @@ async function createCouponsTable() {
           CONSTRAINT FK_coupon_usage_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
           CONSTRAINT FK_coupon_usage_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE NO ACTION
         );
-        
+
         CREATE INDEX IX_coupon_usage_coupon_id ON coupon_usage(coupon_id);
         CREATE INDEX IX_coupon_usage_user_id ON coupon_usage(user_id);
         CREATE INDEX IX_coupon_usage_order_id ON coupon_usage(order_id);
-        
+
         PRINT '✅ coupon_usage table created';
       END
       ELSE
@@ -84,7 +84,7 @@ async function createCouponsTable() {
     `);
 
     console.log('✅ Coupons tables created successfully!');
-    
+
   } catch (error: any) {
     console.error('❌ Error:', error.message);
     throw error;

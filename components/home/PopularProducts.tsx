@@ -23,12 +23,12 @@ export default function PopularProducts({ products }: Props) {
           </p>
           <div className="h-2 w-32 bg-accent-yellow rounded mx-auto"></div>
         </div>
-        
+
         <Suspense fallback={<ProductGridSkeleton count={12} />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-12">
             {products.map((product, index) => (
-              <div 
-                key={product.id} 
+              <div
+                key={product.id}
                 className="animate-fadeInUp"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
@@ -39,8 +39,8 @@ export default function PopularProducts({ products }: Props) {
         </Suspense>
 
         <div className="flex justify-center">
-          <Link 
-            href="/products" 
+          <Link
+            href="/products"
             className="bg-accent-yellow text-primary-blue-dark px-12 py-5 rounded-xl hover:bg-accent-yellow-light font-black transition-all transform hover:scale-110 shadow-2xl text-lg flex items-center gap-3 border-4 border-primary-blue/20 min-w-[240px] justify-center"
           >
             <span>Tüm Ürünleri İncele</span>

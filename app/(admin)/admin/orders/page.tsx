@@ -1,6 +1,6 @@
-import { getAllOrders } from '@/app/server-actions/orderActions';
-import Link from 'next/link';
-import { formatDateToTurkeyShort } from '@/lib/utils/dateFormatter';
+import { getAllOrders } from "@/app/server-actions/orderActions";
+import Link from "next/link";
+import { formatDateToTurkeyShort } from "@/lib/utils/dateFormatter";
 
 export default async function AdminOrdersPage() {
   const result = await getAllOrders();
@@ -9,8 +9,12 @@ export default async function AdminOrdersPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Sipariş Yönetimi</h1>
-          <p className="text-red-600">{result.error || 'Siparişler yüklenirken bir hata oluştu'}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            Sipariş Yönetimi
+          </h1>
+          <p className="text-red-600">
+            {result.error || "Siparişler yüklenirken bir hata oluştu"}
+          </p>
         </div>
       </div>
     );
@@ -19,29 +23,33 @@ export default async function AdminOrdersPage() {
   const orders = result.data;
 
   const statusColors: Record<string, string> = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    CONFIRMED: 'bg-blue-100 text-blue-800',
-    SHIPPED: 'bg-purple-100 text-purple-800',
-    DELIVERED: 'bg-green-100 text-green-800',
-    CANCELLED: 'bg-red-100 text-red-800',
+    PENDING: "bg-yellow-100 text-yellow-800",
+    CONFIRMED: "bg-blue-100 text-blue-800",
+    SHIPPED: "bg-purple-100 text-purple-800",
+    DELIVERED: "bg-green-100 text-green-800",
+    CANCELLED: "bg-red-100 text-red-800",
   };
 
   const statusLabels: Record<string, string> = {
-    PENDING: 'Beklemede',
-    CONFIRMED: 'Onaylandı',
-    SHIPPED: 'Kargoya Verildi',
-    DELIVERED: 'Teslim Edildi',
-    CANCELLED: 'İptal Edildi',
+    PENDING: "Beklemede",
+    CONFIRMED: "Onaylandı",
+    SHIPPED: "Kargoya Verildi",
+    DELIVERED: "Teslim Edildi",
+    CANCELLED: "İptal Edildi",
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Sipariş Yönetimi</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Sipariş Yönetimi
+        </h1>
 
         {orders.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <p className="text-gray-600 text-lg">Henüz sipariş bulunmamaktadır.</p>
+            <p className="text-gray-600 text-lg">
+              Henüz sipariş bulunmamaktadır.
+            </p>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -86,7 +94,8 @@ export default async function AdminOrdersPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          statusColors[order.status] || 'bg-gray-100 text-gray-800'
+                          statusColors[order.status] ||
+                          "bg-gray-100 text-gray-800"
                         }`}
                       >
                         {statusLabels[order.status] || order.status}
@@ -110,4 +119,3 @@ export default async function AdminOrdersPage() {
     </div>
   );
 }
-

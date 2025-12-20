@@ -33,7 +33,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: any
   // Verileri çek (Parametre hatalarını temizledik)
   const [productsRes, categoriesRes, attributesRes, brandsRes] = await Promise.all([
     getAllProducts(category, search),
-    getCategoryTree(),
+    getCategoryTree(false), // Sadece aktif kategoriler
     getAllAttributesWithValues(true),
     getAllBrands(true)
   ]);
@@ -42,7 +42,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: any
   const pData = productsRes as any;
   const products = pData.data || (Array.isArray(pData) ? pData : []);
 
-  const categories = Array.isArray(categoriesRes) ? categoriesRes : ((categoriesRes as any).data || []);
+  // Kategori verisini güvenli hale getirme
+  const categories = categoriesRes.success && categoriesRes.data ? categoriesRes.data : [];
+
   const attributes = (attributesRes as any).data || (Array.isArray(attributesRes) ? attributesRes : []);
   const brands = (brandsRes as any).data || (Array.isArray(brandsRes) ? brandsRes : []);
 
@@ -50,7 +52,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: any
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-64">
-          <ProductFilters 
+          <ProductFilters
             categories={categories}
             attributes={attributes}
             brands={brands}

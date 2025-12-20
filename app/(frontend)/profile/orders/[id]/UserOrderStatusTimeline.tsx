@@ -56,7 +56,7 @@ export default function UserOrderStatusTimeline({ history }: UserOrderStatusTime
               {!isLast && (
                 <div className="absolute left-3 top-6 bottom-0 w-0.5 bg-gray-300" />
               )}
-              
+
               {/* Timeline dot */}
               <div className={`absolute left-0 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs ${
                 isLast ? 'bg-pink-600 border-pink-600 text-white' : 'bg-white border-gray-300'
@@ -74,7 +74,7 @@ export default function UserOrderStatusTimeline({ history }: UserOrderStatusTime
                     {formatDateToTurkeyShort(item.createdAt)}
                   </p>
                 </div>
-                
+
                 {item.note && (
                   <p className="text-xs text-gray-600 mt-2 italic">
                     💬 {item.note}

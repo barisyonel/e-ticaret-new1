@@ -12,7 +12,7 @@ export default async function OrderDetailPage({
   params: { id: string };
 }) {
   const orderId = parseInt(params.id, 10);
-  
+
   if (isNaN(orderId)) {
     notFound();
   }

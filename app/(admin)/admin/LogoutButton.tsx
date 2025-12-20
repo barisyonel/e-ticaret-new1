@@ -1,11 +1,11 @@
 // Logout Button - Client Component
-'use client';
+"use client";
 
-import { logoutUser } from '@/app/auth/actions';
+import { logoutUser } from "@/app/auth/actions";
 
 export default function LogoutButton() {
   const handleLogout = async () => {
-    if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+    if (confirm("Çıkış yapmak istediğinize emin misiniz?")) {
       await logoutUser();
     }
   };
@@ -19,4 +19,3 @@ export default function LogoutButton() {
     </button>
   );
 }
-

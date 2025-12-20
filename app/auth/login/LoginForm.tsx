@@ -22,7 +22,7 @@ export default function LoginForm() {
       const role = result.data?.role;
       // Check for redirect parameter
       const redirectTo = searchParams.get('redirect');
-      
+
       // Cookie set edildikten sonra tam sayfa yenileme ile redirect yap
       // Bu, middleware'in cookie'yi görmesini sağlar
       if (role === 'ADMIN') {
