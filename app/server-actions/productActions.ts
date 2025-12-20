@@ -1,67 +1,161 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { ProductRepository } from '@/lib/repositories/ProductRepository';
 
-// Mock Data
-const MOCK_PRODUCTS = [
-  {
-    id: 1,
-    name: 'Traktör Yağ Filtresi',
-    slug: 'traktor-yag-filtresi',
-    price: 450,
-    stock: 100,
-    categoryId: 1,
-    description: 'Yüksek kaliteli yağ filtresi.',
-    image: null,
-    images: [],
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 2,
-    name: 'Hidrolik Pompa',
-    slug: 'hidrolik-pompa',
-    price: 2500,
-    stock: 15,
-    categoryId: 2,
-    description: 'New Holland uyumlu hidrolik pompa.',
-    image: null,
-    images: [],
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-];
+export interface ActionResponse<T = void> {
+  success: boolean;
+  error?: string;
+  data?: T;
+}
 
-export async function getAllProducts(categorySlug: string = '', search: string = '', filters: any = {}) {
-  let filtered = [...MOCK_PRODUCTS];
-
-  if (search) {
-    filtered = filtered.filter(p =>
-      p.name.toLowerCase().includes(search.toLowerCase())
-    );
+// Parse images from JSON string
+function parseImages(imagesJson: string | null): string[] {
+  if (!imagesJson) return [];
+  try {
+    const parsed = JSON.parse(imagesJson);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
-
-  // HATA ÇÖZÜMÜ: "as any" ekledik.
-  // Bu sayede ProductsPageClient.tsx içindeki "result.success" kontrolü hata vermez.
-  return {
-    success: true,
-    data: filtered,
-    total: filtered.length,
-    page: 1,
-    limit: 10
-  } as any;
 }
 
-export async function getProductById(id: number) {
-  const product = MOCK_PRODUCTS.find(p => p.id === id);
-  return product || null;
+export async function getAllProducts(categorySlug: string = '', search: string = '', filters: any = {}): Promise<ActionResponse<{
+  products: any[];
+  total: number;
+  page: number;
+  limit: number;
+}>> {
+  try {
+    const products = await ProductRepository.findAll(false); // Sadece aktif ürünler
+
+    // Format products
+    let formattedProducts = products.map(product => ({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      stock: product.stock,
+      description: product.description,
+      images: parseImages(product.images),
+      isActive: product.isActive,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+    }));
+
+    // Filter by category if provided
+    if (categorySlug) {
+      // Get category by slug
+      const CategoryRepository = (await import('@/lib/repositories/CategoryRepository')).CategoryRepository;
+      const repo = new CategoryRepository();
+      const category = await repo.findBySlug(categorySlug, false);
+      if (category) {
+        // Get products in this category (you may need to implement this in ProductRepository)
+        // For now, we'll just filter by primaryCategoryId if available
+        // Note: This is a simplified filter - you may need to join with product_categories table
+        // formattedProducts = formattedProducts.filter(p => p.categoryId === category.id);
+      }
+    }
+
+    // Filter by search
+    if (search) {
+      formattedProducts = formattedProducts.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.description?.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    return {
+      success: true,
+      data: {
+        products: formattedProducts,
+        total: formattedProducts.length,
+        page: 1,
+        limit: 100,
+      },
+    };
+  } catch (error) {
+    console.error('Get all products error:', error);
+    return {
+      success: false,
+      error: 'Ürünler yüklenirken bir hata oluştu',
+      data: {
+        products: [],
+        total: 0,
+        page: 1,
+        limit: 100,
+      },
+    };
+  }
 }
 
-export async function getProductBySlug(slug: string) {
-  const product = MOCK_PRODUCTS.find(p => p.slug === slug);
-  return product || null;
+export async function getProductById(id: number): Promise<ActionResponse<any>> {
+  try {
+    const product = await ProductRepository.findById(id, false);
+    if (!product) {
+      return {
+        success: false,
+        error: 'Ürün bulunamadı',
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        stock: product.stock,
+        description: product.description,
+        images: parseImages(product.images),
+        isActive: product.isActive,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      },
+    };
+  } catch (error) {
+    console.error('Get product by id error:', error);
+    return {
+      success: false,
+      error: 'Ürün yüklenirken bir hata oluştu',
+    };
+  }
+}
+
+export async function getProductBySlug(slug: string): Promise<ActionResponse<any>> {
+  try {
+    const product = await ProductRepository.findBySlug(slug, false);
+    if (!product) {
+      return {
+        success: false,
+        error: 'Ürün bulunamadı',
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        stock: product.stock,
+        description: product.description,
+        images: parseImages(product.images),
+        isActive: product.isActive,
+        categoryId: product.primaryCategoryId || null,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+      },
+    };
+  } catch (error) {
+    console.error('Get product by slug error:', error);
+    return {
+      success: false,
+      error: 'Ürün yüklenirken bir hata oluştu',
+    };
+  }
 }
 
 export async function createProduct(formData: FormData): Promise<{ success: boolean; error?: string }> {

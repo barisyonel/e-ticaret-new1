@@ -201,7 +201,7 @@ function ProductsPageContent({
 
       const result = await getAllProducts(category, undefined, attributeFilters);
       if (result.success && result.data) {
-        setProducts(result.data);
+        setProducts(result.data.products);
       }
     });
   };
@@ -228,7 +228,7 @@ function ProductsPageContent({
     startTransition(async () => {
       const result = await getAllProducts();
       if (result.success && result.data) {
-        setProducts(result.data);
+        setProducts(result.data.products);
       }
     });
   };

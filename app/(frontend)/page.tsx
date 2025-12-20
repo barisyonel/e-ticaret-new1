@@ -1,14 +1,18 @@
 import Link from 'next/link';
 import { getMainCategories } from '@/app/server-actions/categoryActions';
+import { getAllProducts } from '@/app/server-actions/productActions';
+import PopularProducts from '@/components/home/PopularProducts';
 
 export default async function HomePage() {
-  // HATA ÇÖZÜMÜ:
-  // 1. Parametre (false) kaldırıldı.
-  // 2. Artık result.data yok, direkt array geliyor.
-  const categories = await getMainCategories();
+  // Kategorileri çek
+  const categoriesResult = await getMainCategories(false);
+  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
+  const mainCategories = categories.slice(0, 8);
 
-  // İlk 8 kategoriyi al (Array kontrolü ile)
-  const mainCategories = Array.isArray(categories) ? categories.slice(0, 8) : [];
+  // Ürünleri çek (ilk 12 ürün)
+  const productsResult = await getAllProducts('', '');
+  const allProducts = productsResult.success && productsResult.data ? productsResult.data.products : [];
+  const featuredProducts = allProducts.slice(0, 12);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -38,10 +42,10 @@ export default async function HomePage() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {mainCategories.length > 0 ? (
-            mainCategories.map((cat: any) => (
+            mainCategories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/category/${cat.slug}`}
+                href={`/products?category=${cat.slug}`}
                 className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-4 flex flex-col items-center text-center border border-gray-100"
               >
                 <div className="w-full aspect-square relative bg-gray-100 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
@@ -68,6 +72,9 @@ export default async function HomePage() {
           )}
         </div>
       </div>
+
+      {/* Öne Çıkan Ürünler Bölümü */}
+      <PopularProducts products={featuredProducts} />
     </main>
   );
 }

@@ -11,15 +11,14 @@ interface ProductDetailPageProps {
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  // HATA ÇÖZÜMÜ:
-  // result değişkeni artık direkt "product" verisidir.
-  // success veya data kontrolü yapmıyoruz.
-  const product = await getProductBySlug(params.slug);
+  const productResult = await getProductBySlug(params.slug);
 
-  // Eğer ürün null ise (bulunamadıysa) 404 sayfasına git
-  if (!product) {
+  // Eğer ürün bulunamadıysa 404 sayfasına git
+  if (!productResult.success || !productResult.data) {
     notFound();
   }
+
+  const product = productResult.data;
 
   // Yorum/Puanlama verisi (Opsiyonel - Hata vermemesi için güvenli hale getirildi)
   // const rating = await getProductRating(product.id);

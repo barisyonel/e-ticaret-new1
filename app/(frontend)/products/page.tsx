@@ -38,9 +38,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: any
     getAllBrands(true)
   ]);
 
-  // Tip güvenliği için 'as any' kullanıyoruz (Build garantisi için)
-  const pData = productsRes as any;
-  const products = pData.data || (Array.isArray(pData) ? pData : []);
+  // Ürün verisini güvenli hale getirme
+  const products = productsRes.success && productsRes.data ? productsRes.data.products : [];
 
   // Kategori verisini güvenli hale getirme
   const categories = categoriesRes.success && categoriesRes.data ? categoriesRes.data : [];
