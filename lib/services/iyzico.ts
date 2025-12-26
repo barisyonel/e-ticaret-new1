@@ -197,10 +197,10 @@ export async function checkIyzicoPaymentStatus(
 /**
  * iyzico callback doğrulama
  */
-export function verifyIyzicoCallback(
+export async function verifyIyzicoCallback(
   token: string,
   conversationId: string
-): boolean {
+): Promise<boolean> {
   try {
     // iyzico callback doğrulama mantığı
     // Gerçek uygulamada iyzico'nun gönderdiği token'ı doğrulamalısınız
@@ -210,6 +210,7 @@ export function verifyIyzicoCallback(
     return false;
   }
 }
+
 
 
 
