@@ -2,15 +2,21 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { getProductImageUrl, getProductImages } from '@/lib/utils/productImage';
 
 interface ProductImageGalleryProps {
   images: string[];
   productName: string;
+  slug?: string;
 }
 
-export default function ProductImageGallery({ images, productName }: ProductImageGalleryProps) {
+export default function ProductImageGallery({ images, productName, slug }: ProductImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const mainImage = images[selectedImage] || images[0] || '/placeholder-image.svg';
+  // Eğer görsel yoksa, URL'den otomatik görsel oluştur
+  const productImages = images && images.length > 0 
+    ? images 
+    : getProductImages(null, productName, slug, 3, 600, 600);
+  const mainImage = productImages[selectedImage] || productImages[0] || getProductImageUrl(null, productName, slug, 600, 600);
 
   return (
     <div className="space-y-4">
@@ -27,9 +33,9 @@ export default function ProductImageGallery({ images, productName }: ProductImag
       </div>
 
       {/* Thumbnail Images */}
-      {images.length > 1 && (
+      {productImages.length > 1 && (
         <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-          {images.map((image, index) => (
+          {productImages.map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}

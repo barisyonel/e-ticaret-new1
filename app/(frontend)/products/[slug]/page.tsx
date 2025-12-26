@@ -29,7 +29,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
         {/* Sol Taraf: Görsel Galerisi */}
         <div className="flex flex-col">
-          <ProductImageGallery images={product.images || []} productName={product.name} />
+          <ProductImageGallery images={product.images || []} productName={product.name} slug={product.slug} />
         </div>
 
         {/* Sağ Taraf: Ürün Bilgileri */}

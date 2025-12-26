@@ -8,6 +8,7 @@ import { useCompare } from '@/app/context/CompareContext';
 import FavoriteButton from './FavoriteButton';
 import { showToast } from './ToastContainer';
 import { getProductRating } from '@/app/server-actions/reviewActions';
+import { getProductImageUrl } from '@/lib/utils/productImage';
 
 interface ProductCardProps {
   product: {
@@ -31,8 +32,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   const { addToCompare, removeFromCompare, isInCompare, canAddMore } = useCompare();
   const images = product.images || [];
-  const mainImage = images[0] || '/placeholder-image.svg';
-  const hoverImage = images[1] || mainImage;
+  const mainImage = getProductImageUrl(images, product.name, product.slug, 400, 300);
+  const hoverImage = images[1] ? getProductImageUrl([images[1]], product.name, product.slug, 400, 300) : mainImage;
 
   // Load product rating
   useEffect(() => {

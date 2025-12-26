@@ -7,7 +7,17 @@ export default async function HomePage() {
   // Kategorileri çek
   const categoriesResult = await getMainCategories(false);
   const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
-  const mainCategories = categories.slice(0, 8);
+  // Aktif kategorileri filtrele ve sırala
+  const activeCategories = categories
+    .filter(cat => cat.isActive !== false)
+    .sort((a, b) => {
+      // displayOrder'a göre sırala, yoksa isme göre
+      if (a.displayOrder !== b.displayOrder) {
+        return (a.displayOrder || 0) - (b.displayOrder || 0);
+      }
+      return a.name.localeCompare(b.name, 'tr');
+    });
+  const mainCategories = activeCategories.slice(0, 8);
 
   // Ürünleri çek (ilk 12 ürün)
   const productsResult = await getAllProducts('', '');
@@ -36,13 +46,21 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Kategoriler Bölümü */}
-      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Popüler Kategoriler</h2>
+      {/* Kategoriler Bölümü - Sadece kategoriler varsa göster */}
+      {mainCategories.length > 0 && (
+        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Popüler Ürünler</h2>
+            <Link
+              href="/products"
+              className="text-primary-blue hover:text-primary-blue-dark font-medium text-sm flex items-center gap-1"
+            >
+              Tüm Kategoriler <span>→</span>
+            </Link>
+          </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {mainCategories.length > 0 ? (
-            mainCategories.map((cat) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {mainCategories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/products?category=${cat.slug}`}
@@ -64,17 +82,32 @@ export default async function HomePage() {
                   {cat.name}
                 </h3>
               </Link>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-10 bg-white rounded-lg border border-dashed border-gray-300 text-gray-500">
-              Henüz kategori bulunmuyor.
-            </div>
-          )}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Öne Çıkan Ürünler Bölümü */}
-      <PopularProducts products={featuredProducts} />
+      {/* Öne Çıkan Ürünler Bölümü - Her zaman göster (ürünler varsa) */}
+      {featuredProducts.length > 0 && <PopularProducts products={featuredProducts} />}
+
+      {/* Eğer ne kategori ne de ürün yoksa bilgilendirme mesajı */}
+      {mainCategories.length === 0 && featuredProducts.length === 0 && (
+        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+            <div className="text-6xl mb-4">🛒</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Henüz içerik eklenmemiş</h3>
+            <p className="text-gray-500 mb-6">
+              Kategoriler ve ürünler eklendiğinde burada görünecektir.
+            </p>
+            <Link
+              href="/products"
+              className="inline-block bg-primary-blue text-white px-6 py-3 rounded-lg hover:bg-primary-blue-dark transition-colors font-medium"
+            >
+              Tüm Ürünleri Görüntüle
+            </Link>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
