@@ -14,6 +14,7 @@ import { sql } from '@/lib/db';
 import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '@/lib/email';
 import { createNotification } from './notificationActions';
 import { CouponRepository } from '@/lib/repositories/CouponRepository';
+import { createIyzicoPayment, IyzicoPaymentRequest } from '@/lib/services/iyzico';
 
 // Validation schema
 const shippingAddressSchema = z.object({
@@ -85,17 +86,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
     // Validate payment format (no real card validation, just format check)
     const validatedPayment = paymentInfoSchema.parse(rawPayment);
 
-    // Note: In a real application, you would process the payment here
-    // For now, we just validate the format and proceed
-    // TODO: Integrate with real payment gateway (e.g., Stripe, iyzico, etc.)
-    console.log('Payment information validated (test mode):', {
-      cardNumber: validatedPayment.cardNumber.replace(/\d(?=\d{4})/g, '*'), // Mask all but last 4 digits
-      cardHolder: validatedPayment.cardHolder,
-      expiryDate: validatedPayment.expiryDate,
-      cvc: '***', // Never log CVC
-    });
-
-    // Get cart items
+    // Get cart items first to calculate total
     const cartItems = await CartRepository.findByUserId(user.id);
     if (cartItems.length === 0) {
       return {
@@ -104,8 +95,149 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
       };
     }
 
-    // Create order with transaction
+    // Get products for basket items
+    const productIds = cartItems.map(item => item.productId);
+    const products = await ProductRepository.findAll(true); // Include inactive for calculation
+    const productMap = new Map(products.filter(p => productIds.includes(p.id)).map(p => [p.id, p]));
+
+    // Calculate subtotal
+    let subtotal = 0;
+    const basketItems: Array<{
+      id: string;
+      name: string;
+      category1: string;
+      itemType: string;
+      price: number;
+    }> = [];
+
+    for (const cartItem of cartItems) {
+      const product = productMap.get(cartItem.productId);
+      if (product) {
+        const itemPrice = parseFloat(product.price.toString()) * cartItem.quantity;
+        subtotal += itemPrice;
+        basketItems.push({
+          id: product.id.toString(),
+          name: product.name.substring(0, 100), // iyzico limit
+          category1: 'Yedek Parça',
+          itemType: 'PHYSICAL',
+          price: itemPrice,
+        });
+      }
+    }
+
+    // Apply coupon if provided (before iyzico payment)
+    let discountAmount = 0;
+    let couponId: number | null = null;
+    const couponIdParam = formData.get('couponId');
+    const discountAmountParam = formData.get('discountAmount');
+
+    if (couponIdParam && discountAmountParam) {
+      couponId = parseInt(couponIdParam as string, 10);
+      discountAmount = parseFloat(discountAmountParam as string);
+
+      const coupon = await CouponRepository.findById(couponId);
+      if (coupon) {
+        const validation = await CouponRepository.validateCoupon(coupon.code, user.id, subtotal);
+        if (validation.valid && validation.discountAmount) {
+          discountAmount = validation.discountAmount;
+        } else {
+          discountAmount = 0;
+          couponId = null;
+        }
+      } else {
+        discountAmount = 0;
+        couponId = null;
+      }
+    }
+
+    // Calculate total
+    const total = Math.max(0, subtotal - discountAmount);
+
+    // Prepare iyzico payment request
+    const expiryParts = validatedPayment.expiryDate.split('/');
+    const expiryMonth = expiryParts[0];
+    const expiryYear = '20' + expiryParts[1];
+    const cardNumberDigits = validatedPayment.cardNumber.replace(/\D/g, '');
+    
+    // Get user email
+    const userData = await UserRepository.findById(user.id);
+    const userEmail = userData?.email || `${user.id}@temp.com`;
+
+    // Split full name
+    const nameParts = validatedAddress.fullName.trim().split(' ');
+    const buyerName = nameParts[0] || '';
+    const buyerSurname = nameParts.slice(1).join(' ') || buyerName;
+
+    const basketId = `BASKET-${user.id}-${Date.now()}`;
+
+    const iyzicoRequest: IyzicoPaymentRequest = {
+      price: subtotal,
+      paidPrice: total,
+      currency: 'TRY',
+      basketId: basketId,
+      paymentCard: {
+        cardHolderName: validatedPayment.cardHolder.toUpperCase(),
+        cardNumber: cardNumberDigits,
+        expireMonth: expiryMonth,
+        expireYear: expiryYear,
+        cvc: validatedPayment.cvc,
+      },
+      buyer: {
+        id: user.id.toString(),
+        name: buyerName,
+        surname: buyerSurname,
+        gsmNumber: validatedAddress.phone,
+        email: userEmail,
+        identityNumber: '11111111111', // Default for test, should be collected in real app
+        registrationAddress: validatedAddress.address,
+        city: validatedAddress.city,
+        country: validatedAddress.country,
+        zipCode: validatedAddress.postalCode,
+      },
+      shippingAddress: {
+        contactName: validatedAddress.fullName,
+        city: validatedAddress.city,
+        country: validatedAddress.country,
+        address: validatedAddress.address,
+        zipCode: validatedAddress.postalCode,
+      },
+      billingAddress: {
+        contactName: validatedAddress.fullName,
+        city: validatedAddress.city,
+        country: validatedAddress.country,
+        address: validatedAddress.address,
+        zipCode: validatedAddress.postalCode,
+      },
+      basketItems: basketItems,
+    };
+
+    // Process payment with iyzico
+    const paymentResult = await createIyzicoPayment(iyzicoRequest);
+
+    if (!paymentResult.success || !paymentResult.data) {
+      return {
+        success: false,
+        error: paymentResult.error || 'Ödeme işlemi başarısız oldu',
+      };
+    }
+
+    const paymentData = paymentResult.data;
+
+    // Check if payment was successful
+    if (paymentData.paymentStatus !== 'SUCCESS') {
+      return {
+        success: false,
+        error: paymentData.errorMessage || 'Ödeme işlemi başarısız oldu',
+      };
+    }
+
+    // Create order with transaction (after successful payment)
     const order = await executeTransaction(async (transaction) => {
+      // Get cart items again (within transaction)
+      const cartItems = await CartRepository.findByUserId(user.id);
+      if (cartItems.length === 0) {
+        throw new Error('Sepetiniz boş');
+      }
       // Re-fetch products and check stock
       const orderItems: Array<{
         productId: number;
@@ -210,10 +342,11 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
         }
       }
 
-      // Calculate subtotal
+      // Use the total from iyzico payment (already calculated and paid)
+      // The total was already calculated before payment, so we use it here
       const subtotal = orderItems.reduce((sum, item) => sum + item.priceSnapshot * item.quantity, 0);
-
-      // Apply coupon if provided
+      
+      // Re-apply coupon validation (for order record)
       let discountAmount = 0;
       let couponId: number | null = null;
       const couponIdParam = formData.get('couponId');
@@ -230,7 +363,6 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
           if (validation.valid && validation.discountAmount) {
             discountAmount = validation.discountAmount;
           } else {
-            // Coupon is no longer valid, don't apply it
             discountAmount = 0;
             couponId = null;
           }
@@ -240,7 +372,7 @@ export async function createOrder(formData: FormData): Promise<ActionResponse<{ 
         }
       }
 
-      // Calculate total
+      // Calculate total (should match the paid amount from iyzico)
       const total = Math.max(0, subtotal - discountAmount);
 
       // Create order directly in transaction (no nested transaction)

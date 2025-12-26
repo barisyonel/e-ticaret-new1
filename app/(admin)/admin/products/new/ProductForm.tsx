@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createProduct } from "@/app/server-actions/productActions";
 import ImageUpload from "@/components/ImageUpload";
 import Link from "next/link";
+import { generateSlug } from "@/lib/utils/slug";
 
 interface ProductFormProps {
   categories: any[];
@@ -38,10 +39,21 @@ export default function ProductForm({
 
       // Manuel state değerlerini ekle
       formData.set("description", description);
+      formData.set("name", name);
+      
+      // Slug otomatik oluştur (eğer boşsa)
+      const finalSlug = slug.trim() || generateSlug(name);
+      formData.set("slug", finalSlug);
+      
+      formData.set("price", price);
+      formData.set("stock", stock);
+      if (categoryId) {
+        formData.set("categoryId", categoryId);
+      }
 
-      // Resim varsa ekle
+      // Resimleri JSON string olarak ekle
       if (images.length > 0) {
-        formData.set("image", images[0]);
+        formData.set("images", JSON.stringify(images));
       }
 
       // Server Action Çağrısı

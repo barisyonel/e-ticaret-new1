@@ -54,12 +54,17 @@ export default function EditProductForm({
 
       // Manuel state değerlerini ekle
       formData.set("description", description);
+      formData.set("name", name);
+      formData.set("slug", slug);
+      formData.set("price", price.toString());
+      formData.set("stock", stock.toString());
+      if (categoryId) {
+        formData.set("categoryId", categoryId.toString());
+      }
 
-      // Resimleri JSON string olarak veya tek tek ekleyebilirsin,
-      // burada backend'in yapısına göre basitçe ilk resmi 'image' olarak atıyorum
+      // Resimleri JSON string olarak ekle
       if (images.length > 0) {
-        formData.set("image", images[0]);
-        // Çoklu resim desteği varsa: formData.set('images', JSON.stringify(images));
+        formData.set("images", JSON.stringify(images));
       }
 
       // Server Action Çağrısı

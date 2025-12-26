@@ -36,3 +36,16 @@ DATABASE_URL="Server=.\\MSSQLSERVER2019;Database=sitenhaz_sitenhazirDb;User Id=s
 #    Eğer çalışmazsa, Güzelnet panelinden gerçek host adresini öğrenin
 #    ve SEÇENEK 2'yi kullanın
 
+# ============================================
+# iyzico Ödeme Sistemi Yapılandırması
+# ============================================
+# Test ortamı için:
+# IYZICO_API_KEY=your_test_api_key
+# IYZICO_SECRET_KEY=your_test_secret_key
+# IYZICO_URI=https://sandbox-api.iyzipay.com
+
+# Canlı ortam için:
+# IYZICO_API_KEY=your_live_api_key
+# IYZICO_SECRET_KEY=your_live_secret_key
+# IYZICO_URI=https://api.iyzipay.com
+

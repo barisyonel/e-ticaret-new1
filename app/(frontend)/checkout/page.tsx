@@ -299,7 +299,24 @@ export default function CheckoutPage() {
 
               {/* Payment Information */}
               <div className="border-t pt-6 mt-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Ödeme Bilgileri</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">Ödeme Bilgileri</h2>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 px-3 py-1.5 bg-[#F5F5F5] rounded border border-gray-300">
+                      <span className="text-lg font-bold text-[#0066CC]">iyzico</span>
+                      <span className="text-xs text-gray-600 font-semibold">Güvenli Ödeme</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-sm text-blue-800 flex items-center gap-2">
+                    <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span><strong>iyzico</strong> ile güvenli ödeme altyapısı kullanılmaktadır. Kart bilgileriniz hiçbir şekilde saklanmaz.</span>
+                  </p>
+                </div>
 
                 <div className="mb-4">
                   <label htmlFor="cardHolder" className="block text-gray-700 font-medium mb-2">
@@ -376,10 +393,39 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-800">
-                    🔒 Ödeme bilgileriniz güvenli bir şekilde işlenmektedir. Test modunda herhangi bir gerçek ödeme alınmayacaktır.
-                  </p>
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-semibold text-green-800 mb-1">
+                        🔒 Güvenli Ödeme
+                      </p>
+                      <p className="text-xs text-green-700">
+                        Ödeme bilgileriniz iyzico güvenli ödeme altyapısı ile işlenmektedir. Kart bilgileriniz hiçbir şekilde saklanmaz ve 256-bit SSL şifreleme ile korunur.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Accepted Cards */}
+                <div className="mt-4">
+                  <p className="text-xs text-gray-600 mb-2">Kabul Edilen Kartlar:</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="px-3 py-1.5 bg-white border border-gray-200 rounded text-xs font-semibold text-gray-700">
+                      Visa
+                    </div>
+                    <div className="px-3 py-1.5 bg-white border border-gray-200 rounded text-xs font-semibold text-gray-700">
+                      Mastercard
+                    </div>
+                    <div className="px-3 py-1.5 bg-white border border-gray-200 rounded text-xs font-semibold text-gray-700">
+                      Troy
+                    </div>
+                    <div className="px-3 py-1.5 bg-white border border-gray-200 rounded text-xs font-semibold text-gray-700">
+                      Amex
+                    </div>
+                  </div>
                 </div>
               </div>
 

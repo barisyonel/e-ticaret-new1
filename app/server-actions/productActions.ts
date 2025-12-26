@@ -160,8 +160,54 @@ export async function getProductBySlug(slug: string): Promise<ActionResponse<any
 
 export async function createProduct(formData: FormData): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log('Ürün oluşturuldu (Simülasyon)');
+    // Parse form data
+    const name = formData.get('name') as string;
+    const slug = formData.get('slug') as string;
+    const description = formData.get('description') as string || '';
+    const price = parseFloat(formData.get('price') as string) || 0;
+    const stock = parseInt(formData.get('stock') as string) || 0;
+    const categoryId = formData.get('categoryId') ? parseInt(formData.get('categoryId') as string) : null;
+    
+    // Handle images
+    const image = formData.get('image') as string;
+    const imagesJson = formData.get('images') as string;
+    
+    let images: string | null = null;
+    if (imagesJson) {
+      // If images is JSON string, use it directly
+      try {
+        JSON.parse(imagesJson); // Validate JSON
+        images = imagesJson;
+      } catch {
+        images = JSON.stringify([imagesJson]);
+      }
+    } else if (image) {
+      // If single image, convert to JSON array
+      images = JSON.stringify([image]);
+    }
+
+    // Validate required fields
+    if (!name || !slug) {
+      return {
+        success: false,
+        error: 'Ürün adı ve slug gereklidir',
+      };
+    }
+
+    // Create product
+    const product = await ProductRepository.create({
+      name,
+      slug,
+      description,
+      price,
+      stock,
+      images,
+      isActive: stock > 0,
+      primaryCategoryId: categoryId,
+    });
+
     revalidatePath('/admin/products');
+    
     return { success: true };
   } catch (error) {
     console.error('Create product error:', error);
@@ -174,8 +220,92 @@ export async function createProduct(formData: FormData): Promise<{ success: bool
 
 export async function updateProduct(id: number, formData: FormData): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log('Ürün güncellendi (Simülasyon)');
+    // Check if product exists
+    const existingProduct = await ProductRepository.findById(id, true);
+    if (!existingProduct) {
+      return {
+        success: false,
+        error: 'Ürün bulunamadı',
+      };
+    }
+
+    // Parse form data
+    const name = formData.get('name') as string;
+    const slug = formData.get('slug') as string || existingProduct.slug;
+    const description = formData.get('description') as string || existingProduct.description;
+    const price = parseFloat(formData.get('price') as string) || existingProduct.price;
+    const stock = parseInt(formData.get('stock') as string) || existingProduct.stock;
+    const categoryId = formData.get('categoryId') ? parseInt(formData.get('categoryId') as string) : null;
+    
+    // Handle images
+    const image = formData.get('image') as string;
+    const imagesJson = formData.get('images') as string;
+    
+    let images: string | null = null;
+    if (imagesJson) {
+      // If images is JSON string, use it directly
+      try {
+        JSON.parse(imagesJson); // Validate JSON
+        images = imagesJson;
+      } catch {
+        images = JSON.stringify([imagesJson]);
+      }
+    } else if (image) {
+      // If single image, convert to JSON array
+      images = JSON.stringify([image]);
+    } else {
+      // Keep existing images if no new images provided
+      images = existingProduct.images;
+    }
+
+    // Prepare update data
+    const updateData: Partial<{
+      name: string;
+      slug: string;
+      description: string;
+      price: number;
+      stock: number;
+      images: string | null;
+      isActive: boolean;
+      primaryCategoryId: number | null;
+    }> = {};
+
+    if (name && name !== existingProduct.name) {
+      updateData.name = name;
+    }
+    if (slug && slug !== existingProduct.slug) {
+      updateData.slug = slug;
+    }
+    if (description !== existingProduct.description) {
+      updateData.description = description;
+    }
+    if (price !== existingProduct.price) {
+      updateData.price = price;
+    }
+    if (stock !== existingProduct.stock) {
+      updateData.stock = stock;
+    }
+    if (images !== existingProduct.images) {
+      updateData.images = images;
+    }
+    if (categoryId !== null && categoryId !== existingProduct.primaryCategoryId) {
+      updateData.primaryCategoryId = categoryId;
+    }
+
+    // Update product
+    const updatedProduct = await ProductRepository.update(id, updateData);
+
+    if (!updatedProduct) {
+      return {
+        success: false,
+        error: 'Ürün güncellenemedi',
+      };
+    }
+
     revalidatePath('/admin/products');
+    revalidatePath(`/admin/products/${id}/edit`);
+    revalidatePath(`/products/${updatedProduct.slug}`);
+    
     return { success: true };
   } catch (error) {
     console.error('Update product error:', error);
@@ -188,8 +318,27 @@ export async function updateProduct(id: number, formData: FormData): Promise<{ s
 
 export async function deleteProduct(id: number): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log('Ürün silindi (Simülasyon)');
+    // Check if product exists
+    const existingProduct = await ProductRepository.findById(id, true);
+    if (!existingProduct) {
+      return {
+        success: false,
+        error: 'Ürün bulunamadı',
+      };
+    }
+
+    // Delete product
+    const deleted = await ProductRepository.delete(id);
+
+    if (!deleted) {
+      return {
+        success: false,
+        error: 'Ürün silinemedi',
+      };
+    }
+
     revalidatePath('/admin/products');
+    
     return { success: true };
   } catch (error) {
     console.error('Delete product error:', error);
@@ -202,8 +351,30 @@ export async function deleteProduct(id: number): Promise<{ success: boolean; err
 
 export async function toggleProductActive(id: number, isActive: boolean): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log(`Ürün durumu değişti: ${isActive}`);
+    // Check if product exists
+    const existingProduct = await ProductRepository.findById(id, true);
+    if (!existingProduct) {
+      return {
+        success: false,
+        error: 'Ürün bulunamadı',
+      };
+    }
+
+    // Update product active status
+    const updatedProduct = await ProductRepository.update(id, {
+      isActive: isActive,
+    });
+
+    if (!updatedProduct) {
+      return {
+        success: false,
+        error: 'Ürün durumu güncellenemedi',
+      };
+    }
+
     revalidatePath('/admin/products');
+    revalidatePath(`/products/${updatedProduct.slug}`);
+    
     return { success: true };
   } catch (error) {
     console.error('Toggle product active error:', error);

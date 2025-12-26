@@ -29,6 +29,7 @@
     "bcryptjs": "^3.0.2",
     "browser-image-compression": "^2.0.2",
     "cloudinary": "^2.8.0",
+    "iyzipay": "^2.0.64",
     "jose": "^6.1.0",
     "lucide-react": "^0.556.0",
     "mssql": "^11.0.1",
